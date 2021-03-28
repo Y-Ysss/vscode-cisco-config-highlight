@@ -1,0 +1,117 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Cisco Config",
+	"tokenColors": [
+		{
+			"name": "Punctuation",
+			"scope": "punctuation",
+			"settings": {
+				"foreground": "#8d938d"
+			}
+		}
+	],
+	"patterns": [
+		{
+			"include": "#unused"
+		},
+		{
+			"include": "#line-comment"
+		},
+		{
+			"include": "#interface"
+		},
+		{
+			"include": "#vrf"
+		},
+		{
+			"include": "#vlan"
+		},
+		{
+			"include": "#address"
+		},
+		{
+			"include": "#command"
+		},
+		{
+			"include": "#param1"
+		},
+		{
+			"include": "#numeric"
+		}
+	],
+	"repository": {
+		"numeric": {
+			"patterns": [
+				{
+					"name": "support.type",
+					"match": "-?[0-9]+"
+				}
+			]
+		},
+		"line-comment": {
+			"patterns": [
+				{
+					"name": "comment.line.character",
+					"match": "^\\s*(!|-).*"
+				}
+			]
+		},
+		"interface": {
+			"patterns": [
+				{
+					"name": "entity.other.attribute-name.cisco",
+					"match": "(?=(Po|Fa|Gi|Te)).+?\\d+(\\s|$)"
+				}
+			]
+		},
+		"vlan": {
+			"patterns": [
+				{
+					"name": "entity.other.attribute-name",
+					"match": "(VLAN|Vlan|vlan)(\\d+)?"
+				}
+			]
+		},
+		"address": {
+			"patterns": [
+				{
+					"name": "support.type",
+					"match": "((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])"
+				}
+			]
+		},
+		"command": {
+			"patterns": [
+				{
+					"name": "entity.other.inherited-class",
+					"match": "^.*\\s*?#"
+				}
+			]
+		},
+		"param1": {
+			"patterns": [
+				{
+					"name": "punctuation",
+					"match": "(?<=^\\s*?)\\S+"
+				}
+			]
+		},
+		"vrf": {
+			"patterns": [
+				{
+					"name": "entity.name.tag.cisco",
+					"match": "((?<=vrf\\s)(?!.*forwarding)|(?<=vrf\\sforwarding\\s))\\S+"
+				}
+			]
+		},
+		"unused": {
+			"patterns": [
+				{
+					"name": "keyword.negative.cisco",
+					"match": "\\s*?no\\s.*"
+				}
+			]
+		}
+	},
+	"scopeName": "source.cisco"
+}
