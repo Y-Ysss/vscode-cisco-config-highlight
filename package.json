@@ -1,0 +1,25 @@
+{
+    "name": "cisco-config-highlight",
+    "displayName": "cisco-config-highlight",
+    "description": "Highlight Cisco config",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.52.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "cisco",
+            "aliases": ["Cisco Config", "cisco"],
+            "extensions": [".cisco",".config",".txt"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "cisco",
+            "scopeName": "source.cisco",
+            "path": "./syntaxes/cisco.tmLanguage.json"
+        }]
+    }
+}
