@@ -1,90 +1,131 @@
 {
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "Cisco Config",
-	"tokenColors": [
-		{
-			"name": "Punctuation",
-			"scope": "punctuation",
-			"settings": {
-				"foreground": "#8d938d"
-			}
-		}
-	],
 	"patterns": [
 		{
 			"include": "#unused"
 		},
 		{
-			"include": "#line-comment"
+			"include": "#comment"
 		},
 		{
-			"include": "#interface"
+			"include": "#interface_type"
 		},
 		{
 			"include": "#vrf"
 		},
 		{
-			"include": "#vlan"
-		},
-		{
 			"include": "#address"
 		},
 		{
-			"include": "#command"
-		},
-		{
-			"include": "#param1"
+			"include": "#command_hostname"
 		},
 		{
 			"include": "#numeric"
+		},
+		{
+			"include": "#param1"
 		}
 	],
 	"repository": {
+		"interface_type": {
+			"patterns": [
+				{
+					"include": "#ethernet"
+				},
+				{
+					"include": "#loopback"
+				},
+				{
+					"include": "#port_channel"
+				},
+				{
+					"include": "#tunnel"
+				},
+				{
+					"include": "#vlan"
+				}
+			],
+			"repository": {
+				"ethernet": {
+					"name": "entity.name.class.interface.ethernet.cisco",
+					"match": "\\b((Fast|(Five|Ten|Forty)?Gigabit)?Ethernet|Fa|Gi|Te|Fo)((\\d+[\\./])*)?\\d+(\\.\\d+)?\\b"
+				},
+				"loopback": {
+					"name": "entity.name.class.interface.loopback.cisco",
+					"match": "\\b(Loopback|Lo)\\d+\\b"
+				},
+				"port_channel": {
+					"name": "entity.name.class.interface.portchannel.cisco",
+					"match": "\\b(Port-channel|Po)([1-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])\\b"
+				},
+				"tunnel": {
+					"name": "entity.name.class.interface.tunnel.cisco",
+					"match": "\\b(Tunnel|Tu)\\d+\\b"
+				},
+				"vlan": {
+					"name": "entity.name.class.interface.vlan.cisco",
+					"match": "(VLAN|Vlan|vlan)([1-9]|[1-9][0-9]{1,2}|[1-3][0-9]{3}|40[0-8][0-9]|409[0-4])"
+				}
+			}
+		},
 		"numeric": {
 			"patterns": [
 				{
-					"name": "support.type",
-					"match": "-?[0-9]+"
+					"include": "#integer"
+				},
+				{
+					"include": "#hex"
+				}
+			],
+			"repository": {
+				"hex": {
+					"name": "constant.numeric.hex.cisco",
+					"match": "\\b(0x)?[0-9A-F]{2}+?\\b"
+				},
+				"integer": {
+					"name": "constant.numeric.integer.cisco",
+					"match": "\\b-?\\d+\\b"
+				}
+			}
+		},
+		"comment": {
+			"patterns": [
+				{
+					"name": "comment.line",
+					"match": "^\\s*!.*"
 				}
 			]
 		},
-		"line-comment": {
+		"description": {
 			"patterns": [
 				{
-					"name": "comment.line.character",
-					"match": "^\\s*(!|-).*"
-				}
-			]
-		},
-		"interface": {
-			"patterns": [
-				{
-					"name": "entity.other.attribute-name.cisco",
-					"match": "(?=(Po|Fa|Gi|Te)).+?\\d+(\\s|$)"
-				}
-			]
-		},
-		"vlan": {
-			"patterns": [
-				{
-					"name": "entity.other.attribute-name",
-					"match": "(VLAN|Vlan|vlan)(\\d+)?"
+					"name": "comment.line",
+					"match": "^\\s*!.*"
 				}
 			]
 		},
 		"address": {
 			"patterns": [
 				{
-					"name": "support.type",
-					"match": "((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])"
+					"name": "keyword.other.address.cisco",
+					"match": "\\b((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])/(\\d|[1-2]\\d|3[0-2])\\b"
+				},
+				{
+					"name": "keyword.other.address.cisco",
+					"match": "\\b((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b"
 				}
 			]
 		},
-		"command": {
+		"command_hostname": {
 			"patterns": [
 				{
-					"name": "entity.other.inherited-class",
-					"match": "^.*\\s*?#"
+					"name": "meta.function-call.command_hostname.cisco",
+					"match": "^(?!\\s).*\\s*?#"
+				},
+				{
+					"name": "meta.function-call.command_hostname.cisco",
+					"match": "^(?!\\s).*\\s*?>"
 				}
 			]
 		},
@@ -107,7 +148,7 @@
 		"unused": {
 			"patterns": [
 				{
-					"name": "keyword.negative.cisco",
+					"name": "constant.character.escape",
 					"match": "\\s*?no\\s.*"
 				}
 			]
