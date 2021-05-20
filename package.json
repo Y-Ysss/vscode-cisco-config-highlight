@@ -1,8 +1,10 @@
 {
     "name": "cisco-config-highlight",
     "displayName": "Cisco Config Highlight",
-    "description": "Highlight Cisco config",
+    "description": "Cisco config Highlighter",
     "version": "0.1.0",
+	"publisher": "Y-Ysss",
+	"license": "MIT",
     "engines": {
         "vscode": "^1.52.0"
     },

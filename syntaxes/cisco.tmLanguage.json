@@ -229,13 +229,13 @@
 					"match": "(vrf)\\s((forwarding|definition)\\s)?(\\S+)",
 					"captures": {
 						"1": {
-							"name": "entity.name.class.vrf"
+							"name": "entity.name.class.vrf.cisco"
 						},
 						"2": {
-							"name": "entity.other.vrf.forwarding"
+							"name": "entity.other.vrf.forwarding.cisco"
 						},
 						"3": {
-							"name": "entity.other.vrf.definition"
+							"name": "entity.other.vrf.definition.cisco"
 						},
 						"4": {
 							"name": "entity.name.tag.vrf-name.cisco"
