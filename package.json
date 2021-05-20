@@ -1,8 +1,8 @@
 {
     "name": "cisco-config-highlight",
-    "displayName": "cisco-config-highlight",
+    "displayName": "Cisco Config Highlight",
     "description": "Highlight Cisco config",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.52.0"
     },

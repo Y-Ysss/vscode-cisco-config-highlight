@@ -12,10 +12,16 @@
 			"include": "#interface_type"
 		},
 		{
+			"include": "#description"
+		},
+		{
 			"include": "#interface"
 		},
 		{
 			"include": "#vrf"
+		},
+		{
+			"include": "#qos"
 		},
 		{
 			"include": "#address"
@@ -27,14 +33,60 @@
 			"include": "#numeric"
 		},
 		{
+			"include": "#keyword"
+		},
+		{
 			"include": "#param1"
 		}
 	],
 	"repository": {
+		"keyword": {
+			"patterns": [
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(protocol-vlan|mac-vlan|dot1q-tunnel|dot1Q)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(access|trunck)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(add|remove|except)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(allowed|native)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(any|all)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(permit|deny)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(up|down|deleted|administratively(-down)?)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(match-(any|all))(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.cisco",
+					"match": "\\s(in|out|input|output)(?=\\s|$)"
+				}
+			]
+		},
 		"interface_type": {
 			"patterns": [
 				{
 					"include": "#ethernet"
+				},
+				{
+					"include": "#wireless"
 				},
 				{
 					"include": "#loopback"
@@ -53,6 +105,10 @@
 				"ethernet": {
 					"name": "entity.name.class.interface.ethernet.cisco",
 					"match": "\\b((Fast|(Five|Ten|Forty)?Gigabit)?Ethernet|Fa|Gi|Te|Fo)((\\d+[\\./])*)?\\d+(\\.\\d+)?\\b"
+				},
+				"wireless": {
+					"name": "entity.name.class.interface.wireless.cisco",
+					"match": "\\b(Dot11Radio)([0-1]([\\./]\\d)?(\\.\\d+)?)\\b(\\.\\d+)?"
 				},
 				"loopback": {
 					"name": "entity.name.class.interface.loopback.cisco",
@@ -104,14 +160,6 @@
 				}
 			]
 		},
-		"description": {
-			"patterns": [
-				{
-					"name": "comment.line",
-					"match": "^\\s*!.*"
-				}
-			]
-		},
 		"address": {
 			"patterns": [
 				{
@@ -119,12 +167,6 @@
 				},
 				{
 					"include": "#ipv4-full"
-				},
-				{
-					"include": "#ipv6-mapped"
-				},
-				{
-					"include": "#ipv6-embedded"
 				},
 				{
 					"include": "#ipv6-condensed"
@@ -172,6 +214,14 @@
 				}
 			]
 		},
+		"description": {
+			"patterns": [
+				{
+					"match": "(?<=[Dd]escription)\\s(.*)$",
+					"name": "string.other.description.cisco"
+				}
+			]
+		},
 		"vrf": {
 			"patterns": [
 				{
@@ -188,19 +238,86 @@
 							"name": "entity.other.vrf.definition"
 						},
 						"4": {
-							"name": "entity.name.tag.vrfname.cisco"
+							"name": "entity.name.tag.vrf-name.cisco"
 						}
 					}
 				}
 			]
 		},
+		"qos": {
+			"patterns": [
+				{
+					"include": "#class"
+				},
+				{
+					"include": "#service-policy"
+				},
+				{
+					"include": "#policy-map"
+				},
+				{
+					"include": "#class-map"
+				},
+				{
+					"include": "#route-map"
+				},
+				{
+					"include": "#prefix-list"
+				},
+				{
+					"include": "#access-list"
+				}
+			],
+			"repository": {
+				"class": {
+					"match": "(?<=class\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.class-name.cisco"
+				},
+				"service-policy": {
+					"match": "(?<=service-policy\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.service-policy-name.cisco"
+				},
+				"policy-map": {
+					"match": "(?<=policy-map\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.policy-map-name.cisco"
+				},
+				"class-map": {
+					"match": "(?<=class-map\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.class-map-name.cisco"
+				},
+				"route-map": {
+					"match": "(?<=class-map\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.route-map-name.cisco"
+				},
+				"prefix-list": {
+					"match": "(?<=prefix-list\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.prefix-list-name.cisco"
+				},
+				"access-list": {
+					"match": "(?<=access-list\\s(.*\\s)?)(\\S+)$",
+					"name": "entity.name.tag.access-list-name.cisco"
+				}
+			}
+		},
 		"unused": {
 			"patterns": [
 				{
-					"name": "meta.function-call.command-disable",
-					"match": "\\s*?no\\s.*"
+					"include": "#unused"
+				},
+				{
+					"include": "#default"
 				}
-			]
+			],
+			"repository": {
+				"unused": {
+					"name": "meta.function-call.command-disable.unused.cisco",
+					"match": "^\\s*?no\\s.*"
+				},
+				"default": {
+					"name": "meta.function-call.command-disable.default.cisco",
+					"match": "^\\s*?default\\s.*"
+				}
+			}
 		}
 	},
 	"scopeName": "source.cisco"
