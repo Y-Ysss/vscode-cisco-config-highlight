@@ -1,4 +1,10 @@
-# cisco-config-highlight README
+<h1 align="center">
+  <a href="https://github.com/Y-Ysss/vscode-cisco-config-highlight">
+    <img src="./icon.png" alt="theme icon" width="200px">
+  </a><br>
+    Cisco Config Highlight
+</h1>
+<p align="center">Cisco config Syntax Highlighting for Visual Studio Code.</p>
 
 Cisco config Syntax Highlighting for Visual Studio Code
 
