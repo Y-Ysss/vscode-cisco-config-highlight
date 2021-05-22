@@ -2,31 +2,41 @@
     "name": "cisco-config-highlight",
     "displayName": "Cisco Config Highlight",
     "description": "Cisco config Syntax Highlighting for Visual Studio Code.",
-    "version": "0.1.1",
-	"publisher": "Y-Ysss",
-	"license": "MIT",
+    "version": "0.1.2",
+    "publisher": "Y-Ysss",
+    "license": "MIT",
     "engines": {
         "vscode": "^1.52.0"
     },
     "categories": [
         "Programming Languages"
     ],
-	"icon": "icon.png",
+    "icon": "icon.png",
     "contributes": {
-        "languages": [{
-            "id": "cisco",
-            "aliases": ["Cisco Config", "cisco"],
-            "extensions": [".cisco",".config"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "cisco",
-            "scopeName": "source.cisco",
-            "path": "./syntaxes/cisco.tmLanguage.json"
-        }]
+        "languages": [
+            {
+                "id": "cisco",
+                "aliases": [
+                    "Cisco Config",
+                    "cisco"
+                ],
+                "extensions": [
+                    ".cisco",
+                    ".config"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "cisco",
+                "scopeName": "source.cisco",
+                "path": "./syntaxes/cisco.tmLanguage.json"
+            }
+        ]
     },
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Y-Ysss/vscode-cisco-config-highlight.git"
-	}
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Y-Ysss/vscode-cisco-config-highlight.git"
+    }
 }

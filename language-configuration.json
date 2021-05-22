@@ -29,10 +29,10 @@
     ],
     "textMateRules": [
         {
-          "scope": "constant.other.caps.python",
-          "settings": {
-            "foreground": "#f5f5f5"
+            "scope": "constant.other.caps.python",
+            "settings": {
+                "foreground": "#f5f5f5"
+            }
         }
-      }
       ]
 }

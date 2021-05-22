@@ -103,6 +103,15 @@
 				},
 				{
 					"include": "#vlan"
+				},
+				{
+					"include": "#null"
+				},
+				{
+					"include": "#serial"
+				},
+				{
+					"include": "#cellular"
 				}
 			],
 			"repository": {
@@ -112,7 +121,7 @@
 				},
 				"wireless": {
 					"name": "entity.name.class.interface.wireless.cisco",
-					"match": "\\b([Dd]ot11[Rr]adio)(([0-1]([\\./]\\d)?(\\.\\d+)?)\\b(\\.\\d+)?)?"
+					"match": "\\b([Dd]ot11[Rr]adio)(([0-1]([\\./]\\d)?(\\.\\d+)?)\\b(\\.\\d+)?)?\\b"
 				},
 				"loopback": {
 					"name": "entity.name.class.interface.loopback.cisco",
@@ -133,6 +142,14 @@
 				"null": {
 					"name": "entity.name.class.interface.null.cisco",
 					"match": "\\b([Nn]ull)(\\d+)?\\b"
+				},
+				"serial": {
+					"name": "entity.name.class.interface.serial.cisco",
+					"match": "\\b([Ss]erial)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
+				},
+				"cellular": {
+					"name": "entity.name.class.interface.serial.cisco",
+					"match": "\\b([Cc]ellular)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
 				}
 			}
 		},
@@ -280,40 +297,67 @@
 				},
 				{
 					"include": "#access-group"
+				},
+				{
+					"include": "#object-group"
 				}
 			],
 			"repository": {
 				"class": {
 					"match": "(?<=class\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.class-name.cisco"
+					"name": "entity.name.tag.qos.class.name.cisco"
 				},
 				"service-policy": {
 					"match": "(?<=service-policy\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.service-policy-name.cisco"
+					"name": "entity.name.tag.qos.service-policy.name.cisco"
 				},
 				"policy-map": {
 					"match": "(?<=policy-map\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.policy-map-name.cisco"
+					"name": "entity.name.tag.qos.policy-map.name.cisco"
 				},
 				"class-map": {
 					"match": "(?<=class-map\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.class-map-name.cisco"
+					"name": "entity.name.tag.qos.class-map.name.cisco"
 				},
 				"route-map": {
 					"match": "(?<=class-map\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.route-map-name.cisco"
+					"name": "entity.name.tag.qos.route-map.name.cisco"
 				},
 				"prefix-list": {
 					"match": "(?<=prefix-list\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.prefix-list-name.cisco"
+					"name": "entity.name.tag.qos.prefix-list.name.cisco"
 				},
 				"access-list": {
-					"match": "(?<=access-list\\s((extended|standard)\\s)?)(\\S+)\\b",
-					"name": "entity.name.tag.qos.access-list-name.cisco"
+					"match": "(?<=access-list\\s)((extended|standard)\\s)?(\\S+)\\b",
+					"captures":{
+						"2": {
+							"name": "keyword.other.qos.access-list.type.cisco"
+						},
+						"3": {
+							"name": "entity.name.tag.qos.access-list.name.cisco"
+						}
+					}
+					
 				},
 				"access-group": {
-					"match": "(?<=access-group\\sname\\s?(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.access-group-name.cisco"
+					"match": "(?<=access-group\\s)((name)\\s)?(\\S+)\\b",
+					"captures":{
+						"3": {
+							"name": "entity.name.tag.qos.access-group.name.cisco"
+						}
+					}
+				},
+				"object-group": {
+					"match": "(?<=object-group\\s)((service|network)\\s)?(\\S+)\\b",
+					"captures":{
+						"2": {
+							"name": "keyword.other.qos.object-group.type.cisco"
+						},
+						"3": {
+							"name": "entity.name.tag.qos.object-group.name.cisco"
+						}
+					}
+					
 				}
 			}
 		},

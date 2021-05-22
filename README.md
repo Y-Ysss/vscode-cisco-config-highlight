@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/Y-Ysss/vscode-cisco-config-highlight">
-    <img src="./icon.png" alt="theme icon" width="200px">
+    <img src="https://raw.githubusercontent.com/Y-Ysss/vscode-cisco-config-highlight/main//icon.png" alt="theme icon" width="200px">
   </a><br>
     Cisco Config Highlight
 </h1>
@@ -11,12 +11,12 @@ Cisco config Syntax Highlighting for Visual Studio Code
 This project is in the development stages
 
 ## Screenshot
-<img src="./Screenshot.png" alt="screenshot">
+<img src="https://raw.githubusercontent.com/Y-Ysss/vscode-cisco-config-highlight/main/Screenshot.png" alt="screenshot">
 
 ## Token Scopes List
 ```
 keyword.other.config-keyword.vlan.cisco
-keyword.other.config-keyword.access-trunk.cisco
+keyword.other.config-keyword.switchport-mode.cisco
 keyword.other.config-keyword.add-remove.cisco
 keyword.other.config-keyword.allowed-native.cisco
 keyword.other.config-keyword.any-all.cisco
@@ -38,6 +38,7 @@ keyword.other.ipaddress.ipv4.cidr.cisco
 keyword.other.ipaddress.ipv4.full.cisco
 keyword.other.ipaddress.ipv6.condensed.cisco
 keyword.other.ipaddress.ipv6.full.cisco
+eyword.other.ipaddress.mac.cisco
 meta.function-call.command_hostname.cisco
 meta.function-call.command_hostname.cisco
 string.other.description.cisco
@@ -45,13 +46,17 @@ entity.name.class.vrf.declaration.cisco
 entity.other.vrf.forwarding.cisco
 entity.other.vrf.definition.cisco
 entity.name.tag.vrf.vrf-name.cisco
-entity.name.tag.qos.class-name.cisco
-entity.name.tag.qos.service-policy-name.cisco
-entity.name.tag.qos.policy-map-name.cisco
-entity.name.tag.qos.class-map-name.cisco
-entity.name.tag.qos.route-map-name.cisco
-entity.name.tag.qos.prefix-list-name.cisco
-entity.name.tag.qos.access-list-name.cisco
+entity.name.tag.qos.class.name.cisco
+entity.name.tag.qos.service-policy.name.cisco
+entity.name.tag.qos.policy-map.name.cisco
+entity.name.tag.qos.class-map.name.cisco
+entity.name.tag.qos.route-map.name.cisco
+entity.name.tag.qos.prefix-list.name.cisco
+keyword.other.qos.access-list.type.cisco
+entity.name.tag.qos.access-list.name.cisco
+entity.name.tag.qos.access-group.type.cisco
+keyword.other.qos.object-group.type.cisco
+entity.name.tag.qos.object-group.name.cisco
 meta.function-call.command-disable.unused.cisco
 meta.function-call.command-disable.default.cisco
 ```
