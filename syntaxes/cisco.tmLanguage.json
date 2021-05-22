@@ -21,6 +21,9 @@
 			"include": "#vrf"
 		},
 		{
+			"include": "#string"
+		},
+		{
 			"include": "#qos"
 		},
 		{
@@ -31,6 +34,10 @@
 		},
 		{
 			"include": "#numeric"
+		},
+		{
+			"comment": "bgp must be placed after address. {neighbor [peer-group-name or ip-address]}",
+			"include": "#bgp"
 		},
 		{
 			"include": "#keyword"
@@ -112,6 +119,9 @@
 				},
 				{
 					"include": "#cellular"
+				},
+				{
+					"include": "#virtual-template"
 				}
 			],
 			"repository": {
@@ -150,6 +160,10 @@
 				"cellular": {
 					"name": "entity.name.class.interface.serial.cisco",
 					"match": "\\b([Cc]ellular)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
+				},
+				"virtual-template":{
+					"name": "entity.name.class.interface.virtual-template.cisco",
+					"match": "\\b([Vv]irtual-[Tt]emplate)(\\d+)?\\b"
 				}
 			}
 		},
@@ -272,6 +286,53 @@
 				}
 			]
 		},
+		"string":{
+			"patterns": [
+				{
+					"include": "#hostname"
+				}
+			],
+			"repository": {
+				"hostname":{
+					"match": "(?<=hostname\\s)(\\S+)\\b",
+					"name": "entity.name.tag.config-string.hostname.cisco"
+				}
+			}
+		},
+		"bgp":{
+			"patterns": [
+				{
+					"include": "#neighbor-peer-group"
+				},
+				{
+					"include": "#peer-session"
+				},
+				{
+					"include": "#peer-policy"
+				},
+				{
+					"include": "#peer-group"
+				}
+			],
+			"repository": {
+				"neighbor-peer-group":{
+					"match": "(?<=neighbor\\s)(\\S+)\\b",
+					"name": "entity.name.tag.bgp.neighbor-peer-group.name.cisco"
+				},
+				"peer-session":{
+					"match": "(?<=peer-session\\s)(\\S+)\\b",
+					"name": "entity.name.tag.bgp.peer-session.name.cisco"
+				},
+				"peer-policy":{
+					"match": "(?<=peer-policy\\s)(\\S+)\\b",
+					"name": "entity.name.tag.bgp.peer-policy.name.cisco"
+				},
+				"peer-group":{
+					"match": "(?<=peer-group\\s)(\\S+)\\b",
+					"name": "entity.name.tag.bgp.peer-group.name.cisco"
+				}
+			}
+		},
 		"qos": {
 			"patterns": [
 				{
@@ -320,7 +381,7 @@
 					"name": "entity.name.tag.qos.class-map.name.cisco"
 				},
 				"route-map": {
-					"match": "(?<=class-map\\s(.*\\s)?)(\\S+)$",
+					"match": "(?<=route-map\\s(.*\\s)?)(\\S+)$",
 					"name": "entity.name.tag.qos.route-map.name.cisco"
 				},
 				"prefix-list": {

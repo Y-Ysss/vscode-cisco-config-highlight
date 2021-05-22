@@ -38,7 +38,7 @@ keyword.other.ipaddress.ipv4.cidr.cisco
 keyword.other.ipaddress.ipv4.full.cisco
 keyword.other.ipaddress.ipv6.condensed.cisco
 keyword.other.ipaddress.ipv6.full.cisco
-eyword.other.ipaddress.mac.cisco
+keyword.other.ipaddress.mac.cisco
 meta.function-call.command_hostname.cisco
 meta.function-call.command_hostname.cisco
 string.other.description.cisco
@@ -46,6 +46,9 @@ entity.name.class.vrf.declaration.cisco
 entity.other.vrf.forwarding.cisco
 entity.other.vrf.definition.cisco
 entity.name.tag.vrf.vrf-name.cisco
+entity.name.tag.bgp.peer-session.name.cisco
+entity.name.tag.bgp.peer-policy.name.cisco
+entity.name.tag.config-string.hostname.cisco
 entity.name.tag.qos.class.name.cisco
 entity.name.tag.qos.service-policy.name.cisco
 entity.name.tag.qos.policy-map.name.cisco
