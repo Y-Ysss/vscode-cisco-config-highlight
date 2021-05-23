@@ -27,6 +27,9 @@
 			"include": "#qos"
 		},
 		{
+			"include": "#acl"
+		},
+		{
 			"include": "#address"
 		},
 		{
@@ -88,6 +91,10 @@
 				{
 					"name": "keyword.other.config-keyword.input-output.cisco",
 					"match": "\\s(input|output)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.inside-outside.cisco",
+					"match": "\\s(inside|outside)(?=\\s|$)"
 				}
 			]
 		},
@@ -161,7 +168,7 @@
 					"name": "entity.name.class.interface.serial.cisco",
 					"match": "\\b([Cc]ellular)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
 				},
-				"virtual-template":{
+				"virtual-template": {
 					"name": "entity.name.class.interface.virtual-template.cisco",
 					"match": "\\b([Vv]irtual-[Tt]emplate)(\\d+)?\\b"
 				}
@@ -230,20 +237,20 @@
 					"name": "keyword.other.ipaddress.ipv6.full.cisco",
 					"match": "\\b([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\\b"
 				},
-				"mac":{
-					"name":"keyword.other.ipaddress.mac.cisco",
-					"match":"\\b([a-fA-F0-9]{2}[:.-]?){5}[a-fA-F0-9]{2}\\b"
+				"mac": {
+					"name": "keyword.other.ipaddress.mac.cisco",
+					"match": "\\b([a-fA-F0-9]{2}[:.-]?){5}[a-fA-F0-9]{2}\\b"
 				}
 			}
 		},
 		"command_hostname": {
 			"patterns": [
 				{
-					"name": "meta.function-call.command_hostname.cisco",
+					"name": "meta.function-call.command_hostname.user-mode.cisco",
 					"match": "^(?!\\s).*\\s*?#"
 				},
 				{
-					"name": "meta.function-call.command_hostname.cisco",
+					"name": "meta.function-call.command_hostname.privileged-mode.cisco",
 					"match": "^(?!\\s).*\\s*?>"
 				}
 			]
@@ -286,20 +293,20 @@
 				}
 			]
 		},
-		"string":{
+		"string": {
 			"patterns": [
 				{
 					"include": "#hostname"
 				}
 			],
 			"repository": {
-				"hostname":{
+				"hostname": {
 					"match": "(?<=hostname\\s)(\\S+)\\b",
 					"name": "entity.name.tag.config-string.hostname.cisco"
 				}
 			}
 		},
-		"bgp":{
+		"bgp": {
 			"patterns": [
 				{
 					"include": "#neighbor-peer-group"
@@ -315,19 +322,19 @@
 				}
 			],
 			"repository": {
-				"neighbor-peer-group":{
+				"neighbor-peer-group": {
 					"match": "(?<=neighbor\\s)(\\S+)\\b",
 					"name": "entity.name.tag.bgp.neighbor-peer-group.name.cisco"
 				},
-				"peer-session":{
+				"peer-session": {
 					"match": "(?<=peer-session\\s)(\\S+)\\b",
 					"name": "entity.name.tag.bgp.peer-session.name.cisco"
 				},
-				"peer-policy":{
+				"peer-policy": {
 					"match": "(?<=peer-policy\\s)(\\S+)\\b",
 					"name": "entity.name.tag.bgp.peer-policy.name.cisco"
 				},
-				"peer-group":{
+				"peer-group": {
 					"match": "(?<=peer-group\\s)(\\S+)\\b",
 					"name": "entity.name.tag.bgp.peer-group.name.cisco"
 				}
@@ -352,15 +359,6 @@
 				},
 				{
 					"include": "#prefix-list"
-				},
-				{
-					"include": "#access-list"
-				},
-				{
-					"include": "#access-group"
-				},
-				{
-					"include": "#object-group"
 				}
 			],
 			"repository": {
@@ -387,10 +385,25 @@
 				"prefix-list": {
 					"match": "(?<=prefix-list\\s(.*\\s)?)(\\S+)$",
 					"name": "entity.name.tag.qos.prefix-list.name.cisco"
+				}
+			}
+		},
+		"acl": {
+			"patterns": [
+				{
+					"include": "#access-list"
 				},
+				{
+					"include": "#access-group"
+				},
+				{
+					"include": "#object-group"
+				}
+			],
+			"repository": {
 				"access-list": {
 					"match": "(?<=access-list\\s)((extended|standard)\\s)?(\\S+)\\b",
-					"captures":{
+					"captures": {
 						"2": {
 							"name": "keyword.other.qos.access-list.type.cisco"
 						},
@@ -398,11 +411,10 @@
 							"name": "entity.name.tag.qos.access-list.name.cisco"
 						}
 					}
-					
 				},
 				"access-group": {
 					"match": "(?<=access-group\\s)((name)\\s)?(\\S+)\\b",
-					"captures":{
+					"captures": {
 						"3": {
 							"name": "entity.name.tag.qos.access-group.name.cisco"
 						}
@@ -410,7 +422,7 @@
 				},
 				"object-group": {
 					"match": "(?<=object-group\\s)((service|network)\\s)?(\\S+)\\b",
-					"captures":{
+					"captures": {
 						"2": {
 							"name": "keyword.other.qos.object-group.type.cisco"
 						},
@@ -418,7 +430,6 @@
 							"name": "entity.name.tag.qos.object-group.name.cisco"
 						}
 					}
-					
 				}
 			}
 		},

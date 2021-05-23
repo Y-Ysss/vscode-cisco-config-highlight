@@ -2,7 +2,7 @@
     "name": "cisco-config-highlight",
     "displayName": "Cisco Config Highlight",
     "description": "Cisco config Syntax Highlighting for Visual Studio Code.",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "publisher": "Y-Ysss",
     "license": "MIT",
     "engines": {
