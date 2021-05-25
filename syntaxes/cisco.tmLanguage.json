@@ -110,7 +110,7 @@
 					"include": "#loopback"
 				},
 				{
-					"include": "#port_channel"
+					"include": "#port-channel"
 				},
 				{
 					"include": "#tunnel"
@@ -129,6 +129,9 @@
 				},
 				{
 					"include": "#virtual-template"
+				},
+				{
+					"include": "#dialer"
 				}
 			],
 			"repository": {
@@ -144,7 +147,7 @@
 					"name": "entity.name.class.interface.loopback.cisco",
 					"match": "\\b([Ll]oopback|Lo)(\\d+)?\\b"
 				},
-				"port_channel": {
+				"port-channel": {
 					"name": "entity.name.class.interface.portchannel.cisco",
 					"match": "\\b([Pp]ort-channel|Po)(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[1-9])?\\b"
 				},
@@ -171,6 +174,10 @@
 				"virtual-template": {
 					"name": "entity.name.class.interface.virtual-template.cisco",
 					"match": "\\b([Vv]irtual-[Tt]emplate)(\\d+)?\\b"
+				},
+				"dialer": {
+					"name": "entity.name.class.interface.dialer.cisco",
+					"match": "\\b([Dd]ialer)(\\d+)?\\b"
 				}
 			}
 		},
@@ -222,23 +229,23 @@
 			],
 			"repository": {
 				"cidr": {
-					"name": "keyword.other.ipaddress.ipv4.cidr.cisco",
+					"name": "keyword.other.address.ipv4.cidr.cisco",
 					"match": "\\b((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])/(\\d|[1-2]\\d|3[0-2])\\b"
 				},
 				"ipv4-full": {
-					"name": "keyword.other.ipaddress.ipv4.full.cisco",
+					"name": "keyword.other.address.ipv4.full.cisco",
 					"match": "\\b((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\b"
 				},
 				"ipv6-condensed": {
-					"name": "keyword.other.ipaddress.ipv6.condensed.cisco",
+					"name": "keyword.other.address.ipv6.condensed.cisco",
 					"match": "\\b(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))\\b"
 				},
 				"ipv6-full": {
-					"name": "keyword.other.ipaddress.ipv6.full.cisco",
+					"name": "keyword.other.address.ipv6.full.cisco",
 					"match": "\\b([0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\\b"
 				},
 				"mac": {
-					"name": "keyword.other.ipaddress.mac.cisco",
+					"name": "keyword.other.address.mac.cisco",
 					"match": "\\b([a-fA-F0-9]{2}[:.-]?){5}[a-fA-F0-9]{2}\\b"
 				}
 			}
@@ -247,11 +254,11 @@
 			"patterns": [
 				{
 					"name": "meta.function-call.command_hostname.user-mode.cisco",
-					"match": "^(?!\\s).*\\s*?#"
+					"match": "^(?!\\s)[0-9a-zA-Z\\-]+(\\(.*\\))?#"
 				},
 				{
 					"name": "meta.function-call.command_hostname.privileged-mode.cisco",
-					"match": "^(?!\\s).*\\s*?>"
+					"match": "^(?!\\s)[0-9a-zA-Z\\-]++(\\(.*\\))?>"
 				}
 			]
 		},
@@ -301,7 +308,7 @@
 			],
 			"repository": {
 				"hostname": {
-					"match": "(?<=hostname\\s)(\\S+)\\b",
+					"match": "(?<=hostname\\s)[0-9a-zA-Z\\-]+\\b",
 					"name": "entity.name.tag.config-string.hostname.cisco"
 				}
 			}
@@ -405,10 +412,10 @@
 					"match": "(?<=access-list\\s)((extended|standard)\\s)?(\\S+)\\b",
 					"captures": {
 						"2": {
-							"name": "keyword.other.qos.access-list.type.cisco"
+							"name": "keyword.other.acl.access-list.type.cisco"
 						},
 						"3": {
-							"name": "entity.name.tag.qos.access-list.name.cisco"
+							"name": "entity.name.tag.acl.access-list.name.cisco"
 						}
 					}
 				},
@@ -416,7 +423,7 @@
 					"match": "(?<=access-group\\s)((name)\\s)?(\\S+)\\b",
 					"captures": {
 						"3": {
-							"name": "entity.name.tag.qos.access-group.name.cisco"
+							"name": "entity.name.tag.acl.access-group.name.cisco"
 						}
 					}
 				},
@@ -424,10 +431,10 @@
 					"match": "(?<=object-group\\s)((service|network)\\s)?(\\S+)\\b",
 					"captures": {
 						"2": {
-							"name": "keyword.other.qos.object-group.type.cisco"
+							"name": "keyword.other.acl.object-group.type.cisco"
 						},
 						"3": {
-							"name": "entity.name.tag.qos.object-group.name.cisco"
+							"name": "entity.name.tag.acl.object-group.name.cisco"
 						}
 					}
 				}

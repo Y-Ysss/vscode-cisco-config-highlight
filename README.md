@@ -6,7 +6,9 @@
 </h1>
 <p align="center">Cisco device configuration Syntax Highlighting for Visual Studio Code.</p>
 
-This project is in the development stages
+This project is in the development stages.
+
+There's a possibility that definitions will change in the future.
 
 ## Screenshot
 <img src="https://raw.githubusercontent.com/Y-Ysss/vscode-cisco-config-highlight/main/Screenshot.png" alt="screenshot">
@@ -42,6 +44,10 @@ VSCode settings customize sample
 
 ## Token Scopes List
 ```
+punctuation
+
+comment.line
+
 entity.name.tag.config-string.hostname.cisco
 string.other.description.cisco
 
@@ -58,6 +64,7 @@ keyword.other.config-keyword.status.cisco
 keyword.other.config-keyword.match.cisco
 keyword.other.config-keyword.in-out.cisco
 keyword.other.config-keyword.input-output.cisco
+keyword.other.config-keyword.inside-outside.cisco
 
 entity.name.class.interface.ethernet.cisco
 entity.name.class.interface.wireless.cisco
@@ -66,12 +73,16 @@ entity.name.class.interface.portchannel.cisco
 entity.name.class.interface.tunnel.cisco
 entity.name.class.interface.vlan.cisco
 entity.name.class.interface.null.cisco
+entity.name.class.interface.serial.cisco
+entity.name.class.interface.serial.cisco
+entity.name.class.interface.virtual-template.cisco
+entity.name.class.interface.dialer.cisco
 
-keyword.other.ipaddress.ipv4.cidr.cisco
-keyword.other.ipaddress.ipv4.full.cisco
-keyword.other.ipaddress.ipv6.condensed.cisco
-keyword.other.ipaddress.ipv6.full.cisco
-keyword.other.ipaddress.mac.cisco
+keyword.other.address.ipv4.cidr.cisco
+keyword.other.address.ipv4.full.cisco
+keyword.other.address.ipv6.condensed.cisco
+keyword.other.address.ipv6.full.cisco
+keyword.other.address.mac.cisco
 
 meta.function-call.command_hostname.user-mode.cisco
 meta.function-call.command_hostname.privileged-mode.cisco
@@ -92,14 +103,16 @@ entity.name.tag.qos.policy-map.name.cisco
 entity.name.tag.qos.class-map.name.cisco
 entity.name.tag.qos.route-map.name.cisco
 entity.name.tag.qos.prefix-list.name.cisco
-keyword.other.qos.access-list.type.cisco
-entity.name.tag.qos.access-list.name.cisco
-entity.name.tag.qos.access-group.type.cisco
-keyword.other.qos.object-group.type.cisco
-entity.name.tag.qos.object-group.name.cisco
+
+keyword.other.acl.access-list.type.cisco
+entity.name.tag.acl.access-list.name.cisco
+entity.name.tag.acl.access-group.name.cisco
+keyword.other.acl.object-group.type.cisco
+entity.name.tag.acl.object-group.name.cisco
 
 meta.function-call.command-disable.unused.cisco
 meta.function-call.command-disable.default.cisco
+
 ```
 
 ## Install
