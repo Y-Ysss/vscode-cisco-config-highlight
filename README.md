@@ -30,7 +30,7 @@ VSCode settings customize sample
             },
             {
                 "scope": [
-                    "keyword.other.ipaddress",
+                    "keyword.other.address",
                     "constant.numeric"
                 ],
                 "settings": {
@@ -44,12 +44,16 @@ VSCode settings customize sample
 
 ## Token Scopes List
 ```
-punctuation
+punctuation.config-param.first.cisco
 
-comment.line
+comment.line.config.cisco
 
-entity.name.tag.config-string.hostname.cisco
 string.other.description.cisco
+entity.name.tag.config-string.domain-name.cisco
+entity.name.tag.config-string.hostname.cisco
+entity.name.tag.config-string.username.cisco
+string.other.password.cisco
+comment.block.banner.cisco
 
 constant.numeric.hex.cisco
 constant.numeric.integer.cisco

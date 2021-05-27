@@ -12,9 +12,6 @@
 			"include": "#interface_type"
 		},
 		{
-			"include": "#description"
-		},
-		{
 			"include": "#interface"
 		},
 		{
@@ -132,6 +129,9 @@
 				},
 				{
 					"include": "#dialer"
+				},
+				{
+					"include": "#async"
 				}
 			],
 			"repository": {
@@ -157,7 +157,7 @@
 				},
 				"vlan": {
 					"name": "entity.name.class.interface.vlan.cisco",
-					"match": "\\b(VLAN|Vlan|vlan)(409[0-4]|40[0-8][0-9]|[1-3][0-9]{3}|[1-9][0-9]{1,2}|[1-9])?\\b"
+					"match": "\\b(VLAN|[Vv]lan)(409[0-4]|40[0-8][0-9]|[1-3][0-9]{3}|[1-9][0-9]{1,2}|[1-9])?\\b"
 				},
 				"null": {
 					"name": "entity.name.class.interface.null.cisco",
@@ -178,6 +178,10 @@
 				"dialer": {
 					"name": "entity.name.class.interface.dialer.cisco",
 					"match": "\\b([Dd]ialer)(\\d+)?\\b"
+				},
+				"async": {
+					"name": "entity.name.class.interface.dialer.cisco",
+					"match": "\\b([Aa]sync)(\\d+)?\\b"
 				}
 			}
 		},
@@ -204,7 +208,7 @@
 		"comment": {
 			"patterns": [
 				{
-					"name": "comment.line",
+					"name": "comment.line.config.cisco",
 					"match": "^\\s*!.*"
 				}
 			]
@@ -265,16 +269,8 @@
 		"param1": {
 			"patterns": [
 				{
-					"name": "punctuation",
+					"name": "punctuation.config-param.first.cisco",
 					"match": "(?<=^\\s*?)\\S+"
-				}
-			]
-		},
-		"description": {
-			"patterns": [
-				{
-					"match": "(?<=(description|Description:))\\s(.*)$",
-					"name": "string.other.description.cisco"
 				}
 			]
 		},
@@ -304,12 +300,48 @@
 			"patterns": [
 				{
 					"include": "#hostname"
+				},
+				{
+					"include": "#description"
+				},
+				{
+					"include": "#domain-name"
+				},
+				{
+					"include": "#username"
+				},
+				{
+					"include": "#password"
+				},
+				{
+					"include": "#banner"
 				}
 			],
 			"repository": {
+				"description": {
+					"match": "(?<=(description|Description:))\\s(.*)$",
+					"name": "string.other.description.cisco"
+				},
 				"hostname": {
 					"match": "(?<=hostname\\s)[0-9a-zA-Z\\-]+\\b",
 					"name": "entity.name.tag.config-string.hostname.cisco"
+				},
+				"domain-name": {
+					"match": "(?<=ip\\sdomain\\sname\\s)\\S+\\b",
+					"name": "entity.name.tag.config-string.domain-name.cisco"
+				},
+				"username": {
+					"match": "(?<=username\\s)(\\S+)\\b",
+					"name": "entity.name.tag.config-string.username.cisco"
+				},
+				"password": {
+					"match": "(?<=password\\s\\d+\\s)(\\S+)$",
+					"name": "string.other.password.cisco"
+				},
+				"banner": {
+					"begin": "(?<=banner\\s(exec|login|motd)\\s)\\^",
+					"end": "\\^",
+					"name": "comment.block.banner.cisco"
 				}
 			}
 		},

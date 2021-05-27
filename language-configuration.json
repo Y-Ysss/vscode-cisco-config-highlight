@@ -1,9 +1,7 @@
 {
     "comments": {
         // symbol used for single line comment. Remove this entry if your language does not support line comments
-        "lineComment": "//",
-        // symbols used for start and end a block comment. Remove this entry if your language does not support block comments
-        "blockComment": [ "/*", "*/" ]
+        "lineComment": "!"
     },
     // symbols used as brackets
     "brackets": [
@@ -26,13 +24,5 @@
         ["(", ")"],
         ["\"", "\""],
         ["'", "'"]
-    ],
-    "textMateRules": [
-        {
-            "scope": "constant.other.caps.python",
-            "settings": {
-                "foreground": "#f5f5f5"
-            }
-        }
-      ]
+    ]
 }
