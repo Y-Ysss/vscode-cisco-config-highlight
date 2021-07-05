@@ -12,6 +12,10 @@
         "Programming Languages"
     ],
     "icon": "icon.png",
+    "activationEvents": [
+        "onLanguage:cisco"
+    ],
+    "main": "./js/extension",
     "contributes": {
         "languages": [
             {

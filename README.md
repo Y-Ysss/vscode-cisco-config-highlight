@@ -123,7 +123,7 @@ meta.function-call.command-disable.default.cisco
 
 [Visual Studio Marketplace - Cisco Config Highlight](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight)
 
-## Reauests or Issues
+## Requests or Issues
 If you have any requests or complaints, please start an Issue or PullRequest on GitHub.
 
 [GitHub - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
