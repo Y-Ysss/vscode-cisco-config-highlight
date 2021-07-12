@@ -168,7 +168,7 @@
 					"match": "\\b([Ss]erial)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
 				},
 				"cellular": {
-					"name": "entity.name.class.interface.serial.cisco",
+					"name": "entity.name.class.interface.cellular.cisco",
 					"match": "\\b([Cc]ellular)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
 				},
 				"virtual-template": {
