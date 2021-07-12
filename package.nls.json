@@ -1,0 +1,3 @@
+{
+    "configuration.properties.showSymbolsInOutlinePanel.description":"[Experimental Feature] Show Symbol Definitions Within a Document.\nAllow the user to show in outline panel and quickly navigate to any symbol definition in the document."
+}
