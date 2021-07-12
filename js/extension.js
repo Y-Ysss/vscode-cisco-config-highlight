@@ -5,12 +5,35 @@
 'use strict';
 Object.defineProperty(exports, '__esModule', { value: true });
 const vscode = require('vscode');
-function activate(context) {
-    context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider({ language: 'cisco' }, new CiscoConfigDocumentSymbolProvider()));
-}
-exports.activate = activate;
-class CiscoConfigDocumentSymbolProvider {
 
+let documentSymbolProvider = null
+function activate(context) {
+    register(context)
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('cisco-config-highlight.showSymbolsInOutlinePanel')) {
+            if (vscode.workspace.getConfiguration('cisco-config-highlight').get('showSymbolsInOutlinePanel', false)) {
+                register(context)
+                return
+            } else if (documentSymbolProvider) {
+                const idx = context.subscriptions.indexOf(documentSymbolProvider)
+                context.subscriptions.splice(idx, 1)
+                documentSymbolProvider.dispose()
+            }
+        }
+    }));
+}
+
+exports.activate = activate;
+
+function register(context) {
+    if (!vscode.workspace.getConfiguration('cisco-config-highlight').get('showSymbolsInOutlinePanel', false)) {
+        return
+    }
+    documentSymbolProvider = vscode.languages.registerDocumentSymbolProvider({ language: 'cisco' }, new CiscoConfigDocumentSymbolProvider())
+    context.subscriptions.push(documentSymbolProvider)
+}
+
+class CiscoConfigDocumentSymbolProvider {
     get pattern() {
         return /^(?:\s|\t)(?=\n)*(router\sbgp|address-family|class-map|policy-map|interface)(.*)$/gm;
         // |ip\svrf(?!.*forwarding)

@@ -37,6 +37,18 @@
                 "scopeName": "source.cisco",
                 "path": "./syntaxes/cisco.tmLanguage.json"
             }
+        ],
+        "configuration": [
+            {
+                "title": "Cisco Config Highlight",
+                "properties": {
+                    "cisco-config-highlight.showSymbolsInOutlinePanel": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "%configuration.properties.showSymbolsInOutlinePanel.description%"
+                    }
+                }
+            }
         ]
     },
     "repository": {
