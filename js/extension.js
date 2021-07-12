@@ -12,7 +12,8 @@ exports.activate = activate;
 class CiscoConfigDocumentSymbolProvider {
 
     get pattern() {
-        return /^(?:\s|\t)*(router\sbgp|address-family|interface|ip\svrf)(.*)$/gm;
+        return /^(?:\s|\t)(?=\n)*(router\sbgp|address-family|class-map|policy-map|interface)(.*)$/gm;
+        // |ip\svrf(?!.*forwarding)
     }
 
     get defs_outlines() {
@@ -27,24 +28,34 @@ class CiscoConfigDocumentSymbolProvider {
                 node_name: 'router bgp',
                 detail: 'address-family'
             },
+            'class-map': {
+                kind: vscode.SymbolKind.Variable,
+                node_name: 'class-map',
+                detail: 'class-map'
+            },
+            'policy-map': {
+                kind: vscode.SymbolKind.Variable,
+                node_name: 'policy-map',
+                detail: 'policy-map'
+            },
             'interface': {
                 kind: vscode.SymbolKind.Class,
                 node_name: 'interface',
                 detail: 'interface',
                 sub_nodes: [
                     {
-                        pattern: /.*\..*/,
-                        kind: vscode.SymbolKind.Field,
+                        pattern: /(.*)\.(.*)/,
+                        kind: vscode.SymbolKind.Interface,
                         node_name: 'interface',
                         detail: 'sub-interface'
                     }
                 ]
             },
-            'ip vrf': {
-                kind: vscode.SymbolKind.Class,
-                node_name: 'ip vrf',
-                detail: 'vrf'
-            },
+            // 'ip vrf': {
+            //     kind: vscode.SymbolKind.Class,
+            //     node_name: 'ip vrf',
+            //     detail: 'vrf'
+            // },
         }
     }
 
@@ -67,7 +78,7 @@ class CiscoConfigDocumentSymbolProvider {
                         nodes.pop();
                         inside_group = false;
                     }
-                    let symbol = new vscode.DocumentSymbol(info_type, '', vscode.SymbolKind.Namespace, position, position);
+                    const symbol = new vscode.DocumentSymbol(info_type, '', vscode.SymbolKind.Namespace, position, position);
                     nodes[nodes.length - 1].push(symbol);
                     if (!inside_group) {
                         nodes.push(symbol.children);
@@ -81,16 +92,21 @@ class CiscoConfigDocumentSymbolProvider {
                 const sub_nodes = nodes[nodes.length - 1];
                 node_name = info.node_name;
 
-                if (info_type !== info.node_name) {
+                if (info_type !== info.node_name && sub_nodes[sub_nodes.length - 1]) {
                     target = sub_nodes[sub_nodes.length - 1].children;
                     node_name = info.node_name;
                 }
 
                 if (info.sub_nodes) {
                     info.sub_nodes.map((item) => {
-                        if (info_name.match(item.pattern)) {
+                        const m = info_name.match(item.pattern)
+                        if (m) {
+                            symbol.detail = item.detail
+                        }
+                        const s = sub_nodes[sub_nodes.length - 1]
+                        if (m && s && s.name == m[1]) {
                             symbol = new vscode.DocumentSymbol(info_name, item.detail, item.kind, position, position);
-                            target = sub_nodes[sub_nodes.length - 1].children;
+                            target = s.children;
                         }
                     })
                 }
