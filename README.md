@@ -78,7 +78,7 @@ entity.name.class.interface.tunnel.cisco
 entity.name.class.interface.vlan.cisco
 entity.name.class.interface.null.cisco
 entity.name.class.interface.serial.cisco
-entity.name.class.interface.serial.cisco
+entity.name.class.interface.cellular.cisco
 entity.name.class.interface.virtual-template.cisco
 entity.name.class.interface.dialer.cisco
 
@@ -119,12 +119,26 @@ meta.function-call.command-disable.default.cisco
 
 ```
 
+## Experimental Feature
+
+### Show symbols in outline panel
+Open the settings and enter a keyword in the search box. Select the check box to enable.
+
+`@ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel`
+
+### Multilingual support
+Currently, only the configuration page is available.
+
+Following supported languages:
+- English
+- Japanese
+
 ## Install
 
 [Visual Studio Marketplace - Cisco Config Highlight](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight)
 
 ## Requests or Issues
-If you have any requests or complaints, please start an Issue or PullRequest on GitHub.
+If you have any requests or Issues, please start an Issue or PullRequest on GitHub.
 
 [GitHub - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
 
