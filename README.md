@@ -15,9 +15,14 @@ There's a possibility that definitions will change in the future.
 
 ## Token Color Customizations
 
-Open the settings and add option strings to JSON.
+The color of syntax highlighting depends on the theme you have enabled.
 
-VSCode settings customize sample
+If the theme you currently have enabled does not define the colors, you will need to customize the `settings.json` file.
+
+Open the settings and add option strings to JSON.
+(You can open the `settings.json` file by typing `Preferences: Open Settings (JSON)` in the command palette.)
+
+### VSCode settings customize sample
 ``` json
     "editor.tokenColorCustomizations": {
         "textMateRules": [
@@ -136,6 +141,11 @@ Following supported languages:
 ## Install
 
 [Visual Studio Marketplace - Cisco Config Highlight](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight)
+
+## Recommended Extensions
+I recommend the following extensions to more beautiful look:
+- [Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)
+- [Jarvis Prestidge/Sublime Material Theme](https://marketplace.visualstudio.com/items?itemName=jprestidge.theme-material-theme)
 
 ## Requests or Issues
 If you have any requests or Issues, please start an Issue or PullRequest on GitHub.
