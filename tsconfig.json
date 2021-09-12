@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "ES2018",
+        "module": "commonjs",
+        "lib": [
+            "ES2018",
+            "DOM"
+        ],
+        "outDir": "out",
+        "rootDir": "src",
+        "sourceMap": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+    },
+    "exclude": [
+        "node_modules",
+        ".vscode-test"
+    ]
+}
