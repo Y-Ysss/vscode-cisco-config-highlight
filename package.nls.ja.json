@@ -1,3 +1,10 @@
 {
-    "configuration.properties.showSymbolsInOutlinePanel.description":"［実験的機能］ドキュメント内のシンボル定義をアウトラインパネルに表示し、シンボル定義を素早く表示できるようにする。"
+    "configuration.properties.showSymbolsInOutlinePanel.description": "［実験的機能］ドキュメント内のシンボル定義をアウトラインパネルに表示し、シンボル定義を素早く表示できるようにする。",
+    "configuration.properties.showEnableDisableSymbols.description": "［実験的機能］アウトラインパネルに表示するシンボルの有効・無効を設定する。\nこのオプションは、Show Symbols In Outline Panelを有効にする必要があります。",
+    "configuration.properties.symbols.routerBgp.description": "Border Gateway Protocol(BGP) 'router bgp {autonomous-system-number}'",
+    "configuration.properties.symbols.addressFamily.description": "Border Gateway Protocol(BGP) 'address-family ipv4 {unicast|multicast|vrf vrf-name }'",
+    "configuration.properties.symbols.classMap.description": "Quality of Service(QoS) 'class-map {match-any|match-all} name'",
+    "configuration.properties.symbols.policyMap.description": "Quality of Service(QoS) 'policy-map name'",
+    "configuration.properties.symbols.interface.description": "Interface 'interface {type, slot, port, etc...}'",
+    "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'"
 }

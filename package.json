@@ -2,7 +2,7 @@
     "name": "cisco-config-highlight",
     "displayName": "Cisco Config Highlight",
     "description": "Cisco device configuration Syntax Highlighting for Visual Studio Code.",
-    "version": "0.1.5",
+    "version": "0.2.0",
     "publisher": "Y-Ysss",
     "license": "MIT",
     "engines": {
@@ -15,7 +15,7 @@
     "activationEvents": [
         "onLanguage:cisco"
     ],
-    "main": "./js/extension",
+    "main": "./out/extension.js",
     "contributes": {
         "languages": [
             {
@@ -42,10 +42,55 @@
             {
                 "title": "Cisco Config Highlight",
                 "properties": {
-                    "cisco-config-highlight.showSymbolsInOutlinePanel": {
+                    "cisco-config-highlight.outline.showSymbolsInOutlinePanel": {
                         "type": "boolean",
                         "default": false,
                         "description": "%configuration.properties.showSymbolsInOutlinePanel.description%"
+                    },
+                    "cisco-config-highlight.outline.symbolsList": {
+                        "type": "object",
+                        "properties": {
+                            "router_bgp": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.routerBgp.description%"
+                            },
+                            "address_family": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.addressFamily.description%"
+                            },
+                            "class_map": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.classMap.description%"
+                            },
+                            "policy_map": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.policyMap.description%"
+                            },
+                            "interface": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.interface.description%"
+                            },
+                            "sub_interface": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.subInterface.description%"
+                            }
+                        },
+                        "additionalProperties": false,
+                        "default": {
+                            "router_bgp": true,
+                            "address_family": true,
+                            "class_map": true,
+                            "policy_map": true,
+                            "interface": true,
+                            "sub_interface": true
+                        },
+                        "description": "%configuration.properties.showEnableDisableSymbols.description%"
                     }
                 }
             }
