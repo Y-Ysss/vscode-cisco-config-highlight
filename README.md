@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/Y-Ysss/vscode-cisco-config-highlight">
-    <img src="https://raw.githubusercontent.com/Y-Ysss/vscode-cisco-config-highlight/main//icon.png" alt="theme icon" width="200px">
+    <img src="images/icon.png" alt="theme icon" width="200px">
   </a><br>
     Cisco Config Highlight
 </h1>
@@ -10,8 +10,14 @@ This project is in the development stages.
 
 There's a possibility that definitions will change in the future.
 
+## Features
+This extension provides some awesome features for Cisco config text, including:
+
+- Syntax highlighting
+- Config outline (Experimental)
+
 ## Screenshot
-<img src="https://raw.githubusercontent.com/Y-Ysss/vscode-cisco-config-highlight/main/Screenshot.png" alt="screenshot">
+<img src="images/Screenshot.png" alt="screenshot">
 
 ## Token Color Customizations
 
@@ -124,7 +130,7 @@ meta.function-call.command-disable.default.cisco
 
 ```
 
-## Experimental Feature
+## Experimental Features
 
 ### Show symbols in outline panel
 Open the settings and enter a keyword in the search box. Select the check box to enable.
