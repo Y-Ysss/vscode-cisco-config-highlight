@@ -262,7 +262,7 @@
 				},
 				{
 					"name": "meta.function-call.command_hostname.privileged-mode.cisco",
-					"match": "^(?!\\s)[0-9a-zA-Z\\-]++(\\(.*\\))?>"
+					"match": "^(?!\\s)[0-9a-zA-Z\\-]+(\\(.*\\))?>"
 				}
 			]
 		},

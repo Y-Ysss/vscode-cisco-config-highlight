@@ -66,8 +66,7 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
         category_name: 'interface',
         detail: 'interface',
         item_pattern: /[^.]*$/
-      }
-      ,
+      },
       'sub_interface': {
         pattern: /^(?:\s|\t)*(interface)(?:\s)/,
         kind: vscode.SymbolKind.Interface,
@@ -75,7 +74,7 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
         category_name: 'interface',
         parent_name: '.+\.',
         detail: 'sub-interface',
-        item_pattern: /.*(?=\.)/
+        item_pattern: /.*\..*$/
       }
     }
   }
