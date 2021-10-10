@@ -3,6 +3,13 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.3.1 (2021-10-11)
+- Update syntax highlighting patterns.
+  - Add logging system message pattern.
+  - Add interface patterns. (BRI, BVI)
+  - Update status pattern. (add first character uppercase.)
+
+
 ## 0.3.0 (2021-09-14)
 - Changed to use TypeScript.
 - Add a list to the config to toggle which symbols to enable.

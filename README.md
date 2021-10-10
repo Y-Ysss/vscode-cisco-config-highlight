@@ -63,6 +63,7 @@ string.other.description.cisco
 entity.name.tag.config-string.domain-name.cisco
 entity.name.tag.config-string.hostname.cisco
 entity.name.tag.config-string.username.cisco
+entity.name.tag.config-string.logging-system-message.cisco
 string.other.password.cisco
 comment.block.banner.cisco
 
@@ -92,6 +93,9 @@ entity.name.class.interface.serial.cisco
 entity.name.class.interface.cellular.cisco
 entity.name.class.interface.virtual-template.cisco
 entity.name.class.interface.dialer.cisco
+entity.name.class.interface.async.cisco
+entity.name.class.interface.bri.cisco
+entity.name.class.interface.bvi.cisco
 
 keyword.other.address.ipv4.cidr.cisco
 keyword.other.address.ipv4.full.cisco
