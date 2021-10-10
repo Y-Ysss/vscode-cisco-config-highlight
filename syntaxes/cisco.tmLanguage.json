@@ -75,7 +75,7 @@
 				},
 				{
 					"name": "keyword.other.config-keyword.status.cisco",
-					"match": "\\s(up|down|deleted|administratively(-down)?)(?=\\s|$)"
+					"match": "\\s([Uu]p|[Dd]own|[Dd]eleted|[Aa]dministratively(-down)?)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.match.cisco",
@@ -132,6 +132,12 @@
 				},
 				{
 					"include": "#async"
+				},
+				{
+					"include": "#bri"
+				},
+				{
+					"include": "#bvi"
 				}
 			],
 			"repository": {
@@ -180,8 +186,16 @@
 					"match": "\\b([Dd]ialer)(\\d+)?\\b"
 				},
 				"async": {
-					"name": "entity.name.class.interface.dialer.cisco",
+					"name": "entity.name.class.interface.async.cisco",
 					"match": "\\b([Aa]sync)(\\d+)?\\b"
+				},
+				"bri": {
+					"name": "entity.name.class.interface.bri.cisco",
+					"match": "\\b(BRI)(\\d+)?\\b"
+				},
+				"bvi": {
+					"name": "entity.name.class.interface.bvi.cisco",
+					"match": "\\b(BVI)(\\d+)?\\b"
 				}
 			}
 		},
@@ -311,6 +325,9 @@
 					"include": "#username"
 				},
 				{
+					"include": "#logging-system-message"
+				},
+				{
 					"include": "#password"
 				},
 				{
@@ -333,6 +350,10 @@
 				"username": {
 					"match": "(?<=username\\s)(\\S+)\\b",
 					"name": "entity.name.tag.config-string.username.cisco"
+				},
+				"logging-system-message": {
+					"match": "(?<=%)\\S+-\\d-\\S+(?=:)",
+					"name": "entity.name.tag.config-string.logging-system-message.cisco"
 				},
 				"password": {
 					"match": "(?<=password\\s\\d+\\s)(\\S+)$",
