@@ -3,6 +3,10 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.3.3 (2021-11-07)
+- Update outline symbol pattern.
+  - Exclude vrf forwarding from ip vrf outline symbol
+
 ## 0.3.2 (2021-11-07)
 - Update outline symbol.
   - Add vrf symbol.
