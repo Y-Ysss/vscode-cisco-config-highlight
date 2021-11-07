@@ -25,7 +25,7 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
   get defines(): { [name: string]: SymbolInfo } {
     return {
       'ip_vrf': {
-        pattern: /^(?:\s|\t)*ip\svrf(?:\s)/,
+        pattern: /^(?:\s|\t)*ip\svrf(?!\sforwarding)(?:\s)/,
         kind: vscode.SymbolKind.Field,
         node_name: 'ip_vrf',
         category_name: 'ip_vrf',
