@@ -3,6 +3,10 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.3.2 (2021-11-07)
+- Update outline symbol.
+  - Add vrf symbol.
+
 ## 0.3.1 (2021-10-11)
 - Update syntax highlighting patterns.
   - Add logging system message pattern.
