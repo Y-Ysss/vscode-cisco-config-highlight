@@ -24,6 +24,14 @@ type SymbolInfo = {
 class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
   get defines(): { [name: string]: SymbolInfo } {
     return {
+      'ip_vrf': {
+        pattern: /^(?:\s|\t)*ip\svrf(?:\s)/,
+        kind: vscode.SymbolKind.Field,
+        node_name: 'ip_vrf',
+        category_name: 'ip_vrf',
+        detail: 'ip vrf',
+        item_pattern:  /.*$/
+      },
       'router_bgp': {
         pattern: /^(?:\s|\t)*router\sbgp(?:\s)/,
         kind: vscode.SymbolKind.Class,

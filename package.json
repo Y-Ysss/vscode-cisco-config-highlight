@@ -2,7 +2,7 @@
     "name": "cisco-config-highlight",
     "displayName": "Cisco Config Highlight",
     "description": "Cisco device configuration Syntax Highlighting for Visual Studio Code.",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "publisher": "Y-Ysss",
     "license": "MIT",
     "engines": {
@@ -50,6 +50,11 @@
                     "cisco-config-highlight.outline.symbolsList": {
                         "type": "object",
                         "properties": {
+                            "ip_vrf": {
+                                "type": "boolean",
+                                "default": true,
+                                "description": "%configuration.properties.symbols.ipVrf.description%"
+                            },
                             "router_bgp": {
                                 "type": "boolean",
                                 "default": true,
@@ -83,6 +88,7 @@
                         },
                         "additionalProperties": false,
                         "default": {
+                            "ip_vrf": true,
                             "router_bgp": true,
                             "address_family": true,
                             "class_map": true,

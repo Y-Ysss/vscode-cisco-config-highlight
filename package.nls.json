@@ -1,6 +1,7 @@
 {
     "configuration.properties.showSymbolsInOutlinePanel.description": "[Experimental Feature] Show Symbol Definitions Within a Document.\nAllow the user to show in outline panel and quickly navigate to any symbol definition in the document.",
     "configuration.properties.showEnableDisableSymbols.description": "[Experimental Feature] Enable and disable the symbols to display. \nThis option requires Show Symbols In Outline Panel to be enabled.",
+    "configuration.properties.symbols.ipVrf.description": "Virtual Routing and Forwarding(VRF) 'ip vrf {vrf-name}'",
     "configuration.properties.symbols.routerBgp.description": "Border Gateway Protocol(BGP) 'router bgp {autonomous-system-number}'",
     "configuration.properties.symbols.addressFamily.description": "Border Gateway Protocol(BGP) 'address-family ipv4 {unicast|multicast|vrf vrf-name }'",
     "configuration.properties.symbols.classMap.description": "Quality of Service(QoS) 'class-map {match-any|match-all} name'",
