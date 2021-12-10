@@ -439,11 +439,11 @@
 					"name": "entity.name.tag.qos.class-map.name.cisco"
 				},
 				"route-map": {
-					"match": "(?<=route-map\\s(.*\\s)?)(\\S+)$",
+					"match": "(?<=route-map\\s)(\\S+)\\b",
 					"name": "entity.name.tag.qos.route-map.name.cisco"
 				},
 				"prefix-list": {
-					"match": "(?<=prefix-list\\s(.*\\s)?)(\\S+)$",
+					"match": "(?<=prefix-list\\s)(\\S+)\\b",
 					"name": "entity.name.tag.qos.prefix-list.name.cisco"
 				}
 			}
