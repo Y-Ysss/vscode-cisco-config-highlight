@@ -142,7 +142,7 @@ Open the settings and enter a keyword in the search box. Select the check box to
 `@ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel`
 
 #### Supported symbols
-- Command (e.g. `show running-config`)
+- Command (e.g. `hostname#show running-config`)
 - Virtual Routing and Forwarding(VRF) `ip vrf {vrf-name}`
 - Border Gateway Protocol(BGP) `router bgp {autonomous-system-number}`
 - Border Gateway Protocol(BGP) `address-family ipv4 {unicast|multicast|vrf vrf-name }`
