@@ -141,6 +141,16 @@ Open the settings and enter a keyword in the search box. Select the check box to
 
 `@ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel`
 
+#### Supported symbols
+- Command (e.g. `show running-config`)
+- Virtual Routing and Forwarding(VRF) `ip vrf {vrf-name}`
+- Border Gateway Protocol(BGP) `router bgp {autonomous-system-number}`
+- Border Gateway Protocol(BGP) `address-family ipv4 {unicast|multicast|vrf vrf-name }`
+- Quality of Service(QoS) `class-map {match-any|match-all} name`
+- Quality of Service(QoS) `policy-map {name}`
+- Interface `interface {type, slot, port, etc...}`
+- Sub Interface `interface {type, slot, port, etc...}.{number}`
+
 ### Multilingual support
 Currently, only the configuration page is available.
 
@@ -148,7 +158,7 @@ Following supported languages:
 - English
 - Japanese
 
-## Install
+## Installation
 
 [Visual Studio Marketplace - Cisco Config Highlight](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight)
 
@@ -158,7 +168,7 @@ I recommend the following extensions to more beautiful look:
 - [Jarvis Prestidge/Sublime Material Theme](https://marketplace.visualstudio.com/items?itemName=jprestidge.theme-material-theme)
 
 ## Requests or Issues
-If you have any requests or Issues, please start an Issue or PullRequest on GitHub.
+If you have any requests or issues, please start an Issue or PullRequest on GitHub.
 
 [GitHub - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
 
