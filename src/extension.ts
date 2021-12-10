@@ -14,16 +14,15 @@ const regExpJoin = (delimiter: string, list: RegExp[]): RegExp => {
 
 class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
 
-  regexPattern(item: [string, boolean]): RegExp {
-    const k = item[0]
-    const d = symbolsInfo[k]
-    return RegExp(`(?<index_${k}>${d.pattern.source})(?<submatch_${k}>${d.item_pattern.source})`)
+  regexPattern(name: string): RegExp {
+    const d = symbolsInfo[name]
+    return RegExp(`(?<index_${name}>${d.pattern.source})(?<submatch_${name}>${d.item_pattern.source})`)
   }
 
 
   patterns(): { bool: boolean, value?: RegExp } {
     const symbols: { [name: string]: boolean } = vscode.workspace.getConfiguration('cisco-config-highlight').get('outline.symbolsList', {})
-    const patterns: RegExp[] = Object.entries(symbols).filter(item => item[1]).map(item => { return this.regexPattern(item) })
+    const patterns: RegExp[] = Object.entries(symbols).filter(item => item[1]).map(item => { return this.regexPattern(item[0]) })
     if (!patterns.length) {
       return { bool: false }
     }
@@ -33,8 +32,8 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
   provideDocumentSymbols(document: vscode.TextDocument, _token: vscode.CancellationToken): Promise<vscode.DocumentSymbol[]> {
     return new Promise((resolve, reject) => {
       let symbols: vscode.DocumentSymbol[] = [];
-      const a = vscode.workspace.getConfiguration('cisco-config-highlight').get('outline.showSymbolsInOutlinePanel', false)
-      if (!a) {
+      const enabledOutlinePanel = vscode.workspace.getConfiguration('cisco-config-highlight').get('outline.showSymbolsInOutlinePanel', false)
+      if (!enabledOutlinePanel) {
         reject('Cisco Config Highlight: The outline panel view of the symbol is disabled.')
       }
       const text = document.getText();
@@ -44,7 +43,7 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
       }
       let category_name = ''
       let parent_name = ''
-      text.split(/\r?\n/).forEach((item, i) => {
+      text.split(/\r?\n/).forEach((item:string, i:number) => {
         let m: RegExpMatchArray | null = item.match(patterns.value || '')
         if (m?.groups) {
           const data = Object.entries(m.groups).filter(item => item[1] !== undefined)
@@ -57,7 +56,7 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
             category_name = symbols[symbols.length - 1].name
           }
           if (category_name !== info.category_name) {
-            symbols.push(new vscode.DocumentSymbol(info.category_name, '', vscode.SymbolKind.Namespace, position, position))
+            symbols.push(new vscode.DocumentSymbol(info.category_name, '', info.parent_kind ? info.parent_kind : vscode.SymbolKind.Namespace, position, position))
           }
           if (info.parent_name) {
             let pm = data[1][1].match(info.parent_name || '')
@@ -67,10 +66,10 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
           }
           const category = symbols[symbols.length - 1]
           const node: vscode.DocumentSymbol = category.children[category.children.length - 1]
-          if (category.children.length > 0 && parent_name === data[1][1] && node.detail !== info.detail) {
-            node.children.push(new vscode.DocumentSymbol(data[1][1], info.detail, info.kind, position, position))
+          if (category.children.length > 0 && parent_name === data[1][1].trim() && node.detail !== info.detail) {
+            node.children.push(new vscode.DocumentSymbol(data[1][1].trim(), info.detail, info.kind, position, position))
           } else {
-            symbols[symbols.length - 1].children.push(new vscode.DocumentSymbol(data[1][1], info.detail, info.kind, position, position))
+            symbols[symbols.length - 1].children.push(new vscode.DocumentSymbol(data[1][1].trim(), info.detail, info.kind, position, position))
           }
         }
       });
