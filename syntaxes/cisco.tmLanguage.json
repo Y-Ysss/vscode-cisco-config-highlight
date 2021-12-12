@@ -44,6 +44,9 @@
 		},
 		{
 			"include": "#param1"
+		},
+		{
+			"include": "#param1"
 		}
 	],
 	"repository": {
@@ -51,47 +54,51 @@
 			"patterns": [
 				{
 					"name": "keyword.other.config-keyword.vlan.cisco",
-					"match": "\\s(protocol-vlan|mac-vlan|dot1q-tunnel|dot1Q)(?=\\s|$)"
+					"match": "(^|\\s)(protocol-vlan|mac-vlan|dot1q-tunnel|dot1Q)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.switchport-mode.cisco",
-					"match": "\\s(access|trunk|(dynamic\\s(auto|desirable)))(?=\\s|$)"
+					"match": "(^|\\s)(access|trunk|(dynamic\\s(auto|desirable)))(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.add-remove.cisco",
-					"match": "\\s(add|remove|except)(?=\\s|$)"
+					"match": "(^|\\s)(add|remove|except)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.allowed-native.cisco",
-					"match": "\\s(allowed|native)(?=\\s|$)"
+					"match": "(^|\\s)(allowed|native)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.any-all.cisco",
-					"match": "\\s(any|all)(?=\\s|$)"
+					"match": "(^|\\s)(any|all)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.permit-deny.cisco",
-					"match": "\\s(permit|deny)(?=\\s|$)"
+					"match": "(^|\\s)(permit|deny)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.status.cisco",
-					"match": "\\s([Uu]p|[Dd]own|[Dd]eleted|[Aa]dministratively(-down)?)(?=\\s|$)"
+					"match": "(^|\\s)([Uu]p|[Dd]own|[Dd]eleted|[Aa]dministratively(-down)?)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.match.cisco",
-					"match": "\\s(match-(any|all))(?=\\s|$)"
+					"match": "(^|\\s)(match-(any|all))(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.in-out.cisco",
-					"match": "\\s(in|out)(?=\\s|$)"
+					"match": "(^|\\s)(in|out)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.input-output.cisco",
-					"match": "\\s(input|output)(?=\\s|$)"
+					"match": "(^|\\s)(input|output)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.inside-outside.cisco",
-					"match": "\\s(inside|outside)(?=\\s|$)"
+					"match": "(^|\\s)(inside|outside)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.shutdown.cisco",
+					"match": "(^|\\s)(shutdown)(?=\\b|$)"
 				}
 			]
 		},
