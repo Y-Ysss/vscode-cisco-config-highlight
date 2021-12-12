@@ -3,12 +3,22 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.3.5 (2021-12-12)
+### Added
+- Add syntax highlighting patterns.
+  - Add shutdown keyword
+### Changed
+- Update syntax highlighting patterns.
+  - Changed the beginning-of-line match pattern of some patterns from `\s` to `(^|\\s)`.
+  - Updated regular expression in hostname to exclude irrelevant matches.
+
+
 ## 0.3.4 (2021-12-10)
 ### Added
 - Add Command symbol to outline panel.
 ### Changed
 - Update syntax highlighting patterns.
- - Update route-map, prefix-list patterns.
+  - Update route-map, prefix-list patterns.
 - Symbol info object moved to symbolsInfo.ts file.
 
 

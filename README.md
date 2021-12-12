@@ -81,6 +81,7 @@ keyword.other.config-keyword.match.cisco
 keyword.other.config-keyword.in-out.cisco
 keyword.other.config-keyword.input-output.cisco
 keyword.other.config-keyword.inside-outside.cisco
+keyword.other.config-keyword.shutdown.cisco
 
 entity.name.class.interface.ethernet.cisco
 entity.name.class.interface.wireless.cisco
@@ -158,12 +159,21 @@ Following supported languages:
 - English
 - Japanese
 
+## Notes
+### Highlighting in large files
+
+If you want to enable highlighting in large files. Change the following settings to False.
+```
+"editor.largeFileOptimizations": false
+```
+However VSCode disable feature on large files for performance reasons, and forcing VSCode to syntax highlight large files may result in poor editor performance.
+
 ## Installation
 
 [Visual Studio Marketplace - Cisco Config Highlight](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight)
 
 ## Recommended Extensions
-I recommend the following extensions to more beautiful look:
+I recommend the following extensions to more beautiful look.
 - [Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)
 - [Jarvis Prestidge/Sublime Material Theme](https://marketplace.visualstudio.com/items?itemName=jprestidge.theme-material-theme)
 
