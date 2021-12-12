@@ -14,7 +14,7 @@ type SymbolInfo = {
 
 export const symbolsInfo: { [name: string]: SymbolInfo } = {
     'command': {
-        pattern: /^(?:\s|\t)*\S*(?:(#|>))(?!.*(#|>|\s)$)/,
+        pattern: /^(?!\\s)[0-9a-zA-Z\\-]+(?:(#|>))(?!.*(#|>|\s)$)/,
         kind: SymbolKind.String,
         parent_kind: SymbolKind.Event,
         node_name: 'command',
