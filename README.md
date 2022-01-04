@@ -59,6 +59,7 @@ punctuation.config-param.first.cisco
 
 comment.line.config.cisco
 
+string.other.remark.cisco
 string.other.description.cisco
 entity.name.tag.config-string.domain-name.cisco
 entity.name.tag.config-string.hostname.cisco

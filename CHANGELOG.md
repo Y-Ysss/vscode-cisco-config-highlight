@@ -3,9 +3,15 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.3.5 (Unreleased)
+### Added
+- Add syntax highlighting pattern.
+  - Add remark keyword
+
+
 ## 0.3.5 (2021-12-12)
 ### Added
-- Add syntax highlighting patterns.
+- Add syntax highlighting pattern.
   - Add shutdown keyword
 ### Changed
 - Update syntax highlighting patterns.
