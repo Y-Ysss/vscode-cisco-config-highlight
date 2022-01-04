@@ -326,6 +326,9 @@
 					"include": "#description"
 				},
 				{
+					"include": "#remark"
+				},
+				{
 					"include": "#domain-name"
 				},
 				{
@@ -345,6 +348,10 @@
 				"description": {
 					"match": "(?<=(description|Description:))\\s(.*)$",
 					"name": "string.other.description.cisco"
+				},
+				"remark": {
+					"match": "(?<=remark)\\s(.*)$",
+					"name": "string.other.remark.cisco"
 				},
 				"hostname": {
 					"match": "(?<=hostname\\s)[0-9a-zA-Z\\-]+\\b",
