@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
 import { symbolsInfo } from './symbolsInfo';
+import { registerUpdateInfo } from './registerUpdateInfo';
 
 export function activate(context: vscode.ExtensionContext): void {
+  registerUpdateInfo(context);
   context.subscriptions.push(vscode.languages.registerDocumentSymbolProvider({ language: 'cisco' }, new CiscoConfigDocumentSymbolProvider()));
 }
 
