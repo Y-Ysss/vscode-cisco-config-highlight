@@ -3,8 +3,9 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
-## 0.3.5 (Unreleased)
+## 0.4.0 (Unreleased)
 ### Added
+- Added notification of incompatible changes.
 - Add syntax highlighting pattern.
   - Add remark keyword
 
