@@ -21,7 +21,7 @@
 			"include": "#string"
 		},
 		{
-			"include": "#qos"
+			"include": "#group"
 		},
 		{
 			"include": "#acl"
@@ -414,7 +414,7 @@
 				}
 			}
 		},
-		"qos": {
+		"group": {
 			"patterns": [
 				{
 					"include": "#class"
@@ -433,32 +433,46 @@
 				},
 				{
 					"include": "#prefix-list"
+				},
+				{
+					"include": "#object-group"
 				}
 			],
 			"repository": {
 				"class": {
 					"match": "(?<=class\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.class.name.cisco"
+					"name": "entity.name.tag.group.class.name.cisco"
 				},
 				"service-policy": {
 					"match": "(?<=service-policy\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.service-policy.name.cisco"
+					"name": "entity.name.tag.group.service-policy.name.cisco"
 				},
 				"policy-map": {
 					"match": "(?<=policy-map\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.policy-map.name.cisco"
+					"name": "entity.name.tag.group.policy-map.name.cisco"
 				},
 				"class-map": {
 					"match": "(?<=class-map\\s(.*\\s)?)(\\S+)$",
-					"name": "entity.name.tag.qos.class-map.name.cisco"
+					"name": "entity.name.tag.group.class-map.name.cisco"
 				},
 				"route-map": {
 					"match": "(?<=route-map\\s)(\\S+)\\b",
-					"name": "entity.name.tag.qos.route-map.name.cisco"
+					"name": "entity.name.tag.group.route-map.name.cisco"
 				},
 				"prefix-list": {
 					"match": "(?<=prefix-list\\s)(\\S+)\\b",
-					"name": "entity.name.tag.qos.prefix-list.name.cisco"
+					"name": "entity.name.tag.group.prefix-list.name.cisco"
+				},
+				"object-group": {
+					"match": "(?<=object-group\\s)((service|network)\\s)?(\\S+)\\b",
+					"captures": {
+						"2": {
+							"name": "keyword.other.group.object-group.type.cisco"
+						},
+						"3": {
+							"name": "entity.name.tag.group.object-group.name.cisco"
+						}
+					}
 				}
 			}
 		},
@@ -469,9 +483,6 @@
 				},
 				{
 					"include": "#access-group"
-				},
-				{
-					"include": "#object-group"
 				}
 			],
 			"repository": {
@@ -491,17 +502,6 @@
 					"captures": {
 						"3": {
 							"name": "entity.name.tag.acl.access-group.name.cisco"
-						}
-					}
-				},
-				"object-group": {
-					"match": "(?<=object-group\\s)((service|network)\\s)?(\\S+)\\b",
-					"captures": {
-						"2": {
-							"name": "keyword.other.acl.object-group.type.cisco"
-						},
-						"3": {
-							"name": "entity.name.tag.acl.object-group.name.cisco"
 						}
 					}
 				}
