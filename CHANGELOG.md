@@ -8,6 +8,23 @@
 - Added notification of incompatible changes.
 - Add syntax highlighting pattern.
   - Add remark keyword
+### Changed
+- Change Token Name Issue#2
+  - Note: If you have customized the token color in Settings.json, the corresponding Token must be renamed to the new name.
+  - Changed the category name of tokens whose category name was QoS to Group.
+  ```
+  entity.name.tag.qos.class.name.cisco --> entity.name.tag.group.class.name.cisco
+  entity.name.tag.qos.service-policy.name.cisco --> entity.name.tag.group.service-policy.name.cisco
+  entity.name.tag.qos.policy-map.name.cisco --> entity.name.tag.group.policy-map.name.cisco
+  entity.name.tag.qos.class-map.name.cisco --> entity.name.tag.group.class-map.name.cisco
+  entity.name.tag.qos.route-map.name.cisco --> entity.name.tag.group.route-map.name.cisco
+  entity.name.tag.qos.prefix-list.name.cisco --> entity.name.tag.group.prefix-list.name.cisco
+  ```
+  - Changed the category name of some tokens whose category name is ACL to Group.
+  ```
+  keyword.other.acl.object-group.type.cisco --> keyword.other.group.object-group.type.cisco
+  entity.name.tag.acl.object-group.name.cisco --> entity.name.tag.group.object-group.name.cisco
+  ```
 
 
 ## 0.3.5 (2021-12-12)
