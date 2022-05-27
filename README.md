@@ -149,8 +149,8 @@ Open the settings and enter a keyword in the search box. Select the check box to
 - Virtual Routing and Forwarding(VRF) `ip vrf {vrf-name}`
 - Border Gateway Protocol(BGP) `router bgp {autonomous-system-number}`
 - Border Gateway Protocol(BGP) `address-family ipv4 {unicast|multicast|vrf vrf-name }`
-- Quality of Service(QoS) `class-map {match-any|match-all} name`
-- Quality of Service(QoS) `policy-map {name}`
+- Group `class-map {match-any|match-all} name`
+- Group `policy-map {name}`
 - Interface `interface {type, slot, port, etc...}`
 - Sub Interface `interface {type, slot, port, etc...}.{number}`
 
