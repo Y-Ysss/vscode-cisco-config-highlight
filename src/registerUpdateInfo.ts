@@ -2,11 +2,10 @@ import * as vscode from 'vscode';
 import * as semver from 'semver';
 import { notificationConditions } from './notificationConditions';
 
-const extension_id = 'Y-Ysss.cisco-config-highlight';
 
 export function registerUpdateInfo(context: vscode.ExtensionContext) {
     console.log('Hello')
-    const versionKey = `${extension_id}.version`;
+    const versionKey = `previous_version`;
     context.globalState.setKeysForSync([versionKey]);
 
     // https://code.visualstudio.com/api/extension-capabilities/common-capabilities
@@ -14,6 +13,7 @@ export function registerUpdateInfo(context: vscode.ExtensionContext) {
     const currentVersion = context.extension.packageJSON.version;
     context.globalState.update(versionKey, currentVersion);
     // context.globalState.update(versionKey, '0.3.6');   // -----------------------------DEBUG
+    // console.log(context.globalState.keys());
     console.log(previousVersion, currentVersion)
 
     if (!previousVersion || isIgnore(previousVersion, currentVersion)) {
