@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import * as semver from 'semver';
-import { notificationConditions } from './notificationConditions';
+import { notificationConditions, NotificationInfo } from './notificationConditions';
 
 
 export function registerUpdateInfo(context: vscode.ExtensionContext) {
-    console.log('Hello')
+    // console.log('Hello');
     const versionKey = `previous_version`;
     context.globalState.setKeysForSync([versionKey]);
 
@@ -14,24 +14,41 @@ export function registerUpdateInfo(context: vscode.ExtensionContext) {
     context.globalState.update(versionKey, currentVersion);
     // context.globalState.update(versionKey, '0.3.6');   // -----------------------------DEBUG
     // console.log(context.globalState.keys());
-    console.log(previousVersion, currentVersion)
+    console.log(previousVersion, currentVersion);
 
-    if (!previousVersion || isIgnore(previousVersion, currentVersion)) {
+    if (previousVersion && isIgnore(previousVersion, currentVersion)) {
         return;
     }
     notificationConditions.forEach(info => {
-        if (semver.satisfies(previousVersion, info.version_info)) {
-            let message = info.messege.split('${previousVersion}').join(previousVersion);
+        if (!previousVersion || semver.satisfies(previousVersion, info.version_info)) {
+            let prev = previousVersion ? previousVersion : 'undefined'
+            let message = info.messege.split('${previousVersion}').join(prev);
             message = message.split('${currentVersion}').join(currentVersion);
-            const dialog = vscode.window.showInformationMessage(
-                message,
-                info.button_label,
-            );
+            const dialog = getDialog(info, message);
             dialog.then(() => {
-                info.action(previousVersion, currentVersion);
+                info.action(prev, currentVersion);
             });
         }
     });
+}
+
+function getDialog(info: NotificationInfo, message: string): Thenable<string | undefined> {
+    if (info.type === 'info') {
+        return vscode.window.showInformationMessage(
+            message,
+            info.button_label,
+        );
+    } else if (info.type === 'warn') {
+        return vscode.window.showWarningMessage(
+            message,
+            info.button_label,
+        );
+    } else {
+        return vscode.window.showInformationMessage(
+            message,
+            info.button_label,
+        );
+    }
 }
 
 function isIgnore(previousVersion: string, currentVersion: string): boolean {
