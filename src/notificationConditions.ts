@@ -1,8 +1,8 @@
-import { default_action } from "./notificationAction";
+import { default_action } from './notificationAction';
 
 type MessageType = 'info' | 'warn';
 
-type NotificationInfo = {
+export type NotificationInfo = {
     type: MessageType,
     version_info: string,
     messege: string,
@@ -12,9 +12,9 @@ type NotificationInfo = {
 
 export const notificationConditions: NotificationInfo[] = [
     {
-        type: 'warn',
+        type: 'info',
         version_info: '<0.4.0',
-        messege: 'Updated from version ${previousVersion}. Version ${currentVersion} contains changes incompatible with version <0.4.0. Please check Changelog for details.',
+        messege: 'Updated from lower version (${previousVersion}). Version ${currentVersion} contains changes incompatible with version <0.4.0. Please check Changelog for details.',
         button_label: 'Show Changelog',
         action: default_action
     }

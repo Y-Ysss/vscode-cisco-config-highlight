@@ -118,18 +118,19 @@ entity.name.tag.bgp.peer-session.name.cisco
 entity.name.tag.bgp.peer-policy.name.cisco
 entity.name.tag.bgp.peer-group.name.cisco
 
-entity.name.tag.qos.class.name.cisco
-entity.name.tag.qos.service-policy.name.cisco
-entity.name.tag.qos.policy-map.name.cisco
-entity.name.tag.qos.class-map.name.cisco
-entity.name.tag.qos.route-map.name.cisco
-entity.name.tag.qos.prefix-list.name.cisco
+entity.name.tag.group.class.name.cisco
+entity.name.tag.group.service-policy.name.cisco
+entity.name.tag.group.policy-map.name.cisco
+entity.name.tag.group.class-map.name.cisco
+entity.name.tag.group.route-map.name.cisco
+entity.name.tag.group.prefix-list.name.cisco
+
+keyword.other.group.object-group.type.cisco
+entity.name.tag.group.object-group.name.cisco
 
 keyword.other.acl.access-list.type.cisco
 entity.name.tag.acl.access-list.name.cisco
 entity.name.tag.acl.access-group.name.cisco
-keyword.other.acl.object-group.type.cisco
-entity.name.tag.acl.object-group.name.cisco
 
 meta.function-call.command-disable.unused.cisco
 meta.function-call.command-disable.default.cisco
@@ -148,8 +149,8 @@ Open the settings and enter a keyword in the search box. Select the check box to
 - Virtual Routing and Forwarding(VRF) `ip vrf {vrf-name}`
 - Border Gateway Protocol(BGP) `router bgp {autonomous-system-number}`
 - Border Gateway Protocol(BGP) `address-family ipv4 {unicast|multicast|vrf vrf-name }`
-- Quality of Service(QoS) `class-map {match-any|match-all} name`
-- Quality of Service(QoS) `policy-map {name}`
+- Group `class-map {match-any|match-all} name`
+- Group `policy-map {name}`
 - Interface `interface {type, slot, port, etc...}`
 - Sub Interface `interface {type, slot, port, etc...}.{number}`
 
