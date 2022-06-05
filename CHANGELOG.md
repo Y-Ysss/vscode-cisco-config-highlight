@@ -3,10 +3,12 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
-## 0.4.1 (2022-06-04)
+## 0.4.1 (2022-06-xx)
 ### Added
-- Add syntax highlighting pattern.
+- Add syntax highlighting patterns.
   - Add pool name pattern
+  - Add crypto map name pattern
+  - Add transform-set name pattern
 
 
 ## 0.4.0 (2022-06-04)
