@@ -3,7 +3,13 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
-## 0.4.0 (Unreleased)
+## 0.4.1 (2022-06-04)
+### Added
+- Add syntax highlighting pattern.
+  - Add pool name pattern
+
+
+## 0.4.0 (2022-06-04)
 ### Added
 - Added notification of incompatible changes.
 - Add syntax highlighting pattern.
