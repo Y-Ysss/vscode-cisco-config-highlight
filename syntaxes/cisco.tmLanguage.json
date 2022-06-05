@@ -436,6 +436,9 @@
 				},
 				{
 					"include": "#object-group"
+				},
+				{
+					"include": "#pool"
 				}
 			],
 			"repository": {
@@ -473,6 +476,10 @@
 							"name": "entity.name.tag.group.object-group.name.cisco"
 						}
 					}
+				},
+				"pool": {
+					"match": "(?<=pool\\s)(\\S+)\\b",
+					"name": "entity.name.tag.group.pool.name.cisco"
 				}
 			}
 		},
