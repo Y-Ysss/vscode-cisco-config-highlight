@@ -27,6 +27,9 @@
 			"include": "#acl"
 		},
 		{
+			"include": "#crypto"
+		},
+		{
 			"include": "#address"
 		},
 		{
@@ -511,6 +514,26 @@
 							"name": "entity.name.tag.acl.access-group.name.cisco"
 						}
 					}
+				}
+			}
+		},
+		"crypto": {
+			"patterns": [
+				{
+					"include": "#crypto-map"
+				},
+				{
+					"include": "#transform-set"
+				}
+			],
+			"repository": {
+				"crypto-map": {
+					"match": "(?<=crypto\\smap\\s)(\\S+)\\b",
+					"name": "entity.name.tag.crypto.crypto-map.name.cisco"
+				},
+				"transform-set": {
+					"match": "(?<=transform-set\\s)(\\S+)\\b",
+					"name": "entity.name.tag.crypto.transform-set.name.cisco"
 				}
 			}
 		},
