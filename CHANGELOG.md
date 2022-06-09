@@ -9,10 +9,12 @@
 - Update implementation of symbol display in the outline panel, which is currently an experimental feature.
 
 
-## 0.4.1 (2022-06-04)
+## 0.4.1 (2022-06-10)
 ### Added
-- Add syntax highlighting pattern.
+- Add syntax highlighting patterns.
   - Add pool name pattern
+  - Add crypto map name pattern
+  - Add transform-set name pattern
 
 
 ## 0.4.0 (2022-06-04)
