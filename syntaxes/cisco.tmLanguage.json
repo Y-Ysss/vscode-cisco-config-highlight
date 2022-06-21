@@ -148,12 +148,15 @@
 				},
 				{
 					"include": "#bvi"
+				},
+				{
+					"include": "#management"
 				}
 			],
 			"repository": {
 				"ethernet": {
 					"name": "entity.name.class.interface.ethernet.cisco",
-					"match": "\\b(([Ff]ast|([Ff]ive|[Tt]en|[Ff]orty)?[Gg]igabit)?[Ee]thernet|Fa|Gi|Te|Fo)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
+					"match": "\\b(([Ff]ast|([Ff]ive|[Tt]en|[Tt]wenty[Ff]ive|[Ff](orty|ifty)|([Tt]wo)?[Hh]undred)?[Gg](ig)?(abit)?)?[Ee](th)?(ernet)?|Fa|Gi|Te|Fo|Fi)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
 				},
 				"wireless": {
 					"name": "entity.name.class.interface.wireless.cisco",
@@ -165,7 +168,7 @@
 				},
 				"port-channel": {
 					"name": "entity.name.class.interface.portchannel.cisco",
-					"match": "\\b([Pp]ort-channel|Po)(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[1-9])?\\b"
+					"match": "\\b([Pp]ort-?[Cc]hannel|Po)(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[1-9])?\\b"
 				},
 				"tunnel": {
 					"name": "entity.name.class.interface.tunnel.cisco",
@@ -206,6 +209,10 @@
 				"bvi": {
 					"name": "entity.name.class.interface.bvi.cisco",
 					"match": "\\b(BVI)(\\d+)?\\b"
+				},
+				"management": {
+					"name": "entity.name.class.interface.management.cisco",
+					"match": "\\b(Management|[Mm]gmt)((\\d+[\\./])*)?(\\d+)?\\b"
 				}
 			}
 		},
@@ -233,7 +240,7 @@
 			"patterns": [
 				{
 					"name": "comment.line.config.cisco",
-					"match": "^\\s*!.*"
+					"match": "^\\s*[!#].*"
 				}
 			]
 		},
