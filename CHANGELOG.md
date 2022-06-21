@@ -3,6 +3,12 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+
+## 0.5.0 (Unreleased)
+### Changed
+- Update implementation of symbol display in the outline panel, which is currently an experimental feature.
+
+
 ## 0.4.1 (2022-06-10)
 ### Added
 - Add syntax highlighting patterns.
