@@ -4,7 +4,15 @@
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
 
-## 0.5.0 (Unreleased)
+## 0.5.0 (2022-06-21)
+### Added
+- Add syntax highlighting patterns.
+  - Add Management interface pattern
+  - Add TwentyFiveGigabitEthernet interface pattern
+  - Add FiftyGigabitEthernet interface pattern
+  - Add HundredGigabitEthernet interface pattern
+  - Add TwoHundredGigabitEthernet interface pattern
+  - Add comment line pattern (beginning with #)
 ### Changed
 - Update implementation of symbol display in the outline panel, which is currently an experimental feature.
 
