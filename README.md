@@ -16,19 +16,41 @@ This extension provides some awesome features for Cisco config text, including:
 - Syntax highlighting
 - Config outline (Experimental)
 
+## Supported Platforms
+
+Syntaxes often used in Config are supported.
+- IOS
+
+The following platforms provide similar highlighting for syntaxes that overlap with IOS.
+
+In the future, I would like to support the following platforms.
+- NXOS
+- IOS-XR
+- IOS-XE
+- ASA
+
+
+
 ## Screenshot
+Note: Screenshots are using a custom theme.
 <img src="images/Screenshot.png" alt="screenshot">
 
 ## Token Color Customizations
 
 The color of syntax highlighting depends on the theme you have enabled.
 
-If the theme you currently have enabled does not define the colors, you will need to customize the `settings.json` file.
+All highlighting settings are not enabled in VSCode's default theme. For a better experience, I recommend using a custom theme such as MaterialTheme.
+
+If the colors are not defined in the currently activated theme, or if you want to customize the colors and style to your liking, you will need to edit the `settings.json`.
 
 Open the settings and add option strings to JSON.
 (You can open the `settings.json` file by typing `Preferences: Open Settings (JSON)` in the command palette.)
 
-### VSCode settings customize sample
+For more information on how to customize the settings.json file, please refer to the following URL.
+
+[Visual Studio Code Documentaion - Color Themes](https://code.visualstudio.com/docs/getstarted/themes)
+
+### VSCode settings.json customize sample
 ``` json
     "editor.tokenColorCustomizations": {
         "textMateRules": [
@@ -66,6 +88,7 @@ entity.name.tag.config-string.hostname.cisco
 entity.name.tag.config-string.username.cisco
 entity.name.tag.config-string.logging-system-message.cisco
 string.other.password.cisco
+string.other.secret.cisco
 comment.block.banner.cisco
 
 constant.numeric.hex.cisco
@@ -98,6 +121,7 @@ entity.name.class.interface.dialer.cisco
 entity.name.class.interface.async.cisco
 entity.name.class.interface.bri.cisco
 entity.name.class.interface.bvi.cisco
+entity.name.class.interface.management.cisco
 
 keyword.other.address.ipv4.cidr.cisco
 keyword.other.address.ipv4.full.cisco
@@ -139,23 +163,40 @@ meta.function-call.command-disable.default.cisco
 
 ## Experimental Features
 
+- Show symbols in outline panel
+- Multilingual support (settings page)
+
+
 ### Show symbols in outline panel
+
+<img src="images/outline.png" alt="screenshot">
+
 Open the settings and enter a keyword in the search box. Select the check box to enable.
 
-`@ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel`
+```
+@ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel
+```
 
 #### Supported symbols
-- Command (e.g. `hostname#show running-config`)
-- Virtual Routing and Forwarding(VRF) `ip vrf {vrf-name}`
-- Border Gateway Protocol(BGP) `router bgp {autonomous-system-number}`
-- Border Gateway Protocol(BGP) `address-family ipv4 {unicast|multicast|vrf vrf-name }`
-- Group `class-map {match-any|match-all} name`
-- Group `policy-map {name}`
-- Interface `interface {type, slot, port, etc...}`
-- Sub Interface `interface {type, slot, port, etc...}.{number}`
+- Command
+  - `hostname#{command name}`
+  - `hostname>{command name}`
+- Virtual Routing and Forwarding(VRF)
+  - `ip vrf {vrf-name}`
+- Border Gateway Protocol(BGP)
+  - `router bgp {autonomous-system-number}`
+  - `address-family ipv4 {unicast|multicast|vrf vrf-name }`
+- Group
+  - `class-map {match-any|match-all} name`
+  - `policy-map {name}`
+- Interface
+  - `interface {type, slot, port, etc...}`
+  - e.g. `interface GigabitEthernet0/0`
+- Sub Interface
+  - `interface {type, slot, port, etc...}.{number}`
 
 ### Multilingual support
-Currently, only the configuration page is available.
+Currently, only the settings page is available.
 
 Following supported languages:
 - English

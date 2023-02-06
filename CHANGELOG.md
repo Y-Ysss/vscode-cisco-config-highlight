@@ -4,6 +4,11 @@
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
 
+## 0.5.1 (2023-02-06)
+### Added
+- Add syntax highlighting pattern.
+  - Add secret pattern
+
 ## 0.5.0 (2022-06-21)
 ### Added
 - Add syntax highlighting patterns.
