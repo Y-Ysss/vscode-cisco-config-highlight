@@ -351,6 +351,9 @@
 					"include": "#password"
 				},
 				{
+					"include": "#secret"
+				},
+				{
 					"include": "#banner"
 				}
 			],
@@ -382,6 +385,10 @@
 				"password": {
 					"match": "(?<=password\\s\\d+\\s)(\\S+)$",
 					"name": "string.other.password.cisco"
+				},
+				"secret": {
+					"match": "(?<=secret\\s\\d+\\s)(\\S+)$",
+					"name": "string.other.secret.cisco"
 				},
 				"banner": {
 					"begin": "(?<=banner\\s(exec|login|motd)\\s)\\^",
