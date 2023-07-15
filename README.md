@@ -32,14 +32,14 @@ In the future, I would like to support the following platforms.
 
 
 ## Screenshot
-Note: Screenshots are using a custom theme.
+Note: Screenshots are using a custom theme ([Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)).
 <img src="images/Screenshot.png" alt="screenshot">
 
 ## Token Color Customizations
 
 The color of syntax highlighting depends on the theme you have enabled.
 
-All highlighting settings are not enabled in VSCode's default theme. For a better experience, I recommend using a custom theme such as MaterialTheme.
+All highlighting settings are not enabled in VSCode's default theme. For a better experience, I recommend using a custom theme.
 
 If the colors are not defined in the currently activated theme, or if you want to customize the colors and style to your liking, you will need to edit the `settings.json`.
 
@@ -55,7 +55,7 @@ For more information on how to customize the settings.json file, please refer to
     "editor.tokenColorCustomizations": {
         "textMateRules": [
             {
-                "scope": "entity.name.class.interface.ethernet.cisco",
+                "scope": "entity.name.class.interface.ethernet",
                 "settings": {
                     "foreground": "#328f16",
                     "fontStyle": "italic"
@@ -77,88 +77,103 @@ For more information on how to customize the settings.json file, please refer to
 
 ## Token Scopes List
 ```
-punctuation.config-param.first.cisco
+comment.block.banner
+comment.line.config
 
-comment.line.config.cisco
+constant.numeric.hex
+constant.numeric.integer
 
-string.other.remark.cisco
-string.other.description.cisco
-entity.name.tag.config-string.domain-name.cisco
-entity.name.tag.config-string.hostname.cisco
-entity.name.tag.config-string.username.cisco
-entity.name.tag.config-string.logging-system-message.cisco
-string.other.password.cisco
-string.other.secret.cisco
-comment.block.banner.cisco
+entity.name.class.interface.async
+entity.name.class.interface.bri
+entity.name.class.interface.bvi
+entity.name.class.interface.cellular
+entity.name.class.interface.dialer
+entity.name.class.interface.ethernet
+entity.name.class.interface.loopback
+entity.name.class.interface.management
+entity.name.class.interface.null
+entity.name.class.interface.portchannel
+entity.name.class.interface.serial
+entity.name.class.interface.tunnel
+entity.name.class.interface.virtual-template
+entity.name.class.interface.vlan
+entity.name.class.interface.wireless
+entity.name.class.vrf.declaration
 
-constant.numeric.hex.cisco
-constant.numeric.integer.cisco
+entity.name.tag.acl.access-group.name
+entity.name.tag.acl.access-list.name
 
-keyword.other.config-keyword.vlan.cisco
-keyword.other.config-keyword.switchport-mode.cisco
-keyword.other.config-keyword.add-remove.cisco
-keyword.other.config-keyword.allowed-native.cisco
-keyword.other.config-keyword.any-all.cisco
-keyword.other.config-keyword.permit-deny.cisco
-keyword.other.config-keyword.status.cisco
-keyword.other.config-keyword.match.cisco
-keyword.other.config-keyword.in-out.cisco
-keyword.other.config-keyword.input-output.cisco
-keyword.other.config-keyword.inside-outside.cisco
-keyword.other.config-keyword.shutdown.cisco
+entity.name.tag.bgp.neighbor-peer-group.name
+entity.name.tag.bgp.peer-group.name
+entity.name.tag.bgp.peer-policy.name
+entity.name.tag.bgp.peer-session.name
 
-entity.name.class.interface.ethernet.cisco
-entity.name.class.interface.wireless.cisco
-entity.name.class.interface.loopback.cisco
-entity.name.class.interface.portchannel.cisco
-entity.name.class.interface.tunnel.cisco
-entity.name.class.interface.vlan.cisco
-entity.name.class.interface.null.cisco
-entity.name.class.interface.serial.cisco
-entity.name.class.interface.cellular.cisco
-entity.name.class.interface.virtual-template.cisco
-entity.name.class.interface.dialer.cisco
-entity.name.class.interface.async.cisco
-entity.name.class.interface.bri.cisco
-entity.name.class.interface.bvi.cisco
-entity.name.class.interface.management.cisco
+entity.name.tag.config-string.domain-name
+entity.name.tag.config-string.hostname
+entity.name.tag.config-string.logging-system-message
+entity.name.tag.config-string.username
 
-keyword.other.address.ipv4.cidr.cisco
-keyword.other.address.ipv4.full.cisco
-keyword.other.address.ipv6.condensed.cisco
-keyword.other.address.ipv6.full.cisco
-keyword.other.address.mac.cisco
+entity.name.tag.crypto.crypto-map.name
+entity.name.tag.crypto.transform-set.name
 
-meta.function-call.command_hostname.user-mode.cisco
-meta.function-call.command_hostname.privileged-mode.cisco
+entity.name.tag.group.class-map.name
+entity.name.tag.group.class.name
+entity.name.tag.group.object-group.name
+entity.name.tag.group.policy-map.name
+entity.name.tag.group.pool.name
+entity.name.tag.group.prefix-list.name
+entity.name.tag.group.route-map.name
+entity.name.tag.group.service-policy.name
 
-entity.name.class.vrf.declaration.cisco
-entity.other.vrf.forwarding.cisco
-entity.other.vrf.definition.cisco
-entity.name.tag.vrf.vrf-name.cisco
+entity.name.tag.vrf.vrf-name
+entity.other.vrf.definition
+entity.other.vrf.forwarding
 
-entity.name.tag.bgp.neighbor-peer-group.name.cisco
-entity.name.tag.bgp.peer-session.name.cisco
-entity.name.tag.bgp.peer-policy.name.cisco
-entity.name.tag.bgp.peer-group.name.cisco
+keyword.other.acl.access-list.type
+keyword.other.address.ipv4.cidr
+keyword.other.address.ipv4.full
+keyword.other.address.ipv6.condensed
+keyword.other.address.ipv6.full
+keyword.other.address.mac
 
-entity.name.tag.group.class.name.cisco
-entity.name.tag.group.service-policy.name.cisco
-entity.name.tag.group.policy-map.name.cisco
-entity.name.tag.group.class-map.name.cisco
-entity.name.tag.group.route-map.name.cisco
-entity.name.tag.group.prefix-list.name.cisco
+keyword.other.config-keyword.add-remove.add
+keyword.other.config-keyword.add-remove.except
+keyword.other.config-keyword.add-remove.remove
+keyword.other.config-keyword.allowed-native
+keyword.other.config-keyword.any-all.all
+keyword.other.config-keyword.any-all.any
+keyword.other.config-keyword.in-out.in
+keyword.other.config-keyword.in-out.out
+keyword.other.config-keyword.input-output.input
+keyword.other.config-keyword.input-output.output
+keyword.other.config-keyword.inside-outside.inside
+keyword.other.config-keyword.inside-outside.outside
+keyword.other.config-keyword.match.all
+keyword.other.config-keyword.match.any
+keyword.other.config-keyword.permit-deny.deny
+keyword.other.config-keyword.permit-deny.permit
+keyword.other.config-keyword.shutdown
+keyword.other.config-keyword.status.administratively-down
+keyword.other.config-keyword.status.deleted
+keyword.other.config-keyword.status.down
+keyword.other.config-keyword.status.up
+keyword.other.config-keyword.switchport-mode.access
+keyword.other.config-keyword.switchport-mode.dynamic
+keyword.other.config-keyword.switchport-mode.trunk
+keyword.other.config-keyword.vlan
+keyword.other.group.object-group.type
 
-keyword.other.group.object-group.type.cisco
-entity.name.tag.group.object-group.name.cisco
+meta.function-call.command_hostname.privileged-mode
+meta.function-call.command_hostname.user-mode
+meta.function-call.command-disable.default
+meta.function-call.command-disable.unused
 
-keyword.other.acl.access-list.type.cisco
-entity.name.tag.acl.access-list.name.cisco
-entity.name.tag.acl.access-group.name.cisco
+punctuation.config-param.first
 
-meta.function-call.command-disable.unused.cisco
-meta.function-call.command-disable.default.cisco
-
+string.other.description
+string.other.password
+string.other.remark
+string.other.secret
 ```
 
 ## Experimental Features
