@@ -60,44 +60,96 @@
 					"match": "(^|\\s)(protocol-vlan|mac-vlan|dot1q-tunnel|dot1Q)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.switchport-mode.cisco",
-					"match": "(^|\\s)(access|trunk|(dynamic\\s(auto|desirable)))(?=\\s|$)"
+					"name": "keyword.other.config-keyword.switchport-mode.access.cisco",
+					"match": "(^|\\s)(access)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.add-remove.cisco",
-					"match": "(^|\\s)(add|remove|except)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.switchport-mode.trunk.cisco",
+					"match": "(^|\\s)(trunk)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.switchport-mode.dynamic.cisco",
+					"match": "(^|\\s)(dynamic\\s(auto|desirable))(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.add-remove.add.cisco",
+					"match": "(^|\\s)(add)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.add-remove.remove.cisco",
+					"match": "(^|\\s)(remove)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.add-remove.except.cisco",
+					"match": "(^|\\s)(except)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.allowed-native.cisco",
 					"match": "(^|\\s)(allowed|native)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.any-all.cisco",
-					"match": "(^|\\s)(any|all)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.any-all.any.cisco",
+					"match": "(^|\\s)(any)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.permit-deny.cisco",
-					"match": "(^|\\s)(permit|deny)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.any-all.all.cisco",
+					"match": "(^|\\s)(all)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.status.cisco",
-					"match": "(^|\\s)([Uu]p|[Dd]own|[Dd]eleted|[Aa]dministratively(-down)?)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.permit-deny.permit.cisco",
+					"match": "(^|\\s)(permit)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.match.cisco",
-					"match": "(^|\\s)(match-(any|all))(?=\\s|$)"
+					"name": "keyword.other.config-keyword.permit-deny.deny.cisco",
+					"match": "(^|\\s)(deny)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.in-out.cisco",
-					"match": "(^|\\s)(in|out)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.status.up.cisco",
+					"match": "(^|\\s)([Uu]p)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.input-output.cisco",
-					"match": "(^|\\s)(input|output)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.status.down.cisco",
+					"match": "(^|\\s)([Dd]own)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.inside-outside.cisco",
-					"match": "(^|\\s)(inside|outside)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.status.deleted.cisco",
+					"match": "(^|\\s)([Dd]eleted)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.status.administratively-down.cisco",
+					"match": "(^|\\s)([Aa]dministratively(-down)?)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.match.any.cisco",
+					"match": "(^|\\s)(match-(any))(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.match.all.cisco",
+					"match": "(^|\\s)(match-(all))(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.in-out.in.cisco",
+					"match": "(^|\\s)(in)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.in-out.out.cisco",
+					"match": "(^|\\s)(out)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.input-output.input.cisco",
+					"match": "(^|\\s)(input)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.input-output.output.cisco",
+					"match": "(^|\\s)(output)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.inside-outside.inside.cisco",
+					"match": "(^|\\s)(inside)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.inside-outside.outside.cisco",
+					"match": "(^|\\s)(outside)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.shutdown.cisco",
