@@ -460,6 +460,9 @@
 				},
 				{
 					"include": "#pool"
+				},
+				{
+					"include": "#policy-list"
 				}
 			],
 			"repository": {
@@ -501,6 +504,10 @@
 				"pool": {
 					"match": "(?<=pool\\s)(\\S+)\\b",
 					"name": "entity.name.tag.group.pool.name.cisco"
+				},
+				"policy-list": {
+					"match": "(?<=policy-list\\s)(\\S+)\\b",
+					"name": "entity.name.tag.group.policy-list.name.cisco"
 				}
 			}
 		},
