@@ -463,6 +463,9 @@
 				},
 				{
 					"include": "#policy-list"
+				},
+				{
+					"include": "#traffic-filter"
 				}
 			],
 			"repository": {
@@ -508,6 +511,10 @@
 				"policy-list": {
 					"match": "(?<=policy-list\\s)(\\S+)\\b",
 					"name": "entity.name.tag.group.policy-list.name.cisco"
+				},
+				"traffic-filter": {
+					"match": "(?<=traffic-filter\\s)(\\S+)\\b",
+					"name": "entity.name.tag.group.traffic-filter.name.cisco"
 				}
 			}
 		},
