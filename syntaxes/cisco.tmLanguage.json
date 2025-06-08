@@ -76,8 +76,12 @@
 					"match": "(^|\\s)(any|all)(?=\\s|$)"
 				},
 				{
-					"name": "keyword.other.config-keyword.permit-deny.cisco",
-					"match": "(^|\\s)(permit|deny)(?=\\s|$)"
+					"name": "keyword.other.config-keyword.permit.cisco",
+					"match": "(^|\\s)(permit)(?=\\s|$)"
+				},
+				{
+					"name": "keyword.other.config-keyword.deny.cisco",
+					"match": "(^|\\s)(deny)(?=\\s|$)"
 				},
 				{
 					"name": "keyword.other.config-keyword.status.cisco",
