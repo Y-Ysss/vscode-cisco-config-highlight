@@ -2,7 +2,7 @@
   "name": "cisco-config-highlight",
   "displayName": "Cisco Config Highlight",
   "description": "Cisco device configuration Syntax Highlighting for Visual Studio Code.",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "publisher": "Y-Ysss",
   "license": "MIT",
   "repository": {
@@ -33,6 +33,17 @@
           ".config"
         ],
         "configuration": "./language-configuration.json"
+      },
+      {
+        "id": "cisco-opt1",
+        "aliases": [
+          "Cisco Config(opt1)"
+        ],
+        "extensions": [
+          ".cisco",
+          ".config"
+        ],
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -40,6 +51,21 @@
         "language": "cisco",
         "scopeName": "source.cisco",
         "path": "./syntaxes/cisco.tmLanguage.json"
+      },
+      {
+        "language": "cisco-opt1",
+        "scopeName": "source.opt1.cisco",
+        "path": "./syntaxes/cisco-opt1.tmLanguage.json"
+      },
+      {
+        "scopeName": "source.markdown.cisco",
+        "path": "./syntaxes/cisco.md.tmLanguage.json",
+        "injectTo": [
+          "text.html.markdown"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.cisco": "cisco"
+        }
       }
     ],
     "configuration": [

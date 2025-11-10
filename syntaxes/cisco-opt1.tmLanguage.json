@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Cisco Config opt1",
+  "patterns": [
+    {
+      "include": "#unused"
+    },
+    {
+      "include": "source.cisco"
+    }
+  ],
+  "repository": {
+    "unused": {
+      "patterns": [
+        {
+          "include": "#unused"
+        },
+        {
+          "include": "#default"
+        }
+      ],
+      "repository": {
+        "unused": {
+          "name": "meta.function-call.command-disable.unused.cisco",
+          "match": "^\\s*?no\\s"
+        },
+        "default": {
+          "name": "meta.function-call.command-disable.default.cisco",
+          "match": "^\\s*?default\\s"
+        }
+      }
+    }
+  },
+  "scopeName": "source.opt1.cisco"
+}
