@@ -1,4 +1,4 @@
-import { Action, default_action } from './notificationAction';
+import { type Action, default_action } from './notificationAction';
 
 type MessageType = 'info' | 'warn';
 
