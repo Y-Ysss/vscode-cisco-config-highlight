@@ -13,7 +13,7 @@ interface SymbolInfo {
 
 export const symbolsInfo: Record<string, SymbolInfo> = {
   command: {
-    pattern: /^(?!\\s)[0-9a-zA-Z\\-]+(?:(#|>))(?!.*(#|>|\s)$)/,
+    pattern: /^(?!\\s)[0-9a-zA-Z-]+(?:(#|>))(?!.*(#|>|\s)$)/,
     kind: SymbolKind.String,
     parent_kind: SymbolKind.Event,
     node_name: 'command',

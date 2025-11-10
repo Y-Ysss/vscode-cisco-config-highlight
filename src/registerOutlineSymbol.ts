@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 
 import { symbolsInfo } from './symbolsInfo';
 
-export function registerOutlineSymbolProvider(context: vscode.ExtensionContext) {
+export function registerOutlineSymbolProvider(
+  context: vscode.ExtensionContext,
+) {
   context.subscriptions.push(
     vscode.languages.registerDocumentSymbolProvider(
       { language: 'cisco' },
@@ -33,8 +35,8 @@ const getSettingsOptions = (): { bool: boolean; value?: RegExp } => {
     .getConfiguration('cisco-config-highlight')
     .get('outline.symbolsList', {});
   const patterns: RegExp[] = Object.entries(symbols)
-    .filter(item => item[1])
-    .map(item => {
+    .filter((item) => item[1])
+    .map((item) => {
       return regexPattern(item[0]);
     });
   if (!patterns.length) {
@@ -43,7 +45,9 @@ const getSettingsOptions = (): { bool: boolean; value?: RegExp } => {
   return { bool: true, value: regExpJoin('|', patterns) };
 };
 
-class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider {
+class CiscoConfigDocumentSymbolProvider
+  implements vscode.DocumentSymbolProvider
+{
   provideDocumentSymbols(
     document: vscode.TextDocument,
     _token: vscode.CancellationToken,
@@ -72,7 +76,9 @@ class CiscoConfigDocumentSymbolProvider implements vscode.DocumentSymbolProvider
         if (!m?.groups) {
           return;
         }
-        const data = Object.entries(m.groups).filter(item => item[1] !== undefined);
+        const data = Object.entries(m.groups).filter(
+          (item) => item[1] !== undefined,
+        );
         if (data[1][1] === '') {
           return;
         }
