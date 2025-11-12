@@ -22,11 +22,11 @@
       "repository": {
         "unused": {
           "name": "meta.function-call.command-disable.unused.cisco",
-          "match": "^\\s*?no\\s"
+          "match": "^\\s*?no\\b"
         },
         "default": {
           "name": "meta.function-call.command-disable.default.cisco",
-          "match": "^\\s*?default\\s"
+          "match": "^\\s*?default\\b"
         }
       }
     }

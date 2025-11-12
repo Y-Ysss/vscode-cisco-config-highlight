@@ -30,6 +30,9 @@
       "include": "#crypto"
     },
     {
+      "include": "#event_manager"
+    },
+    {
       "include": "#address"
     },
     {
@@ -406,6 +409,9 @@
           "include": "#secret"
         },
         {
+          "include": "#role"
+        },
+        {
           "include": "#banner"
         }
       ],
@@ -434,12 +440,16 @@
           "match": "(?<=%)\\S+-\\d-\\S+(?=:)",
           "name": "entity.name.tag.config-string.logging-system-message.cisco"
         },
+        "role": {
+          "match": "(?<=role\\s)(\\S+)\\b",
+          "name": "entity.name.tag.config-string.role.cisco"
+        },
         "password": {
-          "match": "(?<=password\\s\\d+\\s)(\\S+)$",
+          "match": "(?<=password\\s\\d+\\s)(\\S+)\\b",
           "name": "string.other.password.cisco"
         },
         "secret": {
-          "match": "(?<=secret\\s\\d+\\s)(\\S+)$",
+          "match": "(?<=secret\\s\\d+\\s)(\\S+)\\b",
           "name": "string.other.secret.cisco"
         },
         "banner": {
@@ -584,7 +594,7 @@
       ],
       "repository": {
         "access-list": {
-          "match": "(?<=access-list\\s)((extended|standard)\\s)?(\\S+)\\b",
+          "match": "(?<=access-list\\s)((extended|standard|resequence)\\s)?(\\S+)\\b",
           "captures": {
             "2": {
               "name": "keyword.other.acl.access-list.type.cisco"
@@ -642,6 +652,40 @@
         "keyring": {
           "match": "(?<=\\bkeyring\\s)(\\S+)\\b",
           "name": "entity.name.tag.crypto.keyring.name.cisco"
+        }
+      }
+    },
+    "event_manager": {
+      "patterns": [
+        {
+          "include": "#event_manager_applet"
+        },
+        {
+          "include": "#event_manager_environment"
+        },
+        {
+          "include": "#event_manager_run"
+        },
+        {
+          "include": "#event_manager_action"
+        }
+      ],
+      "repository": {
+        "event_manager_applet": {
+          "match": "(?<=\\bevent\\smanager\\sapplet\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.applet.name.cisco"
+        },
+        "event_manager_environment": {
+          "match": "(?<=\\bevent\\smanager\\senvironment\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.environment.name.cisco"
+        },
+        "event_manager_run": {
+          "match": "(?<=\\bevent\\smanager\\srun\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.run.name.cisco"
+        },
+        "event_manager_action": {
+          "match": "(?<=\\baction\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.action.label.cisco"
         }
       }
     },
