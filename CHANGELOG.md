@@ -3,6 +3,24 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.7.0 (2025-11)
+### Added
+- Add optional syntaxes.
+  - Add individual highlighting for `no|default` commands (disable prefix)
+  - Add syntax highlighting support within Markdown code blocks
+- Add syntax highlighting patterns.
+  - entity.name.tag.config-string.role
+  - entity.name.tag.event-manager.applet.name
+  - entity.name.tag.event-manager.environment.name
+  - entity.name.tag.event-manager.run.name
+  - entity.name.tag.event-manager.action.label
+
+### Changed
+- Refine syntax highlighting patterns.
+  - Improved regex patterns for `no` and `default` commands to use word boundary matching
+  - Enhanced ACL pattern to support `resequence` keyword
+  - Updated password and secret patterns for better token matching
+
 ## 0.6.1 (2025-06-19)
 ### Added
 - Add syntax highlighting patterns.
