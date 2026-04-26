@@ -32,7 +32,7 @@ export async function registerUpdateInfo(
       semver.satisfies(previousVersion, info.version_info)
     ) {
       const prev = previousVersion ? previousVersion : 'undefined';
-      let message = info.messege.split('${previousVersion}').join(prev);
+      let message = info.message.split('${previousVersion}').join(prev);
       message = message.split('${currentVersion}').join(currentVersion);
       outputChannel.appendLine(message);
       const dialog = getDialog(info, message);
