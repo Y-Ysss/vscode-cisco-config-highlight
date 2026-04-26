@@ -3,6 +3,49 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.7.0 (2026-04)
+### Added
+- Add syntax highlighting patterns.
+  - entity.name.class.interface.bdi
+  - entity.name.class.interface.nvi
+  - entity.name.class.interface.vmi
+  - entity.name.class.interface.vasileft
+  - entity.name.class.interface.vasiright
+  - entity.name.class.interface.app-gigabitethernet
+  - entity.name.tag.config-string.name
+  - entity.name.tag.config-string.role
+  - entity.name.tag.wireless.ssid.name
+  - entity.name.tag.acl.access-class.name
+  - entity.name.tag.crypto.key-chain.name
+  - entity.name.tag.event-manager.applet.name
+  - entity.name.tag.event-manager.environment.name
+  - entity.name.tag.event-manager.run.name
+  - entity.name.tag.event-manager.action.label
+  - string.other.key-string
+  - keyword.other.config-keyword.enable-disable.enable
+  - keyword.other.config-keyword.enable-disable.disable
+
+### Changed
+- Improve syntax highlighting patterns.
+  - Removed the beginning-of-line constraint for line comments.
+  - Improved domain name pattern to handle `ip domain-name` command.
+  - Improved banner pattern to handle various delimiters and banner types more robustly.
+  - Improved password and secret patterns to support Nexus syntax (e.g., for Nexus configuration, `username user-id [password [0 | 5] password] [expire date] [role role-name]`).
+  - Improved ACL pattern to support `resequence` keyword.
+ - Improved interface pattern to reduce false positives for keywords consisting only of the letter "E".
+  - Added MAC address pattern to support Cisco dotted Style (e.g., 001A.2B3C.4D5E).
+  - Added `use-vrf`, `ip vrf context`, and `ip vrf member` patterns to support VRF name highlighting in more contexts.
+- Removed scopes that were not correctly captured by the regular expression.
+  - entity.other.vrf.definition
+  - entity.other.vrf.forwarding
+
+### Contributions to extension:
+- Improvements to syntax highlighting patterns, partially based on contributions by [@CantiFirestarter](https://github.com/CantiFirestarter)'s contribution in #21.
+  - entity.name.tag.config-string.name
+  - entity.name.class.interface.app-gigabitethernet
+  - Improved MAC address pattern
+
+
 ## 0.6.1 (2025-06-19)
 ### Added
 - Add syntax highlighting patterns.

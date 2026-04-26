@@ -9,6 +9,9 @@
       "include": "#comment"
     },
     {
+      "include": "#group"
+    },
+    {
       "include": "#interface_type"
     },
     {
@@ -21,13 +24,13 @@
       "include": "#string"
     },
     {
-      "include": "#group"
-    },
-    {
       "include": "#acl"
     },
     {
       "include": "#crypto"
+    },
+    {
+      "include": "#event_manager"
     },
     {
       "include": "#address"
@@ -121,11 +124,11 @@
         },
         {
           "name": "keyword.other.config-keyword.match.any.cisco",
-          "match": "(^|\\s)(match-(any))(?=\\s|$)"
+          "match": "(^|\\s)(match-any)(?=\\s|$)"
         },
         {
           "name": "keyword.other.config-keyword.match.all.cisco",
-          "match": "(^|\\s)(match-(all))(?=\\s|$)"
+          "match": "(^|\\s)(match-all)(?=\\s|$)"
         },
         {
           "name": "keyword.other.config-keyword.in-out.in.cisco",
@@ -150,6 +153,14 @@
         {
           "name": "keyword.other.config-keyword.inside-outside.outside.cisco",
           "match": "(^|\\s)(outside)(?=\\s|$)"
+        },
+        {
+          "name": "keyword.other.config-keyword.enable-disable.enable.cisco",
+          "match": "(^|\\s)(enabled?)(?=\\s|$)"
+        },
+        {
+          "name": "keyword.other.config-keyword.enable-disable.disable.cisco",
+          "match": "(^|\\s)(disabled?)(?=\\s|$)"
         },
         {
           "name": "keyword.other.config-keyword.shutdown.cisco",
@@ -202,13 +213,31 @@
           "include": "#bvi"
         },
         {
+          "include": "#bdi"
+        },
+        {
+          "include": "#nvi"
+        },
+        {
+          "include": "#vmi"
+        },
+        {
+          "include": "#vasileft"
+        },
+        {
+          "include": "#vasiright"
+        },
+        {
+          "include": "#app-gigabitethernet"
+        },
+        {
           "include": "#management"
         }
       ],
       "repository": {
         "ethernet": {
           "name": "entity.name.class.interface.ethernet.cisco",
-          "match": "\\b(([Ff]ast|([Ff]ive|[Tt]en|[Tt]wenty[Ff]ive|[Ff](orty|ifty)|([Tt]wo)?[Hh]undred)?[Gg](ig)?(abit)?)?[Ee](th)?(ernet)?|Fa|Gi|Te|Fo|Fi)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
+          "match": "\\b(([Ff]ast|([Ff]ive|[Tt]en|[Tt]wenty[Ff]ive|[Ff](orty|ifty)|([Tt]wo)?[Hh]undred)?[Gg](ig)?(abit)?)[Ee](th(ernet)?)?|[Ee]th(ernet)?|Fa|Gi|Te|Fo|Fi)(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
         },
         "wireless": {
           "name": "entity.name.class.interface.wireless.cisco",
@@ -262,6 +291,30 @@
           "name": "entity.name.class.interface.bvi.cisco",
           "match": "\\b(BVI)(\\d+)?\\b"
         },
+        "bdi": {
+          "name": "entity.name.class.interface.bdi.cisco",
+          "match": "\\b(BDI|[Bb]ridge-?[Dd]omain)(\\d+)?\\b"
+        },
+        "nvi": {
+          "name": "entity.name.class.interface.nvi.cisco",
+          "match": "(?i)\\b(nvi)(\\d+)?\\b"
+        },
+        "vmi": {
+          "name": "entity.name.class.interface.vmi.cisco",
+          "match": "(?i)\\b(vmi)(\\d+)?\\b"
+        },
+        "vasileft": {
+          "name": "entity.name.class.interface.vasileft.cisco",
+          "match": "\\b([Vv]asi[Ll]eft)(\\d+)?\\b"
+        },
+        "vasiright": {
+          "name": "entity.name.class.interface.vasiright.cisco",
+          "match": "\\b([Vv]asi[Rr]ight)(\\d+)?\\b"
+        },
+        "app-gigabitethernet": {
+          "name": "entity.name.class.interface.app-gigabitethernet.cisco",
+          "match": "\\b(App[Gg](ig)?(abit)?)([Ee](th(ernet)?)?)?(((\\d+[\\./])*)?\\d+(\\.\\d+)?)?\\b"
+        },
         "management": {
           "name": "entity.name.class.interface.management.cisco",
           "match": "\\b(Management|[Mm]gmt)((\\d+[\\./])*)?(\\d+)?\\b"
@@ -292,7 +345,7 @@
       "patterns": [
         {
           "name": "comment.line.config.cisco",
-          "match": "^\\s*[!#].*"
+          "match": "[!#].*"
         }
       ]
     },
@@ -332,8 +385,18 @@
           "match": "\\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\\b"
         },
         "mac": {
-          "name": "keyword.other.address.mac.cisco",
-          "match": "\\b([a-fA-F0-9]{2}[:.-]?){5}[a-fA-F0-9]{2}\\b"
+          "patterns": [
+            {
+              "name": "keyword.other.address.mac.cisco",
+              "match": "\\b([a-fA-F0-9]{2}[:.-]?){5}[a-fA-F0-9]{2}\\b",
+              "comment": "Matches Standard MAC addresses in formats like 00:1A:2B:3C:4D:5E, 00-1A-2B-3C-4D-5E, or 001A.2B3C.4D5E"
+            },
+            {
+              "name": "keyword.other.address.mac.cisco",
+              "match": "\\b([a-fA-F0-9]{4}\\.?){2}[a-fA-F0-9]{4}\\b",
+              "comment": "Matches Cisco dotted MAC addresses in the format 001A.2B3C.4D5E"
+            }
+          ]
         }
       }
     },
@@ -361,16 +424,10 @@
       "patterns": [
         {
           "comment": "((?<=vrf\\s)(?!.*forwarding)|(?<=vrf\\sforwarding\\s))\\S+",
-          "match": "(vrf)\\s((forwarding|definition)\\s)?(\\S+)",
+          "match": "(vrf)\\s((forwarding|definition|context|member)\\s)?(\\S+)",
           "captures": {
             "1": {
               "name": "entity.name.class.vrf.declaration.cisco"
-            },
-            "2": {
-              "name": "entity.other.vrf.forwarding.cisco"
-            },
-            "3": {
-              "name": "entity.other.vrf.definition.cisco"
             },
             "4": {
               "name": "entity.name.tag.vrf.vrf-name.cisco"
@@ -397,6 +454,9 @@
           "include": "#username"
         },
         {
+          "include": "#name"
+        },
+        {
           "include": "#logging-system-message"
         },
         {
@@ -404,6 +464,12 @@
         },
         {
           "include": "#secret"
+        },
+        {
+          "include": "#key-string"
+        },
+        {
+          "include": "#role"
         },
         {
           "include": "#banner"
@@ -423,28 +489,48 @@
           "name": "entity.name.tag.config-string.hostname.cisco"
         },
         "domain-name": {
-          "match": "(?<=ip\\sdomain\\sname\\s)\\S+\\b",
+          "match": "(?<=ip\\sdomain[\\s-]name\\s)\\S+\\b",
           "name": "entity.name.tag.config-string.domain-name.cisco"
         },
         "username": {
           "match": "(?<=username\\s)(\\S+)\\b",
           "name": "entity.name.tag.config-string.username.cisco"
         },
+        "name": {
+          "match": "(?<=name\\s)(\\S+)\\b",
+          "name": "entity.name.tag.config-string.name.cisco"
+        },
         "logging-system-message": {
           "match": "(?<=%)\\S+-\\d-\\S+(?=:)",
           "name": "entity.name.tag.config-string.logging-system-message.cisco"
         },
+        "role": {
+          "match": "(?<=role\\s)(\\S+)\\b",
+          "name": "entity.name.tag.config-string.role.cisco"
+        },
         "password": {
-          "match": "(?<=password\\s\\d+\\s)(\\S+)$",
+          "match": "(?<=password\\s\\d+\\s)(\\S+)(?=\\s|$)",
           "name": "string.other.password.cisco"
         },
         "secret": {
-          "match": "(?<=secret\\s\\d+\\s)(\\S+)$",
+          "match": "(?<=secret\\s\\d+\\s)(\\S+)(?=\\s|$)",
           "name": "string.other.secret.cisco"
         },
+        "key-string": {
+          "patterns": [
+            {
+              "match": "(?<=key-string\\s)(?!\\d+)(\\S+)\\b",
+              "name": "string.other.key-string.cisco"
+            },
+            {
+              "match": "(?<=key-string\\s\\d+\\s)(\\S+)\\b",
+              "name": "string.other.key-string.cisco"
+            }
+          ]
+        },
         "banner": {
-          "begin": "(?<=banner\\s(exec|login|motd)\\s)\\^",
-          "end": "\\^",
+          "begin": "(?<=banner\\s+(exec|login|motd|incoming|slip-ppp)\\s+)(\\S)",
+          "end": "\\2",
           "name": "comment.block.banner.cisco"
         }
       }
@@ -517,6 +603,9 @@
         },
         {
           "include": "#community"
+        },
+        {
+          "include": "#wireless_ssid"
         }
       ],
       "repository": {
@@ -570,6 +659,10 @@
         "community": {
           "match": "(?<=community\\s)(\\S+)\\b",
           "name": "entity.name.tag.group.community.name.cisco"
+        },
+        "wireless_ssid": {
+          "match": "(?<=ssid\\s)(\\S+)\\b",
+          "name": "entity.name.tag.wireless.ssid.name.cisco"
         }
       }
     },
@@ -580,11 +673,14 @@
         },
         {
           "include": "#access-group"
+        },
+        {
+          "include": "#access-class"
         }
       ],
       "repository": {
         "access-list": {
-          "match": "(?<=access-list\\s)((extended|standard)\\s)?(\\S+)\\b",
+          "match": "(?<=access-list\\s)((extended|standard|resequence)\\s)?(\\S+)\\b",
           "captures": {
             "2": {
               "name": "keyword.other.acl.access-list.type.cisco"
@@ -601,6 +697,10 @@
               "name": "entity.name.tag.acl.access-group.name.cisco"
             }
           }
+        },
+        "access-class": {
+          "match": "(?<=access-class\\s)(\\S+)\\b",
+          "name": "entity.name.tag.acl.access-class.name.cisco"
         }
       }
     },
@@ -620,6 +720,9 @@
         },
         {
           "include": "#keyring"
+        },
+        {
+          "include": "#key-chain"
         }
       ],
       "repository": {
@@ -642,6 +745,44 @@
         "keyring": {
           "match": "(?<=\\bkeyring\\s)(\\S+)\\b",
           "name": "entity.name.tag.crypto.keyring.name.cisco"
+        },
+        "key-chain": {
+          "match": "(?<=\\bkey\\schain\\s)(\\S+)\\b",
+          "name": "entity.name.tag.crypto.key-chain.name.cisco"
+        }
+      }
+    },
+    "event_manager": {
+      "patterns": [
+        {
+          "include": "#event_manager_applet"
+        },
+        {
+          "include": "#event_manager_environment"
+        },
+        {
+          "include": "#event_manager_run"
+        },
+        {
+          "include": "#event_manager_action"
+        }
+      ],
+      "repository": {
+        "event_manager_applet": {
+          "match": "(?<=\\bevent\\smanager\\sapplet\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.applet.name.cisco"
+        },
+        "event_manager_environment": {
+          "match": "(?<=\\bevent\\smanager\\senvironment\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.environment.name.cisco"
+        },
+        "event_manager_run": {
+          "match": "(?<=\\bevent\\smanager\\srun\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.run.name.cisco"
+        },
+        "event_manager_action": {
+          "match": "(?<=\\baction\\s)(\\S+)\\b",
+          "name": "entity.name.tag.event-manager.action.label.cisco"
         }
       }
     },
