@@ -1,0 +1,62 @@
+// vscode module mock — used via Vitest alias resolution
+
+export const SymbolKind = {
+  File: 0,
+  Module: 1,
+  Namespace: 2,
+  Package: 3,
+  Class: 4,
+  Method: 5,
+  Property: 6,
+  Field: 7,
+  Constructor: 8,
+  Enum: 9,
+  Interface: 10,
+  Function: 11,
+  Variable: 12,
+  Constant: 13,
+  String: 14,
+  Number: 15,
+  Boolean: 16,
+  Array: 17,
+  Object: 18,
+  Key: 19,
+  Null: 20,
+  EnumMember: 21,
+  Struct: 22,
+  Event: 23,
+  Operator: 24,
+  TypeParameter: 25,
+};
+
+export class DocumentSymbol {
+  children: DocumentSymbol[] = [];
+  constructor(
+    public name: string,
+    public detail: string,
+    public kind: number,
+    public range: unknown,
+    public selectionRange: unknown,
+  ) {}
+}
+
+export const workspace = {
+  getConfiguration: (_section?: string) => ({
+    get: (_key: string, defaultValue: unknown) => defaultValue,
+  }),
+};
+
+export const languages = {
+  registerDocumentSymbolProvider: () => ({ dispose: () => {} }),
+};
+
+export const window = {
+  showInformationMessage: (..._args: unknown[]) => Promise.resolve(undefined),
+  showWarningMessage: (..._args: unknown[]) => Promise.resolve(undefined),
+  createOutputChannel: (_name: string) => ({
+    appendLine: (_value: string) => {},
+    append: (_value: string) => {},
+    show: () => {},
+    dispose: () => {},
+  }),
+};
