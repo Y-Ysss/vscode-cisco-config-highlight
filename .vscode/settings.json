@@ -18,5 +18,6 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit"
-  }
+  },
+  "files.eol": "\n"
 }
