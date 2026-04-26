@@ -1,7 +1,10 @@
 import * as semver from 'semver';
 import * as vscode from 'vscode';
 import { outputChannel } from './extension';
-import { notificationConditions, NotificationInfo } from './notificationConditions';
+import {
+  type NotificationInfo,
+  notificationConditions,
+} from './notificationConditions';
 
 export async function registerUpdateInfo(
   context: vscode.ExtensionContext,
@@ -10,7 +13,8 @@ export async function registerUpdateInfo(
   context.globalState.setKeysForSync([versionKey]);
 
   // https://code.visualstudio.com/api/extension-capabilities/common-capabilities
-  const previousVersion: string | undefined = context.globalState.get(versionKey);
+  const previousVersion: string | undefined =
+    context.globalState.get(versionKey);
   const currentVersion = (context.extension as Extension).packageJSON.version;
   await context.globalState.update(versionKey, currentVersion);
   outputChannel.appendLine(
@@ -22,8 +26,11 @@ export async function registerUpdateInfo(
     );
     return;
   }
-  notificationConditions.forEach(info => {
-    if (!previousVersion || semver.satisfies(previousVersion, info.version_info)) {
+  notificationConditions.forEach((info) => {
+    if (
+      !previousVersion ||
+      semver.satisfies(previousVersion, info.version_info)
+    ) {
       const prev = previousVersion ? previousVersion : 'undefined';
       let message = info.messege.split('${previousVersion}').join(prev);
       message = message.split('${currentVersion}').join(currentVersion);
