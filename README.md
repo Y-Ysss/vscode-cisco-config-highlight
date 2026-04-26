@@ -130,10 +130,18 @@ entity.name.class.interface.tunnel
 entity.name.class.interface.virtual-template
 entity.name.class.interface.vlan
 entity.name.class.interface.wireless
+entity.name.class.interface.bdi
+entity.name.class.interface.nvi
+entity.name.class.interface.vmi
+entity.name.class.interface.vasileft
+entity.name.class.interface.vasiright
+entity.name.class.interface.app-gigabitethernet
+
 entity.name.class.vrf.declaration
 
 entity.name.tag.acl.access-group.name
 entity.name.tag.acl.access-list.name
+entity.name.tag.acl.access-class.name
 
 entity.name.tag.bgp.neighbor-peer-group.name
 entity.name.tag.bgp.peer-group.name
@@ -144,12 +152,17 @@ entity.name.tag.config-string.domain-name
 entity.name.tag.config-string.hostname
 entity.name.tag.config-string.logging-system-message
 entity.name.tag.config-string.username
+entity.name.tag.config-string.name
+entity.name.tag.config-string.role
+
+entity.name.tag.wireless.ssid.name
 
 entity.name.tag.crypto.crypto-map.name
 entity.name.tag.crypto.transform-set.name
 entity.name.tag.crypto.ipsec-profile.name
 entity.name.tag.crypto.isakmp-profile.name
 entity.name.tag.crypto.keyring.name
+entity.name.tag.crypto.key-chain.name
 
 entity.name.tag.group.class-map.name
 entity.name.tag.group.class.name
@@ -163,9 +176,12 @@ entity.name.tag.group.policy-list.name
 entity.name.tag.group.traffic-filter.name
 entity.name.tag.group.community.name
 
+entity.name.tag.event-manager.applet.name
+entity.name.tag.event-manager.environment.name
+entity.name.tag.event-manager.run.name
+entity.name.tag.event-manager.action.label
+
 entity.name.tag.vrf.vrf-name
-entity.other.vrf.definition
-entity.other.vrf.forwarding
 
 keyword.other.acl.access-list.type
 keyword.other.address.ipv4.cidr
@@ -198,6 +214,8 @@ keyword.other.config-keyword.status.up
 keyword.other.config-keyword.switchport-mode.access
 keyword.other.config-keyword.switchport-mode.dynamic
 keyword.other.config-keyword.switchport-mode.trunk
+keyword.other.config-keyword.enable-disable.enable
+keyword.other.config-keyword.enable-disable.disable
 keyword.other.config-keyword.vlan
 keyword.other.group.object-group.type
 
@@ -212,6 +230,7 @@ string.other.description
 string.other.password
 string.other.remark
 string.other.secret
+string.other.key-string
 ```
 
 ## Experimental Features
