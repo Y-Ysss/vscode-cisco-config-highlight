@@ -32,11 +32,14 @@ export async function registerUpdateInfo(
       semver.satisfies(previousVersion, info.version_info)
     ) {
       const prev = previousVersion ? previousVersion : 'undefined';
-      let message = info.message.split('${previousVersion}').join(prev);
-      message = message.split('${currentVersion}').join(currentVersion);
+      let message = info.message.replaceAll('${previousVersion}', prev);
+      message = message.replaceAll('${currentVersion}', currentVersion);
       outputChannel.appendLine(message);
       const dialog = getDialog(info, message);
-      void dialog.then(async () => {
+      void dialog.then(async (selected) => {
+        if (!shouldRunAction(selected, info.button_label)) {
+          return;
+        }
         try {
           await info.action(prev, currentVersion);
         } catch (err) {
@@ -53,24 +56,28 @@ function getDialog(
 ): Thenable<string | undefined> {
   if (info.type === 'info') {
     return vscode.window.showInformationMessage(message, info.button_label);
-  } else if (info.type === 'warn') {
-    return vscode.window.showWarningMessage(message, info.button_label);
-  } else {
-    return vscode.window.showInformationMessage(message, info.button_label);
   }
+  return vscode.window.showWarningMessage(message, info.button_label);
 }
 
-function isIgnore(previousVersion: string, currentVersion: string): boolean {
-  const isLessThan = semver.lt(previousVersion, currentVersion);
-  if (isLessThan) {
-    const differs: semver.ReleaseType | null = semver.diff(
-      previousVersion,
-      currentVersion,
-    );
-
-    if (!differs || differs === 'patch') {
-      return true;
-    }
+export function isIgnore(
+  previousVersion: string,
+  currentVersion: string,
+): boolean {
+  if (!semver.lt(previousVersion, currentVersion)) {
+    // Same version or downgrade: ignore
+    return true;
   }
-  return !isLessThan;
+  const differs: semver.ReleaseType | null = semver.diff(
+    previousVersion,
+    currentVersion,
+  );
+  return !differs || differs === 'patch';
+}
+
+export function shouldRunAction(
+  selected: string | undefined,
+  buttonLabel: string,
+): boolean {
+  return selected === buttonLabel;
 }
