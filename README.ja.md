@@ -4,87 +4,87 @@
   </a><br>
     Cisco Config Highlight
 </h1>
-<p align="center">Syntax Highlighting for Cisco Device Configuration in Visual Studio Code.</p>
+<p align="center">Visual Studio Code用のCiscoデバイス設定ファイルのシンタックスハイライト拡張機能です。</p>
 
-**日本語版: [README.ja.md](README.ja.md)**
+**English version: [README.md](README.md)**
 
-This project is in the development stages.
+このプロジェクトは開発中です。
 
-Definitions may change in future versions.
+将来のバージョンで定義が変更される可能性があります。
 
 > [!NOTE]  
-> Experimental Tool Release  
-> A tool for customizing token definitions has been released.  
-> With the theme editor, you can customize colors and styles while checking the scopes of tokens.  
-> This tool is an experimental feature and may change in the future.  
+> 実験的なツールのリリース  
+> トークンの定義のカスタマイズを行うためのツールを公開しました。  
+> テーマエディタで、トークンのスコープを確認しながら、色やスタイルのカスタマイズができます。  
+> このツールは実験的な機能で、今後変更される可能性があります。  
 > - [TextMate Theme Editor for Cisco Config Highlight](https://text-mate-theme-editor.yuyosy.workers.dev)
 
 
+## 機能
+この拡張機能は、Cisco設定ファイルに対して以下の機能を提供します:
 
-## Features
-This extension provides useful features for Cisco config text, including:
-
-- Syntax highlighting
-- Config outline (Experimental)
+- シンタックスハイライト
+- 設定のアウトライン表示（実験的機能）
 
 
-## Installation
-The extension for VS Code is available on the Visual Studio Marketplace and the Open VSX Registry:
+## インストール
+VS Code用の拡張機能は、Visual Studio MarketplaceおよびOpen VSX Registryで入手できます:
 - [Visual Studio Marketplace - Cisco Config Highlight](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight)
 - [Open VSX Registry - Cisco Config Highlight](https://open-vsx.org/extension/Y-Ysss/cisco-config-highlight)
 
 
-## Supported Platforms
+## サポートプラットフォーム
 
-Syntaxes commonly used in configuration files are supported.
+設定ファイルで一般的に使用される構文をサポートしています。
 - IOS
 - IOS-XE
 - NXOS
 
-The following platforms provide similar syntax highlighting for constructs that overlap with IOS:
+以下のプラットフォームについても、IOSと共通する構文に対してシンタックスハイライトを提供します:
 - IOS-XR
 - ASA
 
-I would like to expand support for these platforms in the future.
+将来的にこれらのプラットフォームのサポートを拡大していく予定です。
 
 
-## Screenshot
+## スクリーンショット
 > [!NOTE]  
-> All screenshots in this README use a custom theme ([Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)).
+> このREADME内のすべてのスクリーンショットは、カスタムテーマ（[Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)）を使用しています。
+
 <img src="images/Screenshot.png" alt="screenshot">
 
-## Token Color Customizations
+## トークンカラーのカスタマイズ
 
-The color of syntax highlighting depends on the theme you have enabled.
+シンタックスハイライトの色は、有効にしているテーマに依存します。
 
-Not all highlighting settings are enabled in VSCode's default theme. For a better experience, I recommend using a custom theme or defining your own token color customizations.
+VSCodeのデフォルトテーマでは、すべてのハイライト設定が有効化されていません。より良い体験のために、カスタムテーマの使用を推奨します。
 
-If the colors are not defined in the currently activated theme, or if you want to customize the colors and style to your liking, you will need to edit the `settings.json`.
+現在有効なテーマで色が定義されていない場合、または色やスタイルを好みに合わせてカスタマイズしたい場合は、`settings.json`を編集する必要があります。
 
-Open the settings and add the customization options to the JSON.
-(You can open the `settings.json` file by typing `Preferences: Open Settings (JSON)` in the command palette.)
+設定を開き、カスタマイズオプションをJSONに追加してください。
+（コマンドパレットで`Preferences: Open Settings (JSON)`と入力すると`settings.json`ファイルを開くことができます。）
 
-For more information on how to customize the settings.json file, please refer to the following URL.
+settings.jsonファイルのカスタマイズ方法の詳細については、以下のURLを参照してください。
 
-[Visual Studio Code Documentation - Color Themes](https://code.visualstudio.com/docs/getstarted/themes)
+[Visual Studio Code ドキュメント - カラーテーマ](https://code.visualstudio.com/docs/getstarted/themes)
 
-### Scope Hierarchy
-Tokens follow a hierarchical structure, which allows you to abbreviate scopes when customizing them.
+### スコープの階層構造
+トークンは階層構造に従っており、カスタマイズ時にスコープを省略することができます。
 
-For example, consider the following two scopes:
+例として以下の2つのスコープを指定した場合:
 - `entity.name.class.interface.ethernet`
 - `entity.name.class.interface.loopback`
 
-If you specify these scopes in full, the customization will apply only to those specific tokens.
+上記の完全なスコープを指定すると、カスタマイズは指定のトークンにのみ適用されます。
 
-However, if you use a higher-level scope such as:
+また、以下のような上位レベルのスコープを使用すると:
 - `entity.name.class.interface`
 
-The customization will apply to all tokens under that scope.
-The higher (shallower) the level in the hierarchy, the broader the range of tokens affected.
+カスタマイズはそのスコープ配下のすべてのトークンに適用されます。
+階層が上位（浅い）ほど、影響を受けるトークンの範囲が広くなります。
 
 
-### VSCode settings.json customize sample
+### VSCode settings.json カスタマイズサンプル
 ``` json
     "editor.tokenColorCustomizations": {
         "textMateRules": [
@@ -109,7 +109,7 @@ The higher (shallower) the level in the hierarchy, the broader the range of toke
     }
 ```
 
-## Token Scopes List
+## トークンスコープ一覧
 ```
 comment.block.banner
 comment.line.config
@@ -132,18 +132,10 @@ entity.name.class.interface.tunnel
 entity.name.class.interface.virtual-template
 entity.name.class.interface.vlan
 entity.name.class.interface.wireless
-entity.name.class.interface.bdi
-entity.name.class.interface.nvi
-entity.name.class.interface.vmi
-entity.name.class.interface.vasileft
-entity.name.class.interface.vasiright
-entity.name.class.interface.app-gigabitethernet
-
 entity.name.class.vrf.declaration
 
 entity.name.tag.acl.access-group.name
 entity.name.tag.acl.access-list.name
-entity.name.tag.acl.access-class.name
 
 entity.name.tag.bgp.neighbor-peer-group.name
 entity.name.tag.bgp.peer-group.name
@@ -154,17 +146,13 @@ entity.name.tag.config-string.domain-name
 entity.name.tag.config-string.hostname
 entity.name.tag.config-string.logging-system-message
 entity.name.tag.config-string.username
-entity.name.tag.config-string.name
 entity.name.tag.config-string.role
-
-entity.name.tag.wireless.ssid.name
 
 entity.name.tag.crypto.crypto-map.name
 entity.name.tag.crypto.transform-set.name
 entity.name.tag.crypto.ipsec-profile.name
 entity.name.tag.crypto.isakmp-profile.name
 entity.name.tag.crypto.keyring.name
-entity.name.tag.crypto.key-chain.name
 
 entity.name.tag.group.class-map.name
 entity.name.tag.group.class.name
@@ -184,6 +172,8 @@ entity.name.tag.event-manager.run.name
 entity.name.tag.event-manager.action.label
 
 entity.name.tag.vrf.vrf-name
+entity.other.vrf.definition
+entity.other.vrf.forwarding
 
 keyword.other.acl.access-list.type
 keyword.other.address.ipv4.cidr
@@ -216,8 +206,6 @@ keyword.other.config-keyword.status.up
 keyword.other.config-keyword.switchport-mode.access
 keyword.other.config-keyword.switchport-mode.dynamic
 keyword.other.config-keyword.switchport-mode.trunk
-keyword.other.config-keyword.enable-disable.enable
-keyword.other.config-keyword.enable-disable.disable
 keyword.other.config-keyword.vlan
 keyword.other.group.object-group.type
 
@@ -232,69 +220,68 @@ string.other.description
 string.other.password
 string.other.remark
 string.other.secret
-string.other.key-string
 ```
 
-## Experimental Features
+## 実験的機能
 
-- Show symbols in outline panel
-- Multilingual support (settings page)
+- アウトラインパネルでのシンボル表示
+- 多言語サポート（設定ページ）
 
 
-### Show symbols in outline panel
+### アウトラインパネルでのシンボル表示
 
 <img src="images/outline.png" alt="screenshot">
 
-Open the settings and enter a keyword in the search box. Select the check box to enable.
+設定を開き、検索ボックスにキーワードを入力してください。チェックボックスを選択することで有効化できます。
 
 ```
 @ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel
 ```
 
-#### Supported symbols
-- Command
+#### サポートされているシンボル
+- コマンド
   - `hostname#{command name}`
   - `hostname>{command name}`
-- Virtual Routing and Forwarding(VRF)
+- 仮想ルーティング・フォワーディング(VRF)
   - `ip vrf {vrf-name}`
-- Border Gateway Protocol(BGP)
+- ボーダーゲートウェイプロトコル(BGP)
   - `router bgp {autonomous-system-number}`
   - `address-family ipv4 {unicast|multicast|vrf vrf-name }`
-- Group
+- グループ
   - `class-map {match-any|match-all} name`
   - `policy-map {name}`
-- Interface
+- インターフェイス
   - `interface {type, slot, port, etc...}`
-  - e.g. `interface GigabitEthernet0/0`
-- Sub Interface
+  - 例: `interface GigabitEthernet0/0`
+- サブインターフェイス
   - `interface {type, slot, port, etc...}.{number}`
 
-### Multilingual support
-Currently, only the settings page is available.
+### 多言語サポート
+現在は設定ページのみ対応しています。
 
-The following languages are supported:
-- English
-- Japanese
+以下の言語がサポートされています:
+- 英語
+- 日本語
 
-## Notes
-### Highlighting in large files
+## 注意事項
+### 大きなファイルでのハイライト
 
-If you want to enable highlighting in large files, change the following setting to false:
+大きなファイルでハイライトを有効にしたい場合は、以下の設定をfalseに変更してください:
 ```
 "editor.largeFileOptimizations": false
 ```
-However, VSCode disables features on large files for performance reasons, and forcing VSCode to syntax highlight large files may result in poor editor performance.
+ただし、VSCodeはパフォーマンス上の理由から、大きなファイルでは機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
 
 
-## Recommended Extensions
-I recommend the following extensions for a better visual experience:
+## 推奨拡張機能
+より良い視覚的な体験のために、以下の拡張機能を推奨します:
 - [Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)
 - [Jarvis Prestidge/Sublime Material Theme](https://marketplace.visualstudio.com/items?itemName=jprestidge.theme-material-theme)
 
-## Requests or Issues
-If you have any requests or issues, please open an Issue or submit a Pull Request on GitHub.
+## リクエストまたは問題報告
+リクエストや問題がある場合は、GitHubでIssueを開くか、プルリクエストを送信してください。
 
 [GitHub - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
 
-## License
+## ライセンス
 MIT License Copyright (c) 2021 Y-Ysss
