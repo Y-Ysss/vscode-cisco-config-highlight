@@ -13,7 +13,7 @@
 将来のバージョンで定義が変更される可能性があります。
 
 > [!NOTE]  
-> 実験的なツールのリリース  
+> 実験的なツールをリリース  
 > トークンの定義のカスタマイズを行うためのツールを公開しました。  
 > テーマエディタで、トークンのスコープを確認しながら、色やスタイルのカスタマイズができます。  
 > このツールは実験的な機能で、今後変更される可能性があります。  
@@ -59,7 +59,7 @@ VS Code用の拡張機能は、Visual Studio MarketplaceおよびOpen VSX Regist
 
 VSCodeのデフォルトテーマでは、すべてのハイライト設定が有効化されていません。より良い体験のために、カスタムテーマの使用を推奨します。
 
-現在有効なテーマで色が定義されていない場合、または色やスタイルを好みに合わせてカスタマイズしたい場合は、`settings.json`を編集する必要があります。
+また、現在有効なテーマで色が定義されていない場合、または色やスタイルを好みに合わせてカスタマイズしたい場合は、`settings.json`を編集する必要があります。
 
 設定を開き、カスタマイズオプションをJSONに追加してください。
 （コマンドパレットで`Preferences: Open Settings (JSON)`と入力すると`settings.json`ファイルを開くことができます。）
@@ -132,10 +132,18 @@ entity.name.class.interface.tunnel
 entity.name.class.interface.virtual-template
 entity.name.class.interface.vlan
 entity.name.class.interface.wireless
+entity.name.class.interface.bdi
+entity.name.class.interface.nvi
+entity.name.class.interface.vmi
+entity.name.class.interface.vasileft
+entity.name.class.interface.vasiright
+entity.name.class.interface.app-gigabitethernet
+
 entity.name.class.vrf.declaration
 
 entity.name.tag.acl.access-group.name
 entity.name.tag.acl.access-list.name
+entity.name.tag.acl.access-class.name
 
 entity.name.tag.bgp.neighbor-peer-group.name
 entity.name.tag.bgp.peer-group.name
@@ -146,13 +154,17 @@ entity.name.tag.config-string.domain-name
 entity.name.tag.config-string.hostname
 entity.name.tag.config-string.logging-system-message
 entity.name.tag.config-string.username
+entity.name.tag.config-string.name
 entity.name.tag.config-string.role
+
+entity.name.tag.wireless.ssid.name
 
 entity.name.tag.crypto.crypto-map.name
 entity.name.tag.crypto.transform-set.name
 entity.name.tag.crypto.ipsec-profile.name
 entity.name.tag.crypto.isakmp-profile.name
 entity.name.tag.crypto.keyring.name
+entity.name.tag.crypto.key-chain.name
 
 entity.name.tag.group.class-map.name
 entity.name.tag.group.class.name
@@ -172,8 +184,6 @@ entity.name.tag.event-manager.run.name
 entity.name.tag.event-manager.action.label
 
 entity.name.tag.vrf.vrf-name
-entity.other.vrf.definition
-entity.other.vrf.forwarding
 
 keyword.other.acl.access-list.type
 keyword.other.address.ipv4.cidr
@@ -206,6 +216,8 @@ keyword.other.config-keyword.status.up
 keyword.other.config-keyword.switchport-mode.access
 keyword.other.config-keyword.switchport-mode.dynamic
 keyword.other.config-keyword.switchport-mode.trunk
+keyword.other.config-keyword.enable-disable.enable
+keyword.other.config-keyword.enable-disable.disable
 keyword.other.config-keyword.vlan
 keyword.other.group.object-group.type
 
@@ -220,6 +232,7 @@ string.other.description
 string.other.password
 string.other.remark
 string.other.secret
+string.other.key-string
 ```
 
 ## 実験的機能
@@ -270,7 +283,7 @@ string.other.secret
 ```
 "editor.largeFileOptimizations": false
 ```
-ただし、VSCodeはパフォーマンス上の理由から、大きなファイルでは機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
+ただし、VSCodeはパフォーマンス上の理由から、大きなファイルではハイライト機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
 
 
 ## 推奨拡張機能
