@@ -122,7 +122,12 @@
     "format:fix": "biome format --write ./src",
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
-    "test": "vitest"
+    "test": "vitest",
+    "package": "vsce package",
+    "publish:vsce": "vsce publish --packagePath ./*.vsix",
+    "publish:vsce:pre-release": "vsce publish --packagePath ./*.vsix --pre-release",
+    "publish:ovsx": "ovsx publish ./*.vsix",
+    "publish:ovsx:pre-release": "ovsx publish ./*.vsix --pre-release"
   },
   "dependencies": {
     "semver": "^7.5.2"
@@ -133,6 +138,8 @@
     "@types/semver": "^7.5.2",
     "@types/vscode": "^1.52.0",
     "@vscode/test-cli": "^0.0.12",
+    "@vscode/vsce": "^3.9.1",
+    "ovsx": "^0.10.12",
     "typescript": "^5.4.3",
     "vitest": "^4.1.5"
   }

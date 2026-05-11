@@ -24,11 +24,11 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v8
         with:
-          path: dist
+          path: .
           name: vsix
 
       - name: List downloaded artifacts
-        run: ls -la dist/
+        run: ls -la ./*.vsix
 
       - name: Extract version from tag
         id: version
@@ -54,6 +54,6 @@ jobs:
           prerelease: ${{ steps.version.outputs.is_prerelease == 'true' }}
           generate_release_notes: true
           files: |
-            dist/*.vsix
+            ./*.vsix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

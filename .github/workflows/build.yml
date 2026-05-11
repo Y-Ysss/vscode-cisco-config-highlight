@@ -29,9 +29,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: vsix
-          path: dist/*.vsix
+          path: ./*.vsix
           retention-days: 30
 
-      - name: List dist directory
-        run: ls -la dist/
+      - name: List VSIX files
+        run: ls -la ./*.vsix
         shell: bash

@@ -30,11 +30,11 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v8
         with:
-          path: dist
+          path: .
           name: vsix
 
       - name: List VSIX files
-        run: ls -la dist/
+        run: ls -la ./*.vsix
 
       - name: Check if pre-release
         id: check_prerelease
@@ -79,11 +79,11 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v8
         with:
-          path: dist
+          path: .
           name: vsix
 
       - name: List VSIX files
-        run: ls -la dist/
+        run: ls -la ./*.vsix
 
       - name: Check if pre-release
         id: check_prerelease
