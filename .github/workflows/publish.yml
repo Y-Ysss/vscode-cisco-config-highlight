@@ -1,0 +1,109 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build VSIX
+    uses: ./.github/workflows/build.yml
+
+  publish-marketplace:
+    name: Publish to VS Code Marketplace
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: .
+          name: vsix
+
+      - name: List VSIX files
+        run: ls -la ./*.vsix
+
+      - name: Check if pre-release
+        id: check_prerelease
+        run: |
+          VERSION=$(jq -r .version package.json)
+          if [[ "${VERSION}" == *"-"* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "Pre-release version detected: ${VERSION}"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "Stable version: ${VERSION}"
+          fi
+
+      - name: Publish to VS Code Marketplace
+        run: |
+          if [[ "${{ steps.check_prerelease.outputs.is_prerelease }}" == "true" ]]; then
+            npm run publish:vsce:pre-release
+          else
+            npm run publish:vsce
+          fi
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        timeout-minutes: 5
+
+  publish-openvsx:
+    name: Publish to Open VSX Registry
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: .
+          name: vsix
+
+      - name: List VSIX files
+        run: ls -la ./*.vsix
+
+      - name: Check if pre-release
+        id: check_prerelease
+        run: |
+          VERSION=$(jq -r .version package.json)
+          if [[ "${VERSION}" == *"-"* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "Pre-release version detected: ${VERSION}"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "Stable version: ${VERSION}"
+          fi
+
+      - name: Publish to Open VSX Registry
+        run: |
+          if [[ "${{ steps.check_prerelease.outputs.is_prerelease }}" == "true" ]]; then
+            npm run publish:ovsx:pre-release
+          else
+            npm run publish:ovsx
+          fi
+        env:
+          OVSX_PAT: ${{ secrets.OPENVSX_TOKEN }}
+        timeout-minutes: 5

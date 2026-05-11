@@ -3,7 +3,7 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
-## 0.7.0 (2026-04)
+## 0.7.0 (2026-05)
 ### Added
 - Add syntax highlighting patterns.
   - entity.name.class.interface.bdi

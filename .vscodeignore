@@ -1,9 +1,37 @@
+# User Specified Files
+data/
+**/*.local*
+**/*.local*/**
+*.env*
+
+# Development files
+.git/**
+.jj/**
+.github/**
 .vscode/**
-.vscode-test/**
+node_modules/**
+build/**
+dist/**
+scripts/**
+.gitignore
+.gitattributes
+mise.toml
+AGENTS.md
+
+# Build outputs to exclude
 out/test/**
+**/*.map
+
+# Source files
 test/**
 src/**
-**/*.map
-.gitignore
-tsconfig.json
-vsc-extension-quickstart.md
+**/mocks/**
+**/*.test.*
+.vscode-test.mjs
+tsconfig*.json
+biome.jsonc
+rollup.config.ts
+vitest.config.ts
+
+# README files (keep only main README)
+README.*.md
