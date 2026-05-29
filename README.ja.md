@@ -18,6 +18,10 @@
 > テーマエディタで、トークンのスコープを確認しながら、色やスタイルのカスタマイズができます。  
 > このツールは実験的な機能で、今後変更される可能性があります。  
 > - [TextMate Theme Editor for Cisco Config Highlight](https://text-mate-theme-editor.yuyosy.workers.dev)
+>
+> テーマエディタはブラウザで動作するWebアプリケーションです。
+> 
+> <img src="https://raw.githubusercontent.com/yuyosy/textmate-theme-editor/refs/heads/main/public/screenshot.png" alt="theme icon" width="480px">
 
 
 ## 機能

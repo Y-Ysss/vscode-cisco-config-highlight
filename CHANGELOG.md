@@ -3,7 +3,14 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
-## 0.7.0 (2026-05)
+## 0.7.1 (2026-06-29)
+
+### Changed
+- Update syntax highlighting patterns.
+  - Improved keyword patterns
+  - Fixed an issue where the `use-vrf` command was not highlighted correctly.
+
+## 0.7.0 (2026-05-11)
 ### Added
 - Add syntax highlighting patterns.
   - entity.name.class.interface.bdi
