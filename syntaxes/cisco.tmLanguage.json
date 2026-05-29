@@ -50,9 +50,6 @@
     },
     {
       "include": "#param1"
-    },
-    {
-      "include": "#param1"
     }
   ],
   "repository": {
@@ -60,35 +57,35 @@
       "patterns": [
         {
           "name": "keyword.other.config-keyword.vlan.cisco",
-          "match": "(^|\\s)(protocol-vlan|mac-vlan|dot1q-tunnel|dot1[Qq])(?=\\s|$)"
+          "match": "(?<![-\\w])(?:protocol-vlan|mac-vlan|dot1q-tunnel|dot1[Qq])(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.switchport-mode.access.cisco",
-          "match": "(^|\\s)(access)(?=\\s|$)"
+          "match": "(?<![-\\w])access(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.switchport-mode.trunk.cisco",
-          "match": "(^|\\s)(trunk)(?=\\s|$)"
+          "match": "(?<![-\\w])trunk(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.switchport-mode.dynamic.cisco",
-          "match": "(^|\\s)(dynamic\\s(auto|desirable))(?=\\s|$)"
+          "match": "(?<![-\\w])dynamic\\s(?:auto|desirable)(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.add-remove.add.cisco",
-          "match": "(^|\\s)(add)(?=\\s|$)"
+          "match": "(?<![-\\w])add(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.add-remove.remove.cisco",
-          "match": "(^|\\s)(remove)(?=\\s|$)"
+          "match": "(?<![-\\w])remove(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.add-remove.except.cisco",
-          "match": "(^|\\s)(except)(?=\\s|$)"
+          "match": "(?<![-\\w])except(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.allowed-native.cisco",
-          "match": "(^|\\s)(allowed|native)(?=\\s|$)"
+          "match": "(?<![-\\w])(?:allowed|native)(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.any-all.any.cisco",
@@ -100,11 +97,11 @@
         },
         {
           "name": "keyword.other.config-keyword.permit-deny.permit.cisco",
-          "match": "(^|\\s)(permit)(?=\\s|$)"
+          "match": "(?<![-\\w])permit(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.permit-deny.deny.cisco",
-          "match": "(^|\\s)(deny)(?=\\s|$)"
+          "match": "(?<![-\\w])deny(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.status.up.cisco",
@@ -116,19 +113,19 @@
         },
         {
           "name": "keyword.other.config-keyword.status.deleted.cisco",
-          "match": "(^|\\s)([Dd]eleted)(?=\\s|$)"
+          "match": "(?<![-\\w])[Dd]eleted(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.status.administratively-down.cisco",
-          "match": "(^|\\s)([Aa]dministratively(-down)?)(?=\\s|$)"
+          "match": "(?<![-\\w])[Aa]dministratively(?:-down)?(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.match.any.cisco",
-          "match": "(^|\\s)(match-any)(?=\\s|$)"
+          "match": "(?<![-\\w])match-any(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.match.all.cisco",
-          "match": "(^|\\s)(match-all)(?=\\s|$)"
+          "match": "(?<![-\\w])match-all(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.in-out.in.cisco",
@@ -140,31 +137,31 @@
         },
         {
           "name": "keyword.other.config-keyword.input-output.input.cisco",
-          "match": "(^|\\s)(input)(?=\\s|$)"
+          "match": "(?<![-\\w])input(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.input-output.output.cisco",
-          "match": "(^|\\s)(output)(?=\\s|$)"
+          "match": "(?<![-\\w])output(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.inside-outside.inside.cisco",
-          "match": "(^|\\s)(inside)(?=\\s|$)"
+          "match": "(?<![-\\w])inside(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.inside-outside.outside.cisco",
-          "match": "(^|\\s)(outside)(?=\\s|$)"
+          "match": "(?<![-\\w])outside(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.enable-disable.enable.cisco",
-          "match": "(^|\\s)(enabled?)(?=\\s|$)"
+          "match": "(?<![-\\w])enabled?(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.enable-disable.disable.cisco",
-          "match": "(^|\\s)(disabled?)(?=\\s|$)"
+          "match": "(?<![-\\w])disabled?(?=[^-\\w]|$)"
         },
         {
           "name": "keyword.other.config-keyword.shutdown.cisco",
-          "match": "(^|\\s)(shutdown)(?=\\b|$)"
+          "match": "(?<![-\\w])shutdown(?=[^-\\w]|$)"
         }
       ]
     },
@@ -430,6 +427,17 @@
               "name": "entity.name.class.vrf.declaration.cisco"
             },
             "4": {
+              "name": "entity.name.tag.vrf.vrf-name.cisco"
+            }
+          }
+        },
+        {
+          "match": "(use-vrf)\\s(\\S+)",
+          "captures": {
+            "1": {
+              "name": "entity.name.class.vrf.declaration.cisco"
+            },
+            "2": {
               "name": "entity.name.tag.vrf.vrf-name.cisco"
             }
           }
