@@ -18,6 +18,10 @@ Definitions may change in future versions.
 > With the theme editor, you can customize colors and styles while checking the scopes of tokens.  
 > This tool is an experimental feature and may change in the future.  
 > - [TextMate Theme Editor for Cisco Config Highlight](https://text-mate-theme-editor.yuyosy.workers.dev)
+>
+> The theme editor is a web application that runs in the browser.
+> 
+> <img src="https://raw.githubusercontent.com/yuyosy/textmate-theme-editor/refs/heads/main/public/screenshot.png" alt="theme icon" width="480px">
 
 
 

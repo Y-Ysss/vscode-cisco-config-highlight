@@ -1,3 +1,11 @@
-out
+# User Specified Files
+data/
+*.local*
+*.env*
+
+# Development files
 node_modules
+
+# Build outputs to exclude
+out
 *.vsix
