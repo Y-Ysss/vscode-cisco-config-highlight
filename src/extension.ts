@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { registerOutlineSymbolProvider } from './registerOutlineSymbol';
-import { registerUpdateInfo } from './registerUpdateInfo';
+import { registerUpdateInfo } from './providers/notification/registerUpdateInfo';
+import { registerOutlineSymbolProvider } from './providers/outline/registerOutlineSymbol';
 
 export const outputChannel = vscode.window.createOutputChannel(
   'Cisco Config Highlight',

@@ -1,6 +1,6 @@
 import * as semver from 'semver';
 import * as vscode from 'vscode';
-import { outputChannel } from './extension';
+import { outputChannel } from '../../extension';
 import {
   type NotificationInfo,
   notificationConditions,
