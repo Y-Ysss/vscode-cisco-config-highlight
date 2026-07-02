@@ -11,7 +11,7 @@ const { mockConfig } = vi.hoisted(() => {
 
 // Override only workspace on top of mocks/vscode.ts to allow per-test config
 vi.mock('vscode', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('./mocks/vscode')>();
+  const actual = await importOriginal<typeof import('../../mocks/vscode')>();
   return {
     ...actual,
     workspace: {

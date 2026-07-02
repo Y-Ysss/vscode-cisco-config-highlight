@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { outputChannel } from './extension';
+import { outputChannel } from '../../channel';
 
 // Unused ideas
 // https://code.visualstudio.com/api/extension-guides/webview
