@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-
+import {
+  getConfigOutlineShowSymbolsInOutlinePanel,
+  getConfigOutlineSymbolsList,
+} from '../../config';
+import { EXTENSION_ID } from '../../contributions/configurations';
 import { symbolsInfo } from './symbolsInfo';
 
 export function registerOutlineSymbolProvider(
@@ -12,7 +16,7 @@ export function registerOutlineSymbolProvider(
     ),
     // Invalidate the pattern cache when configuration changes
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('cisco-config-highlight')) {
+      if (e.affectsConfiguration(EXTENSION_ID)) {
         invalidatePatternCache();
       }
     }),
@@ -37,9 +41,7 @@ const regexPattern = (name: string): RegExp => {
 };
 
 const buildSettingsPattern = (): RegExp | null => {
-  const symbols: Record<string, boolean> = vscode.workspace
-    .getConfiguration('cisco-config-highlight')
-    .get('outline.symbolsList', {});
+  const symbols: Record<string, boolean> = getConfigOutlineSymbolsList();
   const patterns: RegExp[] = Object.entries(symbols)
     .filter(([, enabled]) => enabled)
     .map(([name]) => regexPattern(name));
@@ -67,9 +69,7 @@ class CiscoConfigDocumentSymbolProvider
     document: vscode.TextDocument,
     _token: vscode.CancellationToken,
   ): vscode.DocumentSymbol[] {
-    const enabledOutlinePanel = vscode.workspace
-      .getConfiguration('cisco-config-highlight')
-      .get('outline.showSymbolsInOutlinePanel', false);
+    const enabledOutlinePanel = getConfigOutlineShowSymbolsInOutlinePanel();
     if (!enabledOutlinePanel) {
       return [];
     }
