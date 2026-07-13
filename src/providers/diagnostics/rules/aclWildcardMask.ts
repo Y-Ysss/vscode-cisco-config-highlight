@@ -351,6 +351,64 @@ const pushInvalid = (
   });
 };
 
+const ipv4ToUint32 = (
+  octets: readonly [number, number, number, number],
+): number =>
+  ((octets[0] << 24) | (octets[1] << 16) | (octets[2] << 8) | octets[3]) >>> 0;
+
+const uint32ToIpv4 = (value: number): string =>
+  [
+    value >>> 24,
+    (value >>> 16) & 0xff,
+    (value >>> 8) & 0xff,
+    value & 0xff,
+  ].join('.');
+
+const isCanonicalWildcard = (value: number): boolean =>
+  (value & (value + 1)) === 0;
+
+const isSubnetMask = (value: number): boolean => {
+  const host = ~value >>> 0;
+  return (host & (host + 1)) === 0;
+};
+
+const validateWildcardIntent = (
+  findings: RuleFinding[],
+  line: number,
+  addressToken: AclToken,
+  wildcardToken: AclToken,
+  addressOctets: readonly [number, number, number, number],
+  wildcardOctets: readonly [number, number, number, number],
+): void => {
+  const address = ipv4ToUint32(addressOctets);
+  const wildcard = ipv4ToUint32(wildcardOctets);
+
+  if (isSubnetMask(wildcard) && !isCanonicalWildcard(wildcard)) {
+    const suggestion = uint32ToIpv4(~wildcard >>> 0);
+    findings.push({
+      line,
+      start: wildcardToken.start,
+      end: wildcardToken.end,
+      code: 'subnet-mask-used-as-wildcard',
+      message: `Wildcard looks like a subnet mask; use ${suggestion}.`,
+      severity: 'warning',
+    });
+    return;
+  }
+
+  if ((address & wildcard) !== 0) {
+    const canonicalAddress = uint32ToIpv4(address & ~wildcard);
+    findings.push({
+      line,
+      start: addressToken.start,
+      end: wildcardToken.end,
+      code: 'non-canonical-wildcard-address',
+      message: `Address has wildcard bits set; use ${canonicalAddress} ${wildcardToken.text}.`,
+      severity: 'warning',
+    });
+  }
+};
+
 const validateCandidate = (
   findings: RuleFinding[],
   candidate: AclWildcardCandidate,
@@ -362,11 +420,29 @@ const validateCandidate = (
   if (!specs) return;
 
   for (const spec of specs) {
-    if (spec.address && !parseIpv4(spec.address.text)) {
+    if (!spec.address) continue;
+
+    const address = parseIpv4(spec.address.text);
+    if (!address) {
       pushInvalid(findings, candidate.line, spec.address, false);
     }
-    if (spec.wildcard && !parseIpv4(spec.wildcard.text)) {
+
+    if (!spec.wildcard) continue;
+
+    const wildcard = parseIpv4(spec.wildcard.text);
+    if (!wildcard) {
       pushInvalid(findings, candidate.line, spec.wildcard, true);
+    }
+
+    if (address && wildcard) {
+      validateWildcardIntent(
+        findings,
+        candidate.line,
+        spec.address,
+        spec.wildcard,
+        address,
+        wildcard,
+      );
     }
   }
 };

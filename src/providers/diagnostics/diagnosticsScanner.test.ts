@@ -6,6 +6,20 @@ import {
 } from './diagnosticsScanner';
 
 describe('combined Diagnostics scanner', () => {
+  it('emits ACL wildcard intent warnings through the single-pass dispatcher', () => {
+    const line = 'access-list 10 permit 192.168.1.0 255.255.255.0';
+    const lineAt = vi.fn(() => line);
+
+    expect(scanDiagnosticFindings({ lineCount: 1, lineAt })).toMatchObject([
+      {
+        line: 0,
+        code: 'subnet-mask-used-as-wildcard',
+        severity: 'warning',
+      },
+    ]);
+    expect(lineAt).toHaveBeenCalledTimes(1);
+  });
+
   it('emits IPv4 network-boundary warnings through the single-pass dispatcher', () => {
     const lines = [
       'ordinary nonmatching text',

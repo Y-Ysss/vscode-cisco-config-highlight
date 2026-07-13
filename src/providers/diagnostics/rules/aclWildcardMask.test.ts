@@ -184,6 +184,93 @@ describe('scanAclWildcardCandidates', () => {
 });
 
 describe('scanAclWildcardFindings', () => {
+  it('warns about subnet masks in wildcard positions and non-canonical pairs', () => {
+    const findings = scanAclWildcardFindings(
+      source(
+        'access-list 10 permit 192.168.1.0 255.255.255.0',
+        'access-list 10 deny 10.0.0.0 255.0.0.0',
+        'access-list 10 permit 192.168.1.17 0.0.0.252',
+        'ip access-list standard NAMED',
+        '10 permit 198.51.100.0 255.255.255.0',
+        'ip access-list extended EDGE',
+        '20 permit ip 10.0.0.17 0.0.0.252 192.0.2.0 0.0.0.255',
+      ),
+    );
+
+    expect(findings).toEqual([
+      {
+        line: 0,
+        start: 34,
+        end: 47,
+        code: 'subnet-mask-used-as-wildcard',
+        message: expect.stringContaining('0.0.0.255'),
+        severity: 'warning',
+      },
+      {
+        line: 1,
+        start: 29,
+        end: 38,
+        code: 'subnet-mask-used-as-wildcard',
+        message: expect.stringContaining('0.255.255.255'),
+        severity: 'warning',
+      },
+      {
+        line: 2,
+        start: 22,
+        end: 44,
+        code: 'non-canonical-wildcard-address',
+        message: expect.stringContaining('192.168.1.1 0.0.0.252'),
+        severity: 'warning',
+      },
+      {
+        line: 4,
+        start: 23,
+        end: 36,
+        code: 'subnet-mask-used-as-wildcard',
+        message: expect.stringContaining('0.0.0.255'),
+        severity: 'warning',
+      },
+      {
+        line: 6,
+        start: 13,
+        end: 32,
+        code: 'non-canonical-wildcard-address',
+        message: expect.stringContaining('10.0.0.1 0.0.0.252'),
+        severity: 'warning',
+      },
+    ]);
+  });
+
+  it('does not warn for wildcard boundaries, canonical arbitrary masks, or absent pairs', () => {
+    expect(
+      scanAclWildcardFindings(
+        source(
+          'access-list 1 permit 192.0.2.1 0.0.0.0',
+          'access-list 2 deny 0.0.0.0 255.255.255.255',
+          'access-list 3 permit 10.0.0.0 0.255.0.255',
+          'access-list 4 permit any',
+          'access-list 5 permit host 192.0.2.1',
+          'access-list 6 permit 192.0.2.0',
+          'access-list 100 permit ip any host 192.0.2.1',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('does not add semantic warnings to lexically invalid address pairs', () => {
+    const findings = scanAclWildcardFindings(
+      source(
+        'access-list 1 permit 999.0.0.1 255.255.255.0',
+        'access-list 2 permit 192.168.1.17 255.255.255.999',
+      ),
+    );
+
+    expect(findings.map(({ code }) => code)).toEqual([
+      'invalid-ipv4',
+      'invalid-wildcard-mask',
+    ]);
+  });
+
   it('validates standard named and numbered address/wildcard operands exactly', () => {
     const findings = scanAclWildcardFindings(
       source(
@@ -191,7 +278,7 @@ describe('scanAclWildcardFindings', () => {
         'access-list 99 deny 10.0.0.0 0.0.0.999',
         'ip access-list standard NAMED',
         '10 permit host 192.0.2.999',
-        '20 deny 198.51.100.0 0.255.0.255',
+        '20 deny 198.0.100.0 0.255.0.255',
       ),
     );
 
