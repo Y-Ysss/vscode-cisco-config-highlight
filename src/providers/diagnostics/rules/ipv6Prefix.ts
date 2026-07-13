@@ -1,0 +1,266 @@
+import { getFirstToken, type LineSource } from '../../../parser/lineScanUtils';
+import { parseIpv4 } from './ipPrefix';
+import {
+  type PrefixListToken,
+  validatePrefixListModifiers,
+} from './prefixListModifiers';
+import type { RuleFinding } from './ruleFinding';
+
+type Token = PrefixListToken;
+
+const tokenize = (line: string): Token[] =>
+  Array.from(line.matchAll(/[^ \t]+/g), (match) => ({
+    text: match[0],
+    start: match.index,
+    end: match.index + match[0].length,
+  }));
+
+const lower = (token: Token | undefined): string | undefined =>
+  token?.text.toLowerCase();
+
+/** Parses IPv6 text, including a valid dotted-decimal IPv4 tail. */
+export const parseIpv6 = (text: string): boolean => {
+  if (text.length === 0 || text.includes('%')) return false;
+
+  let normalized = text;
+  if (text.includes('.')) {
+    const lastColon = text.lastIndexOf(':');
+    if (lastColon < 0 || !parseIpv4(text.slice(lastColon + 1))) return false;
+    normalized = `${text.slice(0, lastColon + 1)}0:0`;
+  }
+
+  const compression = normalized.indexOf('::');
+  if (compression !== normalized.lastIndexOf('::')) return false;
+  const validHextet = (part: string): boolean =>
+    /^[0-9a-fA-F]{1,4}$/.test(part);
+
+  if (compression < 0) {
+    const parts = normalized.split(':');
+    return parts.length === 8 && parts.every(validHextet);
+  }
+
+  const left = normalized.slice(0, compression);
+  const right = normalized.slice(compression + 2);
+  const leftParts = left.length === 0 ? [] : left.split(':');
+  const rightParts = right.length === 0 ? [] : right.split(':');
+  return (
+    leftParts.length + rightParts.length < 8 &&
+    leftParts.every(validHextet) &&
+    rightParts.every(validHextet)
+  );
+};
+
+const pushInvalidAddress = (
+  findings: RuleFinding[],
+  line: number,
+  token: Token,
+): void => {
+  if (parseIpv6(token.text)) return;
+  findings.push({
+    line,
+    start: token.start,
+    end: token.end,
+    code: 'invalid-ipv6',
+    message: 'Invalid IPv6 address.',
+    severity: 'error',
+  });
+};
+
+const validatePrefixOperand = (
+  findings: RuleFinding[],
+  line: number,
+  operand: Token,
+): number | undefined => {
+  const slash = operand.text.indexOf('/');
+  if (slash < 0) return undefined;
+  const address: Token = {
+    text: operand.text.slice(0, slash),
+    start: operand.start,
+    end: operand.start + slash,
+  };
+  const prefixToken: Token = {
+    text: operand.text.slice(slash + 1),
+    start: operand.start + slash + 1,
+    end: operand.end,
+  };
+  pushInvalidAddress(findings, line, address);
+
+  let prefix: number | undefined;
+  if (/^\d+$/.test(prefixToken.text)) prefix = Number(prefixToken.text);
+  if (prefix === undefined || prefix > 128) {
+    findings.push({
+      line,
+      start: prefixToken.start,
+      end: prefixToken.end,
+      code: 'invalid-prefix-length',
+      message: 'Invalid IPv6 prefix length.',
+      severity: 'warning',
+    });
+  }
+  return prefix;
+};
+
+const validatePrefixList = (
+  findings: RuleFinding[],
+  line: number,
+  tokens: readonly Token[],
+): boolean => {
+  if (lower(tokens[0]) !== 'ipv6' || lower(tokens[1]) !== 'prefix-list') {
+    return false;
+  }
+  let index = 3;
+  if (lower(tokens[index]) === 'seq') index += 2;
+  const action = lower(tokens[index]);
+  if (action !== 'permit' && action !== 'deny') return false;
+  const operand = tokens[index + 1];
+  if (!operand || !operand.text.includes('/')) return false;
+  const prefix = validatePrefixOperand(findings, line, operand);
+  validatePrefixListModifiers(
+    findings,
+    line,
+    tokens.slice(index + 2),
+    prefix,
+    128,
+  );
+  return true;
+};
+
+const validateStandalone = (
+  findings: RuleFinding[],
+  line: number,
+  tokens: readonly Token[],
+): boolean => {
+  if (lower(tokens[0]) !== 'ipv6') return false;
+  if (lower(tokens[1]) === 'prefix-list') {
+    return validatePrefixList(findings, line, tokens);
+  }
+  if (lower(tokens[1]) !== 'address') return false;
+  const operand = tokens[2];
+  if (!operand || !operand.text.includes('/')) return false;
+  validatePrefixOperand(findings, line, operand);
+  return true;
+};
+
+interface AclOperand {
+  readonly kind: 'any' | 'host' | 'prefix';
+  readonly token?: Token;
+  readonly next: number;
+}
+
+const readAclOperand = (
+  tokens: readonly Token[],
+  index: number,
+): AclOperand | undefined => {
+  if (lower(tokens[index]) === 'any') return { kind: 'any', next: index + 1 };
+  if (lower(tokens[index]) === 'host' && tokens[index + 1]) {
+    return { kind: 'host', token: tokens[index + 1], next: index + 2 };
+  }
+  if (tokens[index]?.text.includes('/')) {
+    return { kind: 'prefix', token: tokens[index], next: index + 1 };
+  }
+  return undefined;
+};
+
+const skipPortOperator = (tokens: readonly Token[], index: number): number => {
+  const operator = lower(tokens[index]);
+  if (operator === 'range') return index + 3;
+  if (
+    operator === 'eq' ||
+    operator === 'neq' ||
+    operator === 'lt' ||
+    operator === 'gt'
+  ) {
+    return index + 2;
+  }
+  return index;
+};
+
+const validateAclOperand = (
+  findings: RuleFinding[],
+  line: number,
+  operand: AclOperand,
+): void => {
+  if (!operand.token) return;
+  if (operand.kind === 'host')
+    pushInvalidAddress(findings, line, operand.token);
+  else validatePrefixOperand(findings, line, operand.token);
+};
+
+const validateAclMember = (
+  findings: RuleFinding[],
+  line: number,
+  tokens: readonly Token[],
+): boolean => {
+  let index = 0;
+  if (/^\d+$/.test(tokens[index]?.text ?? '')) index += 1;
+  else if (lower(tokens[index]) === 'sequence' && tokens[index + 1]) index += 2;
+  const action = lower(tokens[index]);
+  if (action !== 'permit' && action !== 'deny') return false;
+  if (!tokens[index + 1]) return false;
+
+  const source = readAclOperand(tokens, index + 2);
+  if (!source) return false;
+  const destinationIndex = skipPortOperator(tokens, source.next);
+  const destination = readAclOperand(tokens, destinationIndex);
+  if (!destination) return false;
+
+  validateAclOperand(findings, line, source);
+  validateAclOperand(findings, line, destination);
+  return true;
+};
+
+const isAclHeader = (tokens: readonly Token[]): boolean =>
+  tokens.length === 3 &&
+  lower(tokens[0]) === 'ipv6' &&
+  lower(tokens[1]) === 'access-list' &&
+  tokens[2] !== undefined;
+
+/** Scans supported IPv6 prefix operands in one forward pass. */
+export const scanIpv6PrefixFindings = (
+  source: LineSource,
+  isCancelled: () => boolean = () => false,
+): RuleFinding[] => {
+  const findings: RuleFinding[] = [];
+  let inAcl = false;
+
+  for (let line = 0; line < source.lineCount; line += 1) {
+    if ((line & 255) === 0 && isCancelled()) return [];
+    const text = source.lineAt(line);
+    let tokens: Token[] | undefined;
+
+    if (inAcl) {
+      tokens = tokenize(text);
+      const first = lower(tokens[0]);
+      let memberIndex = 0;
+      if (/^\d+$/.test(tokens[0]?.text ?? '')) memberIndex = 1;
+      else if (first === 'sequence' && tokens[1]) memberIndex = 2;
+      const memberFirst = lower(tokens[memberIndex]);
+      if (tokens.length === 0 || first === '!' || memberFirst === 'remark') {
+        if (isCancelled()) return [];
+        continue;
+      }
+      if (first === 'exit') {
+        inAcl = false;
+        if (isCancelled()) return [];
+        continue;
+      }
+      if (validateAclMember(findings, line, tokens)) {
+        if (isCancelled()) return [];
+        continue;
+      }
+      inAcl = false;
+    }
+
+    if (!tokens) {
+      if (getFirstToken(text).toLowerCase() !== 'ipv6') continue;
+      tokens = tokenize(text);
+    }
+    if (isAclHeader(tokens)) {
+      inAcl = true;
+      if (isCancelled()) return [];
+      continue;
+    }
+    if (validateStandalone(findings, line, tokens) && isCancelled()) return [];
+  }
+  return findings;
+};

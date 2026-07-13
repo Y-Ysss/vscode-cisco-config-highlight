@@ -1,0 +1,283 @@
+import { getFirstToken, type LineSource } from '../../../parser/lineScanUtils';
+import { validatePrefixListModifiers } from './prefixListModifiers';
+import type { RuleFinding, RuleFindingSeverity } from './ruleFinding';
+
+interface Token {
+  readonly text: string;
+  readonly start: number;
+  readonly end: number;
+}
+
+export interface IpPrefixRuleOptions {
+  readonly allowNonContiguousMask?: boolean;
+}
+
+const tokenize = (line: string): Token[] =>
+  Array.from(line.matchAll(/[^ \t]+/g), (match) => ({
+    text: match[0],
+    start: match.index,
+    end: match.index + match[0].length,
+  }));
+
+const lower = (token: Token | undefined): string | undefined =>
+  token?.text.toLowerCase();
+
+/** Parses exactly four decimal IPv4 octets in the range 0..255. */
+export const parseIpv4 = (
+  text: string,
+): readonly [number, number, number, number] | undefined => {
+  const parts = text.split('.');
+  if (parts.length !== 4) return undefined;
+  const octets: number[] = [];
+  for (const part of parts) {
+    if (!/^\d+$/.test(part)) return undefined;
+    const value = Number(part);
+    if (!Number.isSafeInteger(value) || value > 255) return undefined;
+    octets.push(value);
+  }
+  return [octets[0], octets[1], octets[2], octets[3]];
+};
+
+/** True when a valid IPv4 mask consists of ones followed only by zeroes. */
+export const isContiguousSubnetMask = (
+  octets: readonly [number, number, number, number],
+): boolean => {
+  let sawZero = false;
+  for (const octet of octets) {
+    for (let bit = 7; bit >= 0; bit -= 1) {
+      const isOne = (octet & (1 << bit)) !== 0;
+      if (!isOne) sawZero = true;
+      else if (sawZero) return false;
+    }
+  }
+  return true;
+};
+
+const pushFinding = (
+  findings: RuleFinding[],
+  line: number,
+  range: Pick<Token, 'start' | 'end'>,
+  code: string,
+  message: string,
+  severity: RuleFindingSeverity,
+): void => {
+  findings.push({
+    line,
+    start: range.start,
+    end: range.end,
+    code,
+    message,
+    severity,
+  });
+};
+
+const validateAddress = (
+  findings: RuleFinding[],
+  line: number,
+  token: Token,
+): void => {
+  if (!parseIpv4(token.text)) {
+    pushFinding(
+      findings,
+      line,
+      token,
+      'invalid-ipv4',
+      'Invalid IPv4 address.',
+      'error',
+    );
+  }
+};
+
+const validateSubnetMask = (
+  findings: RuleFinding[],
+  line: number,
+  token: Token,
+  allowNonContiguousMask: boolean,
+): void => {
+  const mask = parseIpv4(token.text);
+  if (!mask) {
+    pushFinding(
+      findings,
+      line,
+      token,
+      'invalid-subnet-mask',
+      'Invalid subnet mask.',
+      'error',
+    );
+  } else if (!allowNonContiguousMask && !isContiguousSubnetMask(mask)) {
+    pushFinding(
+      findings,
+      line,
+      token,
+      'non-contiguous-subnet-mask',
+      'Subnet mask is not contiguous.',
+      'warning',
+    );
+  }
+};
+
+const modifierWarning = (
+  findings: RuleFinding[],
+  line: number,
+  token: Token,
+): void =>
+  pushFinding(
+    findings,
+    line,
+    token,
+    'invalid-prefix-list-modifier',
+    'Invalid prefix-list modifier.',
+    'warning',
+  );
+
+const validateModifiers = (
+  findings: RuleFinding[],
+  line: number,
+  tokens: readonly Token[],
+  prefix: number | undefined,
+): void => {
+  if (tokens.length === 0) return;
+
+  const maskIndex = tokens.findIndex((token) => lower(token) === 'mask');
+  if (maskIndex >= 0) {
+    const mask = tokens[maskIndex + 1];
+    if (mask && !parseIpv4(mask.text)) {
+      pushFinding(
+        findings,
+        line,
+        mask,
+        'invalid-route-match-mask',
+        'Invalid route-match mask.',
+        'error',
+      );
+    }
+    if (maskIndex !== 0 || !mask || tokens.length !== 2) {
+      const relevant =
+        maskIndex === 0 && tokens.length > 2 ? tokens[2] : tokens[maskIndex];
+      modifierWarning(findings, line, relevant);
+    }
+    return;
+  }
+
+  validatePrefixListModifiers(findings, line, tokens, prefix, 32);
+};
+
+const validatePrefixList = (
+  findings: RuleFinding[],
+  line: number,
+  tokens: readonly Token[],
+): boolean => {
+  if (lower(tokens[0]) !== 'ip' || lower(tokens[1]) !== 'prefix-list') {
+    return false;
+  }
+  let index = 3;
+  if (lower(tokens[index]) === 'seq') index += 2;
+  const action = lower(tokens[index]);
+  if (action !== 'permit' && action !== 'deny') return false;
+  const operand = tokens[index + 1];
+  if (!operand) return false;
+
+  const slash = operand.text.indexOf('/');
+  if (slash < 0) return false;
+  const addressToken: Token = {
+    text: operand.text.slice(0, slash),
+    start: operand.start,
+    end: operand.start + slash,
+  };
+  const prefixToken: Token = {
+    text: operand.text.slice(slash + 1),
+    start: operand.start + slash + 1,
+    end: operand.end,
+  };
+  validateAddress(findings, line, addressToken);
+
+  let prefix: number | undefined;
+  if (!/^\d+$/.test(prefixToken.text)) {
+    pushFinding(
+      findings,
+      line,
+      prefixToken,
+      'invalid-prefix-length',
+      'Invalid IPv4 prefix length.',
+      'warning',
+    );
+  } else {
+    prefix = Number(prefixToken.text);
+    if (prefix > 32) {
+      pushFinding(
+        findings,
+        line,
+        prefixToken,
+        'invalid-prefix-length',
+        'Invalid IPv4 prefix length.',
+        'warning',
+      );
+    }
+  }
+  validateModifiers(findings, line, tokens.slice(index + 2), prefix);
+  return true;
+};
+
+const validateCandidate = (
+  findings: RuleFinding[],
+  line: number,
+  text: string,
+  options: IpPrefixRuleOptions,
+): boolean => {
+  const first = getFirstToken(text).toLowerCase();
+  if (first !== 'ip' && first !== 'network') return false;
+  const tokens = tokenize(text);
+
+  if (first === 'network') {
+    if (lower(tokens[2]) !== 'mask' || !tokens[1] || !tokens[3]) return false;
+    validateAddress(findings, line, tokens[1]);
+    validateSubnetMask(
+      findings,
+      line,
+      tokens[3],
+      options.allowNonContiguousMask === true,
+    );
+    return true;
+  }
+  if (lower(tokens[1]) === 'prefix-list') {
+    return validatePrefixList(findings, line, tokens);
+  }
+  if (lower(tokens[1]) !== 'route' && lower(tokens[1]) !== 'address') {
+    return false;
+  }
+  if (!tokens[2] || !tokens[3]) return false;
+  const addressKeyword = lower(tokens[2]);
+  if (
+    addressKeyword === 'vrf' ||
+    addressKeyword === 'dhcp' ||
+    addressKeyword === 'negotiated' ||
+    addressKeyword === 'unnumbered'
+  ) {
+    return false;
+  }
+  validateAddress(findings, line, tokens[2]);
+  validateSubnetMask(
+    findings,
+    line,
+    tokens[3],
+    options.allowNonContiguousMask === true,
+  );
+  return true;
+};
+
+/** Scans supported IPv4 prefix/mask command operands in one forward pass. */
+export const scanIpPrefixFindings = (
+  source: LineSource,
+  options: IpPrefixRuleOptions = {},
+  isCancelled: () => boolean = () => false,
+): RuleFinding[] => {
+  const findings: RuleFinding[] = [];
+  for (let line = 0; line < source.lineCount; line += 1) {
+    if ((line & 255) === 0 && isCancelled()) return [];
+    const text = source.lineAt(line);
+    if (validateCandidate(findings, line, text, options) && isCancelled()) {
+      return [];
+    }
+  }
+  return findings;
+};
