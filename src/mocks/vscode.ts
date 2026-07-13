@@ -62,18 +62,72 @@ export class Range {
   }
 }
 
+export const DiagnosticSeverity = {
+  Error: 0,
+  Warning: 1,
+  Information: 2,
+  Hint: 3,
+};
+
+export class Diagnostic {
+  public source?: string;
+  public code?: string | number;
+
+  constructor(
+    public range: Range,
+    public message: string,
+    public severity: number,
+  ) {}
+}
+
+export class CancellationTokenSource {
+  private cancelled = false;
+  public readonly token = {
+    get isCancellationRequested() {
+      return false;
+    },
+  };
+
+  constructor() {
+    const owner = this;
+    this.token = {
+      get isCancellationRequested() {
+        return owner.cancelled;
+      },
+    };
+  }
+
+  cancel(): void {
+    this.cancelled = true;
+  }
+
+  dispose(): void {}
+}
+
 export const workspace = {
+  textDocuments: [] as unknown[],
   getConfiguration: (_section?: string) => ({
     get: (_key: string, defaultValue: unknown) => defaultValue,
   }),
   onDidChangeConfiguration: () => ({ dispose: () => {} }),
+  onDidOpenTextDocument: () => ({ dispose: () => {} }),
+  onDidChangeTextDocument: () => ({ dispose: () => {} }),
+  onDidCloseTextDocument: () => ({ dispose: () => {} }),
 };
 
 export const languages = {
   registerDocumentSymbolProvider: () => ({ dispose: () => {} }),
+  createDiagnosticCollection: () => ({
+    set: (_uri: unknown, _diagnostics: unknown[]) => {},
+    delete: (_uri: unknown) => {},
+    clear: () => {},
+    dispose: () => {},
+  }),
 };
 
 export const window = {
+  visibleTextEditors: [] as unknown[],
+  onDidChangeTextEditorVisibleRanges: () => ({ dispose: () => {} }),
   showInformationMessage: (..._args: unknown[]) => Promise.resolve(undefined),
   showWarningMessage: (..._args: unknown[]) => Promise.resolve(undefined),
   createOutputChannel: (_name: string) => ({
