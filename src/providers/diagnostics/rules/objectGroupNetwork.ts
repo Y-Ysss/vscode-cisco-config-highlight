@@ -1,4 +1,7 @@
 import type { LineSource } from '../../../parser/lineScanUtils';
+import { isContiguousSubnetMask, parseIpv4 } from './ipPrefix';
+import { parseIpv6 } from './ipv6Prefix';
+import type { RuleFinding } from './ruleFinding';
 
 export type NetworkObjectGroupProfile = 'ios' | 'nxos-ipv4' | 'nxos-ipv6';
 export type NetworkObjectMemberKind =
@@ -60,28 +63,24 @@ const headerProfile = (
 const nxosStart = (tokens: readonly NetworkObjectToken[]): number =>
   tokens[0] && /^\d+$/.test(tokens[0].text) ? 1 : 0;
 
-const IPV4_LEXICAL_PATTERN = /^\d+(?:\.\d+){3}$/;
-const IPV6_LEXICAL_PATTERN = /^(?=[0-9a-f:.]*:)[0-9a-f:.]+$/i;
+const isIpv4Like = (text: string): boolean =>
+  text.includes('.') && /^[\d.]+$/.test(text);
 
-const isAddressLexicallyPlausible = (
-  text: string,
-  profile: Exclude<NetworkObjectGroupProfile, 'ios'>,
-): boolean =>
-  profile === 'nxos-ipv4'
-    ? IPV4_LEXICAL_PATTERN.test(text)
-    : IPV6_LEXICAL_PATTERN.test(text);
+const INCOMPLETE_VALUE_KEYWORDS = new Set([
+  'description',
+  'exit',
+  'group-object',
+  'host',
+  'network-object',
+  'object-group',
+  'range',
+]);
 
-const isPrefixLexicallyPlausible = (
-  text: string,
-  profile: Exclude<NetworkObjectGroupProfile, 'ios'>,
+const isIncompleteValueKeyword = (
+  token: NetworkObjectToken | undefined,
 ): boolean => {
-  const slash = text.indexOf('/');
-  return (
-    slash > 0 &&
-    slash === text.lastIndexOf('/') &&
-    /^\d+$/.test(text.slice(slash + 1)) &&
-    isAddressLexicallyPlausible(text.slice(0, slash), profile)
-  );
+  const keyword = normalized(token);
+  return keyword !== undefined && INCOMPLETE_VALUE_KEYWORDS.has(keyword);
 };
 
 const candidateFor = (
@@ -94,6 +93,10 @@ const candidateFor = (
     if (normalized(tokens[0]) !== 'network-object' || tokens.length < 2) {
       return undefined;
     }
+    const firstOperand = tokens[1];
+    const value =
+      normalized(firstOperand) === 'host' ? tokens[2] : firstOperand;
+    if (!value || isIncompleteValueKeyword(value)) return undefined;
     return {
       line,
       text,
@@ -112,20 +115,17 @@ const candidateFor = (
   if (
     normalized(memberTokens[0]) === 'host' &&
     memberTokens.length === 2 &&
-    isAddressLexicallyPlausible(memberTokens[1].text, profile)
+    !isIncompleteValueKeyword(memberTokens[1])
   ) {
     memberKind = 'host';
     operands = memberTokens.slice(1);
-  } else if (
-    memberTokens.length === 1 &&
-    isPrefixLexicallyPlausible(memberTokens[0].text, profile)
-  ) {
+  } else if (memberTokens.length === 1 && memberTokens[0].text.includes('/')) {
     memberKind = 'prefix';
     operands = memberTokens;
   } else if (
     profile === 'nxos-ipv4' &&
     memberTokens.length === 2 &&
-    memberTokens.every((token) => IPV4_LEXICAL_PATTERN.test(token.text))
+    memberTokens.some((token) => isIpv4Like(token.text))
   ) {
     memberKind = 'address-wildcard';
     operands = memberTokens;
@@ -204,4 +204,189 @@ export const scanNetworkObjectGroupCandidates = (
   }
 
   return candidates;
+};
+
+export interface NetworkObjectGroupRuleOptions {
+  readonly allowNonContiguousMask?: boolean;
+}
+
+const pushFinding = (
+  findings: RuleFinding[],
+  line: number,
+  token: Pick<NetworkObjectToken, 'start' | 'end'>,
+  code: string,
+  message: string,
+  severity: RuleFinding['severity'],
+): void => {
+  findings.push({
+    line,
+    start: token.start,
+    end: token.end,
+    code,
+    message,
+    severity,
+  });
+};
+
+const validateIpv4 = (
+  findings: RuleFinding[],
+  line: number,
+  token: NetworkObjectToken,
+): void => {
+  if (parseIpv4(token.text)) return;
+  pushFinding(
+    findings,
+    line,
+    token,
+    'invalid-ipv4',
+    'Invalid IPv4 address.',
+    'error',
+  );
+};
+
+const validateIpv6 = (
+  findings: RuleFinding[],
+  line: number,
+  token: NetworkObjectToken,
+): void => {
+  if (parseIpv6(token.text)) return;
+  pushFinding(
+    findings,
+    line,
+    token,
+    'invalid-ipv6',
+    'Invalid IPv6 address.',
+    'error',
+  );
+};
+
+const validatePrefix = (
+  findings: RuleFinding[],
+  line: number,
+  token: NetworkObjectToken,
+  profile: Exclude<NetworkObjectGroupProfile, 'ios'>,
+): void => {
+  const slash = token.text.indexOf('/');
+  const address: NetworkObjectToken = {
+    text: token.text.slice(0, slash),
+    start: token.start,
+    end: token.start + slash,
+  };
+  const prefix: NetworkObjectToken = {
+    text: token.text.slice(slash + 1),
+    start: token.start + slash + 1,
+    end: token.end,
+  };
+  if (profile === 'nxos-ipv4') validateIpv4(findings, line, address);
+  else validateIpv6(findings, line, address);
+
+  const maximum = profile === 'nxos-ipv4' ? 32 : 128;
+  const value = /^\d+$/.test(prefix.text) ? Number(prefix.text) : undefined;
+  if (value === undefined || value > maximum) {
+    pushFinding(
+      findings,
+      line,
+      prefix,
+      'invalid-prefix-length',
+      `Invalid ${profile === 'nxos-ipv4' ? 'IPv4' : 'IPv6'} prefix length.`,
+      'warning',
+    );
+  }
+};
+
+const validateIosCandidate = (
+  findings: RuleFinding[],
+  candidate: NetworkObjectGroupCandidate,
+  options: NetworkObjectGroupRuleOptions,
+): void => {
+  const operands = candidate.operands;
+  if (normalized(operands[0]) === 'host') {
+    if (operands[1]) validateIpv4(findings, candidate.line, operands[1]);
+    return;
+  }
+
+  const address = operands[0];
+  if (address) validateIpv4(findings, candidate.line, address);
+  const maskToken = operands[1];
+  if (!maskToken) return;
+  const mask = parseIpv4(maskToken.text);
+  if (!mask) {
+    pushFinding(
+      findings,
+      candidate.line,
+      maskToken,
+      'invalid-subnet-mask',
+      'Invalid subnet mask.',
+      'error',
+    );
+  } else if (
+    options.allowNonContiguousMask !== true &&
+    !isContiguousSubnetMask(mask)
+  ) {
+    pushFinding(
+      findings,
+      candidate.line,
+      maskToken,
+      'non-contiguous-subnet-mask',
+      'Subnet mask is not contiguous.',
+      'warning',
+    );
+  }
+};
+
+const validateCandidate = (
+  findings: RuleFinding[],
+  candidate: NetworkObjectGroupCandidate,
+  options: NetworkObjectGroupRuleOptions,
+): void => {
+  if (candidate.profile === 'ios') {
+    validateIosCandidate(findings, candidate, options);
+    return;
+  }
+  if (candidate.memberKind === 'prefix') {
+    validatePrefix(
+      findings,
+      candidate.line,
+      candidate.operands[0],
+      candidate.profile,
+    );
+    return;
+  }
+  if (candidate.memberKind === 'host') {
+    const address = candidate.operands[0];
+    if (candidate.profile === 'nxos-ipv4') {
+      validateIpv4(findings, candidate.line, address);
+    } else {
+      validateIpv6(findings, candidate.line, address);
+    }
+    return;
+  }
+
+  validateIpv4(findings, candidate.line, candidate.operands[0]);
+  const wildcard = candidate.operands[1];
+  if (!parseIpv4(wildcard.text)) {
+    pushFinding(
+      findings,
+      candidate.line,
+      wildcard,
+      'invalid-wildcard-mask',
+      'Invalid wildcard mask.',
+      'error',
+    );
+  }
+};
+
+/** Validates supported network object-group values from same-pass candidates. */
+export const scanNetworkObjectGroupFindings = (
+  source: LineSource,
+  options: NetworkObjectGroupRuleOptions = {},
+  isCancelled: () => boolean = () => false,
+): RuleFinding[] => {
+  const candidates = scanNetworkObjectGroupCandidates(source, isCancelled);
+  const findings: RuleFinding[] = [];
+  for (const candidate of candidates) {
+    validateCandidate(findings, candidate, options);
+    if (isCancelled()) return [];
+  }
+  return findings;
 };

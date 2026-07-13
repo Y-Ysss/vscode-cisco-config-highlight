@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { LineSource } from '../../../parser/lineScanUtils';
-import { scanNetworkObjectGroupCandidates } from './objectGroupNetwork';
+import {
+  scanNetworkObjectGroupCandidates,
+  scanNetworkObjectGroupFindings,
+} from './objectGroupNetwork';
 
 const source = (...lines: string[]): LineSource => ({
   lineCount: lines.length,
@@ -128,7 +131,7 @@ describe('scanNetworkObjectGroupCandidates', () => {
     expect(candidates).toEqual([]);
   });
 
-  it('terminates on arbitrary one-token and two-token NX-OS text', () => {
+  it('retains explicit malformed hosts and attempted CIDR but terminates on free text', () => {
     const candidates = scanNetworkObjectGroupCandidates(
       source(
         'object-group ip address BAD-PREFIX',
@@ -148,7 +151,18 @@ describe('scanNetworkObjectGroupCandidates', () => {
         'host 2001:db8::2',
       ),
     );
-    expect(candidates).toEqual([]);
+    expect(
+      candidates.map(({ line, memberKind }) => ({ line, memberKind })),
+    ).toEqual([
+      { line: 1, memberKind: 'prefix' },
+      { line: 2, memberKind: 'host' },
+      { line: 7, memberKind: 'host' },
+      { line: 8, memberKind: 'host' },
+      { line: 10, memberKind: 'prefix' },
+      { line: 11, memberKind: 'host' },
+      { line: 13, memberKind: 'host' },
+      { line: 14, memberKind: 'host' },
+    ]);
   });
 
   it('retains IP-shaped values with invalid ranges for Task 10', () => {
@@ -220,5 +234,268 @@ describe('scanNetworkObjectGroupCandidates', () => {
       },
     });
     expect(calls).toEqual([1, 1, 1, 1]);
+  });
+});
+
+describe('scanNetworkObjectGroupFindings', () => {
+  it('accepts all supported IOS and NX-OS member forms and boundaries', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group network IOS',
+          ' network-object host 0.0.0.0',
+          ' network-object 255.255.255.255 255.255.255.255',
+          'object-group ip address NX4',
+          ' 10 host 192.0.2.1',
+          ' 20 0.0.0.0/0',
+          ' 30 255.255.255.255/32',
+          ' 40 198.51.100.0 0.255.0.255',
+          'object-group ipv6 address NX6',
+          ' 10 host ::',
+          ' 20 host ::ffff:192.0.2.255',
+          ' 30 ::/0',
+          ' 40 2001:DB8::/128',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('reports IOS address, subnet-mask, and continuity findings exactly', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group network IOS',
+          ' network-object host bogus',
+          ' network-object 999.0.0.1 255.255.255.0',
+          ' network-object 10.0.0.0 bad-mask',
+          ' network-object 10.0.0.0 255.0.255.0',
+        ),
+      ),
+    ).toEqual([
+      {
+        line: 1,
+        start: 21,
+        end: 26,
+        code: 'invalid-ipv4',
+        message: 'Invalid IPv4 address.',
+        severity: 'error',
+      },
+      {
+        line: 2,
+        start: 16,
+        end: 25,
+        code: 'invalid-ipv4',
+        message: 'Invalid IPv4 address.',
+        severity: 'error',
+      },
+      {
+        line: 3,
+        start: 25,
+        end: 33,
+        code: 'invalid-subnet-mask',
+        message: 'Invalid subnet mask.',
+        severity: 'error',
+      },
+      {
+        line: 4,
+        start: 25,
+        end: 36,
+        code: 'non-contiguous-subnet-mask',
+        message: 'Subnet mask is not contiguous.',
+        severity: 'warning',
+      },
+    ]);
+  });
+
+  it('allows non-contiguous IOS masks only through the option', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group network IOS',
+          'network-object 10.0.0.0 255.0.255.0',
+        ),
+        { allowNonContiguousMask: true },
+      ),
+    ).toEqual([]);
+  });
+
+  it('validates NX-OS IPv4 host, CIDR components, and wildcard independently', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group ip address NX4',
+          ' 10 host malformed',
+          ' 20 999.0.0.1/33',
+          ' 30 foo/bar',
+          ' 40 10.0.0.0 malformed-wildcard',
+          ' 50 malformed-address 0.0.0.999',
+          ' 60 10.0.0.0 0.255.0.255',
+        ),
+      ).map(({ line, start, end, code, severity }) => ({
+        line,
+        start,
+        end,
+        code,
+        severity,
+      })),
+    ).toEqual([
+      { line: 1, start: 9, end: 18, code: 'invalid-ipv4', severity: 'error' },
+      { line: 2, start: 4, end: 13, code: 'invalid-ipv4', severity: 'error' },
+      {
+        line: 2,
+        start: 14,
+        end: 16,
+        code: 'invalid-prefix-length',
+        severity: 'warning',
+      },
+      { line: 3, start: 4, end: 7, code: 'invalid-ipv4', severity: 'error' },
+      {
+        line: 3,
+        start: 8,
+        end: 11,
+        code: 'invalid-prefix-length',
+        severity: 'warning',
+      },
+      {
+        line: 4,
+        start: 13,
+        end: 31,
+        code: 'invalid-wildcard-mask',
+        severity: 'error',
+      },
+      { line: 5, start: 4, end: 21, code: 'invalid-ipv4', severity: 'error' },
+      {
+        line: 5,
+        start: 22,
+        end: 31,
+        code: 'invalid-wildcard-mask',
+        severity: 'error',
+      },
+    ]);
+  });
+
+  it('validates NX-OS IPv6 hosts, embedded IPv4, and CIDR components', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group ipv6 address NX6',
+          ' host 12345::1',
+          ' 10 host ::ffff:192.0.2.256',
+          ' 20 2001:db8::/129',
+          ' 30 bad:::/prefix',
+        ),
+      ).map(({ line, start, end, code, severity }) => ({
+        line,
+        start,
+        end,
+        code,
+        severity,
+      })),
+    ).toEqual([
+      { line: 1, start: 6, end: 14, code: 'invalid-ipv6', severity: 'error' },
+      { line: 2, start: 9, end: 27, code: 'invalid-ipv6', severity: 'error' },
+      {
+        line: 3,
+        start: 15,
+        end: 18,
+        code: 'invalid-prefix-length',
+        severity: 'warning',
+      },
+      { line: 4, start: 4, end: 10, code: 'invalid-ipv6', severity: 'error' },
+      {
+        line: 4,
+        start: 11,
+        end: 17,
+        code: 'invalid-prefix-length',
+        severity: 'warning',
+      },
+    ]);
+  });
+
+  it('retains a malformed IPv4-like operand in an unambiguous two-value slot', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source('object-group ip address NX4', ' 10 1.2.3 malformed-mask'),
+      ).map(({ start, end, code }) => ({ start, end, code })),
+    ).toEqual([
+      { start: 4, end: 9, code: 'invalid-ipv4' },
+      { start: 10, end: 24, code: 'invalid-wildcard-mask' },
+    ]);
+  });
+
+  it('treats known grammar words as incomplete and ordinary free text as termination', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group ip address INCOMPLETE',
+          'host description',
+          'object-group ip address FREE',
+          'ordinary free-text',
+          'host malformed',
+          'object-group network IOS',
+          'network-object host exit',
+          'network-object host malformed-after-termination',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('ignores metadata, unsupported blocks, and ASA syntax', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'object-group service WEB tcp',
+          'host bad',
+          'object network ASA',
+          'host bad',
+          'object-group ip address NX',
+          'description host bad',
+          'group-object BAD',
+          '! host bad',
+          'exit',
+          'host bad',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('returns no partial findings on cancellation and reads each line once', () => {
+    const lines = [
+      'object-group ip address NX',
+      'host malformed',
+      '2001:db8::/999',
+    ];
+    let cancellationCalls = 0;
+    expect(
+      scanNetworkObjectGroupFindings(source(...lines), {}, () => {
+        cancellationCalls += 1;
+        return cancellationCalls === 3;
+      }),
+    ).toEqual([]);
+
+    const calls = lines.map(() => 0);
+    scanNetworkObjectGroupFindings({
+      lineCount: lines.length,
+      lineAt: (index) => {
+        calls[index] += 1;
+        return lines[index];
+      },
+    });
+    expect(calls).toEqual([1, 1, 1]);
+  });
+
+  it('discards findings when cancellation arrives after candidate collection', () => {
+    let calls = 0;
+    expect(
+      scanNetworkObjectGroupFindings(
+        source('object-group ip address NX', 'host malformed'),
+        {},
+        () => {
+          calls += 1;
+          return calls === 4;
+        },
+      ),
+    ).toEqual([]);
+    expect(calls).toBe(4);
   });
 });
