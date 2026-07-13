@@ -6,6 +6,28 @@ import {
 } from './diagnosticsScanner';
 
 describe('combined Diagnostics scanner', () => {
+  it('emits IPv4 network-boundary warnings through the single-pass dispatcher', () => {
+    const lines = [
+      'ordinary nonmatching text',
+      'ip route 10.210.10.0 255.255.0.0 1.1.1.1',
+      'network 10.0.0.17 mask 255.255.255.248',
+      'ip prefix-list PL permit 10.210.10.0/16',
+    ];
+    const lineAt = vi.fn((line: number) => lines[line]);
+
+    const findings = scanDiagnosticFindings({
+      lineCount: lines.length,
+      lineAt,
+    });
+
+    expect(lineAt).toHaveBeenCalledTimes(lines.length);
+    expect(findings).toMatchObject([
+      { line: 1, start: 9, end: 32, code: 'host-bits-set' },
+      { line: 2, start: 8, end: 38, code: 'host-bits-set' },
+      { line: 3, start: 25, end: 39, code: 'host-bits-set' },
+    ]);
+  });
+
   it('reads the source exactly once while preserving all four rule families', () => {
     const lines = [
       'ip address 999.0.0.1 255.255.255.0',

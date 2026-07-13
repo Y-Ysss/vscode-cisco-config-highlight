@@ -30,6 +30,81 @@ describe('IPv4 primitives', () => {
 });
 
 describe('scanIpPrefixFindings', () => {
+  it.each([
+    [
+      'ip route 2.0.0.0 0.0.0.0 192.168.1.1',
+      '2.0.0.0 0.0.0.0',
+      "Not aligned. Use '0.0.0.0 0.0.0.0' or '2.0.0.0 254.0.0.0' (or more specific).",
+    ],
+    [
+      'ip route 10.210.10.0 255.255.0.0 1.1.1.1',
+      '10.210.10.0 255.255.0.0',
+      "Not aligned. Use '10.210.0.0 255.255.0.0' or '10.210.10.0 255.255.254.0' (or more specific).",
+    ],
+    [
+      'ip route 255.0.0.10 255.255.255.0',
+      '255.0.0.10 255.255.255.0',
+      "Not aligned. Use '255.0.0.0 255.255.255.0' or '255.0.0.10 255.255.255.254' (or more specific).",
+    ],
+    [
+      'network 10.0.0.17 mask 255.255.255.248',
+      '10.0.0.17 mask 255.255.255.248',
+      "Not aligned. Use '10.0.0.16 mask 255.255.255.248' or '10.0.0.17 mask 255.255.255.255'.",
+    ],
+    [
+      'network 10.210.10.0 mask 255.255.0.0',
+      '10.210.10.0 mask 255.255.0.0',
+      "Not aligned. Use '10.210.0.0 mask 255.255.0.0' or '10.210.10.0 mask 255.255.254.0' (or more specific).",
+    ],
+    [
+      'ip prefix-list PL permit 10.210.10.0/16',
+      '10.210.10.0/16',
+      "Not aligned to /16. Use '10.210.0.0/16' or '10.210.10.0/23+'.",
+    ],
+    [
+      'ip prefix-list ZERO permit 2.0.0.0/0',
+      '2.0.0.0/0',
+      "Not aligned to /0. Use '0.0.0.0/0' or '2.0.0.0/7+'.",
+    ],
+  ])(
+    'warns when a network operand has host bits: %s',
+    (line, rangeText, message) => {
+      expect(scanIpPrefixFindings(source(line))).toEqual([
+        {
+          line: 0,
+          start: line.indexOf(rangeText),
+          end: line.indexOf(rangeText) + rangeText.length,
+          code: 'host-bits-set',
+          message,
+          severity: 'warning',
+        },
+      ]);
+    },
+  );
+
+  it.each([
+    'ip address 10.0.0.1 255.255.255.0',
+    'ip route 999.0.0.1 255.255.255.0 Null0',
+    'ip route 10.0.0.17 255.0.255.0 Null0',
+    'network 10.0.0.17 mask 255.0.255.0',
+    'ip prefix-list BAD permit 10.0.0.17/33',
+    'ip prefix-list TEXT permit 10.0.0.17/x',
+  ])('does not perform boundary validation for: %s', (line) => {
+    expect(
+      scanIpPrefixFindings(source(line)).some(
+        ({ code }) => code === 'host-bits-set',
+      ),
+    ).toBe(false);
+  });
+
+  it('does not treat allowing a non-contiguous mask as boundary-validatable', () => {
+    expect(
+      scanIpPrefixFindings(source('ip route 10.0.0.17 255.0.255.0 Null0'), {
+        allowNonContiguousMask: true,
+      }),
+    ).toEqual([]);
+  });
+
   it('validates target address and subnet-mask operands with exact ranges', () => {
     const findings = scanIpPrefixFindings(
       source(

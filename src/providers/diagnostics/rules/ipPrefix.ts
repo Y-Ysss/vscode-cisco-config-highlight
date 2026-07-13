@@ -53,6 +53,48 @@ export const isContiguousSubnetMask = (
   return true;
 };
 
+const maskFromPrefix = (
+  prefix: number,
+): readonly [number, number, number, number] => {
+  const octets = [0, 0, 0, 0];
+  for (let index = 0; index < octets.length; index += 1) {
+    const bits = Math.min(8, Math.max(0, prefix - index * 8));
+    octets[index] = bits === 0 ? 0 : (0xff << (8 - bits)) & 0xff;
+  }
+  return [octets[0], octets[1], octets[2], octets[3]];
+};
+
+const prefixLengthFromMask = (
+  mask: readonly [number, number, number, number],
+): number => {
+  let prefix = 0;
+  for (const octet of mask) {
+    for (let bit = 7; bit >= 0; bit -= 1) {
+      if ((octet & (1 << bit)) !== 0) prefix += 1;
+    }
+  }
+  return prefix;
+};
+
+const minimumAlignedPrefix = (
+  address: readonly [number, number, number, number],
+): number => {
+  let trailingZeroBits = 0;
+  for (let index = address.length - 1; index >= 0; index -= 1) {
+    let octet = address[index];
+    if (octet === 0) {
+      trailingZeroBits += 8;
+      continue;
+    }
+    while ((octet & 1) === 0) {
+      trailingZeroBits += 1;
+      octet >>>= 1;
+    }
+    break;
+  }
+  return 32 - trailingZeroBits;
+};
+
 const pushFinding = (
   findings: RuleFinding[],
   line: number,
@@ -86,6 +128,43 @@ const validateAddress = (
       'error',
     );
   }
+};
+
+interface NetworkBoundaryPresentation {
+  readonly range: Pick<Token, 'start' | 'end'>;
+  readonly message: (
+    canonicalAddress: string,
+    prefix: number,
+    alignedPrefix: number,
+    alignedMask: string,
+  ) => string;
+}
+
+const validateNetworkBoundary = (
+  findings: RuleFinding[],
+  line: number,
+  addressToken: Token,
+  mask: readonly [number, number, number, number],
+  presentation: NetworkBoundaryPresentation,
+): void => {
+  const address = parseIpv4(addressToken.text);
+  if (!address || !isContiguousSubnetMask(mask)) return;
+
+  const network = address.map((octet, index) => octet & mask[index]);
+  if (network.every((octet, index) => octet === address[index])) return;
+
+  const canonicalAddress = network.join('.');
+  const prefix = prefixLengthFromMask(mask);
+  const alignedPrefix = minimumAlignedPrefix(address);
+  const alignedMask = maskFromPrefix(alignedPrefix).join('.');
+  pushFinding(
+    findings,
+    line,
+    presentation.range,
+    'host-bits-set',
+    presentation.message(canonicalAddress, prefix, alignedPrefix, alignedMask),
+    'warning',
+  );
 };
 
 const validateSubnetMask = (
@@ -212,6 +291,18 @@ const validatePrefixList = (
         'Invalid IPv4 prefix length.',
         'warning',
       );
+    } else {
+      validateNetworkBoundary(
+        findings,
+        line,
+        addressToken,
+        maskFromPrefix(prefix),
+        {
+          range: operand,
+          message: (canonicalAddress, currentPrefix, alignedPrefix) =>
+            `Not aligned to /${currentPrefix}. Use '${canonicalAddress}/${currentPrefix}' or '${addressToken.text}/${alignedPrefix}${alignedPrefix < 32 ? '+' : ''}'.`,
+        },
+      );
     }
   }
   validateModifiers(findings, line, tokens.slice(index + 2), prefix);
@@ -237,6 +328,14 @@ const validateCandidate = (
       tokens[3],
       options.allowNonContiguousMask === true,
     );
+    const mask = parseIpv4(tokens[3].text);
+    if (mask) {
+      validateNetworkBoundary(findings, line, tokens[1], mask, {
+        range: { start: tokens[1].start, end: tokens[3].end },
+        message: (canonicalAddress, _prefix, alignedPrefix, alignedMask) =>
+          `Not aligned. Use '${canonicalAddress} mask ${tokens[3].text}' or '${tokens[1].text} mask ${alignedMask}'${alignedPrefix < 32 ? ' (or more specific)' : ''}.`,
+      });
+    }
     return true;
   }
   if (lower(tokens[1]) === 'prefix-list') {
@@ -262,6 +361,16 @@ const validateCandidate = (
     tokens[3],
     options.allowNonContiguousMask === true,
   );
+  if (lower(tokens[1]) === 'route') {
+    const mask = parseIpv4(tokens[3].text);
+    if (mask) {
+      validateNetworkBoundary(findings, line, tokens[2], mask, {
+        range: { start: tokens[2].start, end: tokens[3].end },
+        message: (canonicalAddress, _prefix, alignedPrefix, alignedMask) =>
+          `Not aligned. Use '${canonicalAddress} ${tokens[3].text}' or '${tokens[2].text} ${alignedMask}'${alignedPrefix < 32 ? ' (or more specific)' : ''}.`,
+      });
+    }
+  }
   return true;
 };
 
