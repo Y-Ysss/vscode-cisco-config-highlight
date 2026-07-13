@@ -6,11 +6,11 @@ import {
 } from '../../config';
 import { EXTENSION_ID } from '../../contributions/configurations';
 import type { LineSource } from '../../parser/lineScanUtils';
+import {
+  scanDiagnosticFindings,
+  scanDiagnosticFindingsAsync,
+} from './diagnosticsScanner';
 import { diagnosticToVscode } from './diagnosticToVscode';
-import { scanAclWildcardFindings } from './rules/aclWildcardMask';
-import { scanIpPrefixFindings } from './rules/ipPrefix';
-import { scanIpv6PrefixFindings } from './rules/ipv6Prefix';
-import { scanNetworkObjectGroupFindings } from './rules/objectGroupNetwork';
 import type { RuleFinding } from './rules/ruleFinding';
 
 const DEBOUNCE_MILLISECONDS = 400;
@@ -107,22 +107,13 @@ const scanSnapshots = (
       lineCount: snapshot.lines.length,
       lineAt: (line) => snapshot.lines[line],
     };
-    const scanners: ReadonlyArray<() => RuleFinding[]> = [
-      () =>
-        scanIpPrefixFindings(source, { allowNonContiguousMask }, isCancelled),
-      () => scanIpv6PrefixFindings(source, isCancelled),
-      () => scanAclWildcardFindings(source, isCancelled),
-      () =>
-        scanNetworkObjectGroupFindings(
-          source,
-          { allowNonContiguousMask },
-          isCancelled,
-        ),
-    ];
-    for (const scan of scanners) {
-      findings.push(...offsetFindings(scan(), snapshot.start));
-      if (isCancelled()) return null;
-    }
+    findings.push(
+      ...offsetFindings(
+        scanDiagnosticFindings(source, { allowNonContiguousMask }, isCancelled),
+        snapshot.start,
+      ),
+    );
+    if (isCancelled()) return null;
   }
   findings.sort((left, right) => left.line - right.line);
   return findings;
@@ -146,11 +137,11 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
     return work;
   };
 
-  const run = (
+  const run = async (
     document: vscode.TextDocument,
     work: UriWork,
     generation: number,
-  ): void => {
+  ): Promise<void> => {
     if (disposed || !getConfigDiagnosticsEnabled()) return;
     const tokenSource = new vscode.CancellationTokenSource();
     work.tokenSource = tokenSource;
@@ -171,11 +162,16 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
         collection.delete(document.uri);
         return;
       }
-      const snapshots = snapshotRanges(document, ranges, stale);
-      if (snapshots === null || stale()) return;
-      const findings = scanSnapshots(
-        snapshots,
-        getConfigDiagnosticsAllowNonContiguousMask(),
+      const source: LineSource = {
+        lineCount: document.lineCount,
+        lineAt: (line) => document.lineAt(line).text,
+      };
+      const findings = await scanDiagnosticFindingsAsync(
+        source,
+        {
+          allowNonContiguousMask: getConfigDiagnosticsAllowNonContiguousMask(),
+          includedRanges: isLarge ? ranges : undefined,
+        },
         stale,
       );
       if (findings === null || stale()) return;
@@ -199,7 +195,7 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
     work.timer = setTimeout(() => {
       if (work.generation !== generation || disposed) return;
       work.timer = undefined;
-      run(document, work, generation);
+      void run(document, work, generation);
     }, DEBOUNCE_MILLISECONDS);
   };
 

@@ -131,7 +131,7 @@ describe('registerDiagnostics lifecycle', () => {
     vi.restoreAllMocks();
   });
 
-  it('debounces activation/change, replaces results, closes safely, and wires cleanup', () => {
+  it('debounces activation/change, replaces results, closes safely, and wires cleanup', async () => {
     const document = makeDocument(['ip address 999.0.0.1 255.255.255.0']);
     vi.spyOn(vscode.workspace, 'textDocuments', 'get').mockReturnValue([
       document,
@@ -166,12 +166,12 @@ describe('registerDiagnostics lifecycle', () => {
 
     registerDiagnostics(context as never);
     expect(context.subscriptions).toHaveLength(7);
-    vi.advanceTimersByTime(399);
+    await vi.advanceTimersByTimeAsync(399);
     expect(collection.set).not.toHaveBeenCalled();
     change?.({ document });
-    vi.advanceTimersByTime(399);
+    await vi.advanceTimersByTimeAsync(399);
     expect(collection.set).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(1);
+    await vi.advanceTimersByTimeAsync(1);
     expect(collection.set).toHaveBeenCalledOnce();
     expect(collection.set.mock.calls[0][1]).toEqual([
       expect.objectContaining({ code: 'invalid-ipv4' }),
@@ -179,13 +179,13 @@ describe('registerDiagnostics lifecycle', () => {
 
     change?.({ document });
     close?.(document);
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
     expect(collection.set).toHaveBeenCalledOnce();
     expect(collection.delete).toHaveBeenCalledWith(document.uri);
     context.subscriptions.at(-1)?.dispose();
   });
 
-  it('deletes instead of claiming ranges for a large document with no editor', () => {
+  it('deletes instead of claiming ranges for a large document with no editor', async () => {
     const document = makeDocument(['あ']);
     vi.spyOn(vscode.workspace, 'textDocuments', 'get').mockReturnValue([
       document,
@@ -207,7 +207,8 @@ describe('registerDiagnostics lifecycle', () => {
     );
 
     registerDiagnostics({ subscriptions: [] } as never);
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
+    await vi.runAllTimersAsync();
 
     expect(collection.delete).toHaveBeenCalledWith(document.uri);
     expect(collection.set).not.toHaveBeenCalled();
@@ -215,7 +216,7 @@ describe('registerDiagnostics lifecycle', () => {
     expect(notification).not.toHaveBeenCalled();
   });
 
-  it('invokes open and configuration listeners, clears while disabled, and revalidates when enabled', () => {
+  it('invokes open and configuration listeners, clears while disabled, and revalidates when enabled', async () => {
     const existing = makeDocument(['ip address 999.0.0.1 255.255.255.0']);
     const opened = makeDocument(
       ['ipv6 address 2001:12345::1/129'],
@@ -257,13 +258,14 @@ describe('registerDiagnostics lifecycle', () => {
     }) as never);
 
     registerDiagnostics({ subscriptions: [] } as never);
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
     expect(collection.set).toHaveBeenCalledTimes(2);
 
     open?.(opened);
-    vi.advanceTimersByTime(399);
+    await vi.advanceTimersByTimeAsync(399);
     expect(collection.set).toHaveBeenCalledTimes(2);
-    vi.advanceTimersByTime(1);
+    await vi.advanceTimersByTimeAsync(1);
+    await vi.runAllTimersAsync();
     expect(collection.set).toHaveBeenCalledTimes(3);
 
     enabled = false;
@@ -272,18 +274,18 @@ describe('registerDiagnostics lifecycle', () => {
         section === 'cisco-config-highlight.diagnostics',
     });
     expect(collection.clear).toHaveBeenCalledOnce();
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
     expect(collection.set).toHaveBeenCalledTimes(3);
 
     enabled = true;
     configuration?.({ affectsConfiguration: () => true });
-    vi.advanceTimersByTime(399);
+    await vi.advanceTimersByTimeAsync(399);
     expect(collection.set).toHaveBeenCalledTimes(3);
-    vi.advanceTimersByTime(1);
+    await vi.advanceTimersByTimeAsync(1);
     expect(collection.set).toHaveBeenCalledTimes(5);
   });
 
-  it('uses full scan at exact UTF-8 threshold and large mode at threshold plus one', () => {
+  it('uses full scan at exact UTF-8 threshold and large mode at threshold plus one', async () => {
     const exact = makeDocument(['abc'], 'file:///exact.cisco');
     const plusOne = makeDocument(['abcd'], 'file:///plus-one.cisco');
     vi.spyOn(vscode.workspace, 'textDocuments', 'get').mockReturnValue([
@@ -306,7 +308,7 @@ describe('registerDiagnostics lifecycle', () => {
     );
 
     registerDiagnostics({ subscriptions: [] } as never);
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
 
     expect(exact.lineAt).toHaveBeenCalledOnce();
     expect(collection.set).toHaveBeenCalledWith(exact.uri, []);
@@ -314,7 +316,7 @@ describe('registerDiagnostics lifecycle', () => {
     expect(collection.delete).toHaveBeenCalledWith(plusOne.uri);
   });
 
-  it('coalesces visible-range events without immediate text traversal and replaces scrolled diagnostics', () => {
+  it('coalesces visible-range events without immediate text traversal and replaces scrolled diagnostics', async () => {
     const lines = Array.from({ length: 500 }, () => '');
     lines[10] = 'ip address 999.0.0.1 255.255.255.0';
     lines[490] = 'ip address 999.0.0.2 255.255.255.0';
@@ -355,7 +357,8 @@ describe('registerDiagnostics lifecycle', () => {
     }) as never);
 
     registerDiagnostics({ subscriptions: [] } as never);
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
+    await vi.runAllTimersAsync();
     expect(collection.set.mock.calls[0][1]).toEqual([
       expect.objectContaining({
         range: expect.objectContaining({
@@ -369,9 +372,10 @@ describe('registerDiagnostics lifecycle', () => {
     visible?.({ textEditor: editor });
     visible?.({ textEditor: editor });
     expect(document.getText).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(399);
+    await vi.advanceTimersByTimeAsync(399);
     expect(document.getText).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(1);
+    await vi.advanceTimersByTimeAsync(1);
+    await vi.runAllTimersAsync();
     expect(document.getText).toHaveBeenCalledOnce();
     expect(collection.set).toHaveBeenCalledTimes(2);
     expect(collection.set.mock.calls[1][1]).toEqual([
@@ -383,7 +387,7 @@ describe('registerDiagnostics lifecycle', () => {
     ]);
   });
 
-  it('cancels a reentrantly stale in-flight generation before publishing', () => {
+  it('cancels a reentrantly stale in-flight generation before publishing', async () => {
     const lines = Array.from({ length: 300 }, () => '');
     lines[0] = 'ip address 999.0.0.1 255.255.255.0';
     const document = makeDocument(lines);
@@ -419,13 +423,13 @@ describe('registerDiagnostics lifecycle', () => {
     });
 
     registerDiagnostics({ subscriptions: [] } as never);
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
     expect(collection.set).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(400);
+    await vi.runAllTimersAsync();
     expect(collection.set).toHaveBeenCalledOnce();
   });
 
-  it('ignores non-Cisco listener events and disposes collection, listeners, and pending work', () => {
+  it('ignores non-Cisco listener events and disposes collection, listeners, and pending work', async () => {
     const cisco = makeDocument([], 'file:///pending.cisco');
     const plain = {
       ...makeDocument(['plain'], 'file:///plain.txt'),
@@ -488,7 +492,7 @@ describe('registerDiagnostics lifecycle', () => {
     visible?.({ textEditor: { document: plain } });
     open?.(cisco);
     for (const subscription of context.subscriptions) subscription.dispose();
-    vi.advanceTimersByTime(400);
+    await vi.advanceTimersByTimeAsync(400);
 
     expect(plain.getText).not.toHaveBeenCalled();
     expect(cisco.getText).not.toHaveBeenCalled();
