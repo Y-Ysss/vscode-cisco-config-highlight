@@ -11,5 +11,8 @@
   "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'",
   "configuration.properties.symbols.routeMap.description": "Route Map 'route-map {name} {permit|deny} {sequence-number}'",
   "configuration.properties.symbols.ipPrefixList.description": "IPv4 Prefix List 'ip prefix-list {name} ...'",
-  "configuration.properties.outline.maxFileSizeForFullScan.description": "Above this UTF-8 byte size, Outline scans only the beginning of the file and shows a truncation symbol."
+  "configuration.properties.outline.maxFileSizeForFullScan.description": "Above this UTF-8 byte size, Outline scans only the beginning of the file and shows a truncation symbol.",
+  "configuration.properties.diagnostics.maxFileSizeForFullScan.description": "Above this UTF-8 byte size, Diagnostics validates only visible buffered ranges.",
+  "configuration.properties.diagnostics.allowNonContiguousMask.description": "Allow non-contiguous subnet masks. ACL and NX-OS wildcard masks and route-match masks are unaffected.",
+  "configuration.properties.diagnostics.enabled.description": "[Experimental Feature] Enable Cisco configuration Diagnostics.\n\nDiagnostics checks these supported scopes:\n- IPv4 routes, interface addresses, and prefix lists\n- IPv6 addresses, prefix lists, and ACL prefixes\n- IPv4 ACL wildcard masks\n- IOS and NX-OS network object-groups"
 }
