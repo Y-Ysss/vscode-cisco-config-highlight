@@ -123,6 +123,7 @@
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
     "test": "vitest",
+    "bench:outline": "vitest bench src/providers/outline/outlineExtractor.test.bench.ts --run",
     "package": "vsce package",
     "publish:vsce": "vsce publish --packagePath ./*.vsix",
     "publish:vsce:pre-release": "vsce publish --packagePath ./*.vsix --pre-release",

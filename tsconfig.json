@@ -14,5 +14,10 @@
     "noUnusedParameters": true
   },
   "include": ["src"],
-  "exclude": ["node_modules", ".vscode-test", "src/**/*.test.ts"]
+  "exclude": [
+    "node_modules",
+    ".vscode-test",
+    "src/**/*.test.ts",
+    "src/**/*.bench.ts"
+  ]
 }
