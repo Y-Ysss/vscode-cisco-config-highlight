@@ -40,10 +40,33 @@ export class DocumentSymbol {
   ) {}
 }
 
+export class Position {
+  constructor(
+    public line: number,
+    public character: number,
+  ) {}
+}
+
+export class Range {
+  public start: Position;
+  public end: Position;
+
+  constructor(
+    startLine: number,
+    startCharacter: number,
+    endLine: number,
+    endCharacter: number,
+  ) {
+    this.start = new Position(startLine, startCharacter);
+    this.end = new Position(endLine, endCharacter);
+  }
+}
+
 export const workspace = {
   getConfiguration: (_section?: string) => ({
     get: (_key: string, defaultValue: unknown) => defaultValue,
   }),
+  onDidChangeConfiguration: () => ({ dispose: () => {} }),
 };
 
 export const languages = {
