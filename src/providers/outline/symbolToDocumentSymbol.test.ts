@@ -35,6 +35,7 @@ describe('symbolToDocumentSymbol', () => {
     ['sub_interface', SymbolKind.Interface],
     ['route_map', SymbolKind.Variable],
     ['ip_prefix_list', SymbolKind.Constant],
+    ['truncation', SymbolKind.String],
   ] as const)('maps %s to the explicit SymbolKind', (type, kind) => {
     expect(symbolToDocumentSymbol(symbol(type)).kind).toBe(kind);
   });

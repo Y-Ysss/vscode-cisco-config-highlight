@@ -13,6 +13,7 @@ const makeDocument = (
 ) => ({
   lineCount: lines.length,
   lineAt,
+  getText: vi.fn(() => lines.join('\n')),
 });
 
 const token = (isCancellationRequested = false) => ({
@@ -131,6 +132,109 @@ describe('CiscoConfigDocumentSymbolProvider', () => {
     expect(
       provider.provideDocumentSymbols(document, token() as never),
     ).toHaveLength(1);
+  });
+
+  it('full-scans at the exact byte threshold and truncates at threshold plus one', () => {
+    let threshold = 31;
+    vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
+      get: (key: string, defaultValue: unknown) => {
+        if (key === 'outline.showSymbolsInOutlinePanel') return true;
+        if (key === 'outline.maxFileSizeForFullScan') return threshold;
+        return defaultValue;
+      },
+    } as never);
+    const provider = new CiscoConfigDocumentSymbolProviderForTest();
+    const exact = makeDocument(['interface Gi0/0', 'interface Gi0/1']) as never;
+
+    expect(
+      provider.provideDocumentSymbols(exact, token() as never).at(-1)?.name,
+    ).not.toBe('Truncated output (see settings for max output size)');
+
+    threshold = 30;
+    const truncated = provider.provideDocumentSymbols(exact, token() as never);
+    expect(truncated.at(-1)).toMatchObject({
+      name: 'Truncated output (see settings for max output size)',
+      detail: '',
+      kind: vscode.SymbolKind.String,
+      range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 15 },
+      },
+      selectionRange: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 15 },
+      },
+      children: [],
+    });
+    expect(
+      truncated.flatMap(({ children }) => children.map(({ name }) => name)),
+    ).toContain('Gi0/0');
+    expect(
+      truncated.flatMap(({ children }) => children.map(({ name }) => name)),
+    ).not.toContain('Gi0/1');
+  });
+
+  it('uses UTF-8 bytes and never splits text into a line array', () => {
+    const split = vi.spyOn(String.prototype, 'split');
+    vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
+      get: (key: string, defaultValue: unknown) => {
+        if (key === 'outline.showSymbolsInOutlinePanel') return true;
+        if (key === 'outline.maxFileSizeForFullScan') return 4;
+        return defaultValue;
+      },
+    } as never);
+    const document = makeDocument(['a', '\u3042', 'interface Gi0/1']);
+    const result =
+      new CiscoConfigDocumentSymbolProviderForTest().provideDocumentSymbols(
+        document as never,
+        token() as never,
+      );
+
+    expect(document.getText).toHaveBeenCalledOnce();
+    expect(document.lineAt.mock.calls.map(([index]) => index)).toEqual([0]);
+    expect(result.some(({ name }) => name === 'interface')).toBe(false);
+    expect(split).not.toHaveBeenCalled();
+    split.mockRestore();
+  });
+
+  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY])(
+    'falls back to the default threshold for invalid configured value %s',
+    (configured) => {
+      vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
+        get: (key: string, defaultValue: unknown) => {
+          if (key === 'outline.showSymbolsInOutlinePanel') return true;
+          if (key === 'outline.maxFileSizeForFullScan') return configured;
+          return defaultValue;
+        },
+      } as never);
+
+      const result =
+        new CiscoConfigDocumentSymbolProviderForTest().provideDocumentSymbols(
+          makeDocument(['interface Gi0/0']) as never,
+          token() as never,
+        );
+
+      expect(result.at(-1)?.name).not.toBe('この先は省略されています');
+    },
+  );
+
+  it('returns empty on cancellation in truncated mode without notifications', () => {
+    vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
+      get: (key: string, defaultValue: unknown) => {
+        if (key === 'outline.showSymbolsInOutlinePanel') return true;
+        if (key === 'outline.maxFileSizeForFullScan') return 1;
+        return defaultValue;
+      },
+    } as never);
+    const notification = vi.spyOn(vscode.window, 'showInformationMessage');
+
+    expect(
+      new CiscoConfigDocumentSymbolProviderForTest().provideDocumentSymbols(
+        makeDocument(['interface Gi0/0']) as never,
+        token(true) as never,
+      ),
+    ).toEqual([]);
+    expect(notification).not.toHaveBeenCalled();
   });
 });
 

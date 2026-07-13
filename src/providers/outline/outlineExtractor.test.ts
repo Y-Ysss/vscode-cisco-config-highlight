@@ -3,6 +3,7 @@ import {
   type EnabledOutlineCategories,
   extractOutlineSymbols,
   type LineSource,
+  measureOutlineDocument,
 } from './outlineExtractor';
 
 const source = (...lines: string[]): LineSource => ({
@@ -41,6 +42,55 @@ const allDisabled = (): EnabledOutlineCategories =>
   });
 
 describe('extractOutlineSymbols', () => {
+  it('measures exact UTF-8 bytes and keeps the prefix line count in range', () => {
+    expect(measureOutlineDocument('a\n\u3042\ninterface Gi0/1', 4, 3)).toEqual({
+      byteSize: 21,
+      prefixLineCount: 1,
+    });
+    expect(measureOutlineDocument('interface Gi0/0', 1, 1)).toEqual({
+      byteSize: 15,
+      prefixLineCount: 1,
+    });
+    expect(measureOutlineDocument('a\nb', 100, 3).prefixLineCount).toBe(3);
+  });
+
+  it('appends one exact truncation symbol after declarations in the prefix', () => {
+    const result = extractOutlineSymbols(
+      source('interface Gi0/0', 'description uplink'),
+      enabled(),
+      () => false,
+      true,
+    );
+
+    expect(result.at(-1)).toEqual({
+      category: 'truncation',
+      type: 'truncation',
+      name: 'Truncated output (see settings for max output size)',
+      detail: '',
+      range: {
+        start: { line: 1, character: 0 },
+        end: { line: 1, character: 18 },
+      },
+      selectionRange: {
+        start: { line: 1, character: 0 },
+        end: { line: 1, character: 18 },
+      },
+      children: [],
+    });
+    expect(result.filter(({ type }) => type === 'truncation')).toHaveLength(1);
+  });
+
+  it('returns no declaration or truncation symbol when cancelled in truncated mode', () => {
+    expect(
+      extractOutlineSymbols(
+        source('interface Gi0/0'),
+        enabled(),
+        () => true,
+        true,
+      ),
+    ).toEqual([]);
+  });
+
   it('extracts every top-level category with irregular indentation and no separators', () => {
     const result = extractOutlineSymbols(
       source(
@@ -158,14 +208,46 @@ describe('extractOutlineSymbols', () => {
       name: 'show vlan',
       children: [],
     });
-    expect(result[0].range.end).toEqual({ line: 0, character: 16 });
+    expect(result[0].selectionRange.end).toEqual({
+      line: 0,
+      character: 16,
+    });
+    expect(result[0].range.end).toEqual({ line: 2, character: 9 });
   });
 
-  it.each(['sh run', 'sho', 'do show run'])(
-    'makes %s an output parent when a declaration follows',
-    (command) => {
+  it('extends leaf show ranges to the line before the next prompt and then EOF', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'Switch#show vlan',
+        'VLAN Name',
+        'Switch#show clock',
+        '12:00:00 JST',
+      ),
+      enabled(),
+    );
+
+    expect(result).toHaveLength(2);
+    expect(result[0].selectionRange.end).toEqual({
+      line: 0,
+      character: 16,
+    });
+    expect(result[0].range.end).toEqual({ line: 1, character: 9 });
+    expect(result[1].selectionRange.end).toEqual({
+      line: 2,
+      character: 17,
+    });
+    expect(result[1].range.end).toEqual({ line: 3, character: 12 });
+  });
+
+  it.each([
+    ['Router#', 'sh run'],
+    ['Router#', 'sho'],
+    ['Router(config)#', 'do show run'],
+  ])(
+    'makes %s%s an output parent when a declaration follows',
+    (prompt, command) => {
       const result = extractOutlineSymbols(
-        source(`Router(config)#${command}`, 'interface Gi0/0'),
+        source(`${prompt}${command}`, 'interface Gi0/0'),
         enabled(),
       );
 
@@ -176,12 +258,53 @@ describe('extractOutlineSymbols', () => {
     },
   );
 
-  it('uses empty prompts as boundaries and never treats shutdown as show', () => {
+  it('treats configuration prompt contents as config instead of commands', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'Router#conf t',
+        'Enter configuration commands, one per line.  End with CNTL/Z.',
+        'Router(config)#',
+        'Router(config)#',
+        'Router(config)#interface GigabitEthernet0/1/0',
+        'Router(config-if)# switchport mode access',
+        'Router(config-if)# switchport access vlan 20',
+        'Router(config-if)#',
+        'Router(config-if)#interface GigabitEthernet0/1/1',
+        'Router(config-if)# switchport mode access',
+        'Router(config-if)# switchport access vlan 20',
+        'Router(config-if)#',
+      ),
+      enabled(),
+    );
+
+    expect(
+      result
+        .filter((symbol) => symbol.category === 'command')
+        .map((symbol) => symbol.name),
+    ).toEqual(['conf t']);
+    const interfaceCategory = result.find(
+      (symbol) => symbol.category === 'interface',
+    );
+    expect(interfaceCategory?.children.map((symbol) => symbol.name)).toEqual([
+      'GigabitEthernet0/1/0',
+      'GigabitEthernet0/1/1',
+    ]);
+    expect(interfaceCategory?.children[0].range).toEqual({
+      start: { line: 4, character: 15 },
+      end: { line: 7, character: 18 },
+    });
+    expect(interfaceCategory?.children[1].range).toEqual({
+      start: { line: 8, character: 18 },
+      end: { line: 11, character: 18 },
+    });
+  });
+
+  it('uses empty configuration prompts as boundaries without emitting commands', () => {
     const result = extractOutlineSymbols(
       source(
         'Router#shutdown',
         'interface Gi0/0',
-        'Router#',
+        'Router(config)#',
         'interface Gi0/1',
       ),
       enabled(),
@@ -301,7 +424,7 @@ describe('extractOutlineSymbols', () => {
     );
 
     expect(command.children).toEqual([]);
-    expect(command.range.end).toEqual({ line: 0, character: 18 });
+    expect(command.range.end).toEqual({ line: 2, character: 15 });
   });
 
   it('computes exclusive selection and block ranges precisely', () => {

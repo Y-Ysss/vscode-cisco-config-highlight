@@ -1,24 +1,16 @@
 import * as vscode from 'vscode';
 import {
+  getConfigOutlineMaxFileSizeForFullScan,
   getConfigOutlineShowSymbolsInOutlinePanel,
   getConfigOutlineSymbolsList,
 } from '../../config';
 import type { EnabledOutlineCategories, LineSource } from './outlineExtractor';
-import { extractOutlineSymbols } from './outlineExtractor';
+import {
+  extractOutlineSymbols,
+  measureOutlineDocument,
+  OUTLINE_CATEGORIES,
+} from './outlineExtractor';
 import { symbolToDocumentSymbol } from './symbolToDocumentSymbol';
-
-const OUTLINE_CATEGORIES = [
-  'command',
-  'ip_vrf',
-  'router_bgp',
-  'address_family',
-  'class_map',
-  'policy_map',
-  'interface',
-  'sub_interface',
-  'route_map',
-  'ip_prefix_list',
-] as const;
 
 const normalizeEnabledCategories = (
   configured: Record<string, boolean>,
@@ -39,14 +31,22 @@ class CiscoConfigDocumentSymbolProvider
   ): vscode.DocumentSymbol[] {
     if (!getConfigOutlineShowSymbolsInOutlinePanel()) return [];
 
+    const maxFileSizeForFullScan = getConfigOutlineMaxFileSizeForFullScan();
+    const measurement = measureOutlineDocument(
+      document.getText(),
+      maxFileSizeForFullScan,
+      document.lineCount,
+    );
+    const isTruncated = measurement.byteSize > maxFileSizeForFullScan;
     const source: LineSource = {
-      lineCount: document.lineCount,
+      lineCount: isTruncated ? measurement.prefixLineCount : document.lineCount,
       lineAt: (index) => document.lineAt(index).text,
     };
     const symbols = extractOutlineSymbols(
       source,
       normalizeEnabledCategories(getConfigOutlineSymbolsList()),
       () => token.isCancellationRequested,
+      isTruncated,
     );
     if (token.isCancellationRequested) return [];
     return symbols.map(symbolToDocumentSymbol);

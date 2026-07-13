@@ -1,18 +1,27 @@
-import { skipLeadingWhitespace } from '../../parser/lineScanUtils';
+import {
+  type LineSource,
+  skipLeadingWhitespace,
+} from '../../parser/lineScanUtils';
 
-export type OutlineCategory =
-  | 'command'
-  | 'ip_vrf'
-  | 'router_bgp'
-  | 'address_family'
-  | 'class_map'
-  | 'policy_map'
-  | 'interface'
-  | 'sub_interface'
-  | 'route_map'
-  | 'ip_prefix_list';
+export type { LineSource } from '../../parser/lineScanUtils';
 
-export type OutlineSymbolType = 'category' | OutlineCategory;
+export const OUTLINE_CATEGORIES = [
+  'command',
+  'ip_vrf',
+  'router_bgp',
+  'address_family',
+  'class_map',
+  'policy_map',
+  'interface',
+  'sub_interface',
+  'route_map',
+  'ip_prefix_list',
+] as const;
+
+export type OutlineCategory = (typeof OUTLINE_CATEGORIES)[number];
+
+export type OutlineSymbolType = 'category' | 'truncation' | OutlineCategory;
+export type OutlineSymbolCategory = OutlineCategory | 'truncation';
 
 export interface OutlinePosition {
   line: number;
@@ -25,7 +34,7 @@ export interface OutlineRange {
 }
 
 export interface OutlineSymbol {
-  category: OutlineCategory;
+  category: OutlineSymbolCategory;
   type: OutlineSymbolType;
   name: string;
   detail: string;
@@ -36,10 +45,52 @@ export interface OutlineSymbol {
 
 export type EnabledOutlineCategories = Record<OutlineCategory, boolean>;
 
-export interface LineSource {
-  readonly lineCount: number;
-  lineAt(index: number): string;
+export interface OutlineDocumentMeasurement {
+  byteSize: number;
+  prefixLineCount: number;
 }
+
+const utf8ByteLength = (text: string): number => {
+  let bytes = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const codeUnit = text.charCodeAt(index);
+    if (codeUnit <= 0x7f) bytes += 1;
+    else if (codeUnit <= 0x7ff) bytes += 2;
+    else if (
+      codeUnit >= 0xd800 &&
+      codeUnit <= 0xdbff &&
+      index + 1 < text.length &&
+      text.charCodeAt(index + 1) >= 0xdc00 &&
+      text.charCodeAt(index + 1) <= 0xdfff
+    ) {
+      bytes += 4;
+      index += 1;
+    } else bytes += 3;
+  }
+  return bytes;
+};
+
+export const measureOutlineDocument = (
+  text: string,
+  byteBudget: number,
+  documentLineCount: number,
+): OutlineDocumentMeasurement => {
+  const byteSize = utf8ByteLength(text);
+  if (documentLineCount <= 0) return { byteSize, prefixLineCount: 0 };
+  if (byteSize <= byteBudget) {
+    return { byteSize, prefixLineCount: documentLineCount };
+  }
+  const proportionalLineCount = Math.floor(
+    (documentLineCount * byteBudget) / byteSize,
+  );
+  return {
+    byteSize,
+    prefixLineCount: Math.max(
+      1,
+      Math.min(documentLineCount, proportionalLineCount),
+    ),
+  };
+};
 
 interface DeclarationMatch {
   category: Exclude<OutlineCategory, 'command'>;
@@ -65,12 +116,12 @@ interface ActiveDeclaration {
 interface OutputCandidate {
   symbol?: OutlineSymbol;
   scope: Scope;
-  becameParent: boolean;
 }
 
 const PROMPT_PATTERN =
-  /^[0-9a-z][0-9a-z._-]*(?:\([^\r\n()]+\))?[#>](?<command>.*)$/i;
+  /^[0-9a-z][0-9a-z._-]*(?:\((?<mode>[^\r\n()]+)\))?[#>](?<command>.*)$/i;
 const SHOW_COMMAND_PATTERN = /^(?:do\s+)?(?:sh|sho|show)\b/i;
+const CONFIGURATION_SHOW_COMMAND_PATTERN = /^do\s+(?:sh|sho|show)\b/i;
 
 const CATEGORY_NAMES: Record<Exclude<OutlineCategory, 'command'>, string> = {
   ip_vrf: 'ip vrf',
@@ -169,6 +220,7 @@ export const extractOutlineSymbols = (
   source: LineSource,
   enabledCategories: EnabledOutlineCategories,
   isCancelled: () => boolean = () => false,
+  isTruncated = false,
 ): OutlineSymbol[] => {
   const symbols: OutlineSymbol[] = [];
   const parents = new Map<OutlineSymbol, OutlineSymbol>();
@@ -206,7 +258,7 @@ export const extractOutlineSymbols = (
   };
 
   const closeOutput = (end: OutlinePosition): void => {
-    if (outputCandidate?.becameParent && outputCandidate.symbol) {
+    if (outputCandidate?.symbol) {
       extendRange(outputCandidate.symbol, end);
     }
     outputCandidate = undefined;
@@ -300,16 +352,26 @@ export const extractOutlineSymbols = (
       promptMatch = line.match(PROMPT_PATTERN);
     }
 
+    let startCharacter: number;
     if (promptMatch?.groups) {
       if (isCancelled()) return [];
-      closeDeclarations(previousEnd);
-      closeOutput(previousEnd);
 
       const rawCommand = promptMatch.groups.command;
       const command = rawCommand.trim();
-      if (command.length > 0) {
-        const commandStart =
-          line.length - rawCommand.length + skipLeadingWhitespace(rawCommand);
+      const commandStart =
+        line.length - rawCommand.length + skipLeadingWhitespace(rawCommand);
+      const isConfigurationMode = promptMatch.groups.mode
+        ?.toLowerCase()
+        .startsWith('config');
+      const isOutputCommand = CONFIGURATION_SHOW_COMMAND_PATTERN.test(command);
+
+      if (!isConfigurationMode || isOutputCommand) {
+        closeDeclarations(previousEnd);
+        closeOutput(previousEnd);
+        if (command.length === 0) {
+          previousEnd = lineEnd;
+          continue;
+        }
         const selectionRange: OutlineRange = {
           start: { line: lineIndex, character: commandStart },
           end: { line: lineIndex, character: line.trimEnd().length },
@@ -330,16 +392,22 @@ export const extractOutlineSymbols = (
               interfaceBases: new Map(),
               parent: commandSymbol,
             },
-            becameParent: false,
           };
         }
+        previousEnd = lineEnd;
+        continue;
       }
 
-      previousEnd = lineEnd;
-      continue;
+      closeOutput(previousEnd);
+      if (command.length === 0) {
+        previousEnd = lineEnd;
+        continue;
+      }
+      startCharacter = commandStart;
+    } else {
+      startCharacter = skipLeadingWhitespace(line);
     }
 
-    const startCharacter = skipLeadingWhitespace(line);
     if (line.length - startCharacter < 2) {
       previousEnd = lineEnd;
       continue;
@@ -353,7 +421,6 @@ export const extractOutlineSymbols = (
 
     if (match.category === 'address_family') {
       if (activeDeclaration?.kind === 'router_bgp') {
-        if (outputCandidate) outputCandidate.becameParent = true;
         finish(activeAddressFamily, previousEnd);
         const scope = outputCandidate?.scope ?? rootScope;
         const router = activeDeclaration.symbol;
@@ -372,7 +439,6 @@ export const extractOutlineSymbols = (
     }
 
     const scope = outputCandidate?.scope ?? rootScope;
-    if (outputCandidate) outputCandidate.becameParent = true;
     closeDeclarations(previousEnd);
     let rangeParent: OutlineSymbol | undefined;
     let declaration: OutlineSymbol | undefined;
@@ -402,5 +468,24 @@ export const extractOutlineSymbols = (
 
   closeDeclarations(previousEnd);
   closeOutput(previousEnd);
+  if (isCancelled()) return [];
+  if (isTruncated && source.lineCount > 0) {
+    const finalLineRange: OutlineRange = {
+      start: { line: previousEnd.line, character: 0 },
+      end: copyPosition(previousEnd),
+    };
+    symbols.push({
+      category: 'truncation',
+      type: 'truncation',
+      name: 'Truncated output (see settings for max output size)',
+      detail: '',
+      range: finalLineRange,
+      selectionRange: {
+        start: copyPosition(finalLineRange.start),
+        end: copyPosition(finalLineRange.end),
+      },
+      children: [],
+    });
+  }
   return symbols;
 };

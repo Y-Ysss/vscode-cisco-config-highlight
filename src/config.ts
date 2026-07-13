@@ -25,6 +25,22 @@ export function getConfigOutlineSymbolsList(): Record<string, boolean> {
       policy_map: true,
       interface: true,
       sub_interface: true,
+      route_map: true,
+      ip_prefix_list: true,
     }
   );
+}
+
+export const DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN = 10485760;
+
+export function getConfigOutlineMaxFileSizeForFullScan(): number {
+  const configured = getConfig().get<number>(
+    Conf.outlineMaxFileSizeForFullScan,
+    DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN,
+  );
+  return typeof configured === 'number' &&
+    Number.isFinite(configured) &&
+    configured > 0
+    ? configured
+    : DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN;
 }

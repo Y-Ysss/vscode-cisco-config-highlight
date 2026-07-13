@@ -17,6 +17,7 @@ const toSymbolKind = (symbol: OutlineSymbol): vscode.SymbolKind => {
   const kinds: Record<OutlineSymbolType, vscode.SymbolKind> = {
     command: vscode.SymbolKind.Event,
     category: vscode.SymbolKind.Namespace,
+    truncation: vscode.SymbolKind.String,
     ip_vrf: vscode.SymbolKind.Field,
     router_bgp: vscode.SymbolKind.Class,
     address_family: vscode.SymbolKind.Field,
