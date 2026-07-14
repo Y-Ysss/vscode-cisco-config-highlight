@@ -14,6 +14,7 @@ jobs:
     name: Publish to VS Code Marketplace
     needs: build
     runs-on: ubuntu-latest
+    environment: publish
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -63,6 +64,7 @@ jobs:
     name: Publish to Open VSX Registry
     needs: build
     runs-on: ubuntu-latest
+    environment: publish
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

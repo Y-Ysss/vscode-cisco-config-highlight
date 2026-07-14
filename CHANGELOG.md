@@ -3,6 +3,20 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.8.0 (2026-07-15)
+
+### Added
+- Add diagnostics feature
+  - Added an experimental diagnostics feature that validates Cisco configuration files for errors and warnings, including checks for IPv4/IPv6 addresses, prefix lists, ACL wildcard masks, and object-groups.
+- Outline feature enhancements:
+  - Added support for route-map and ip prefix-list as outline symbol categories
+
+## Changed
+- Refactoring and improvements:
+  - Added minimal Position and Range classes to the VSCode mocks for improved test compatibility.
+  - Refactored outline provider registration in the extension entry point for clarity.
+
+
 ## 0.7.1 (2026-06-29)
 
 ### Changed
