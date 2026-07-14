@@ -27,6 +27,7 @@ test/**
 src/**
 **/mocks/**
 **/*.test.*
+**/*.bench.*
 .vscode-test.mjs
 tsconfig*.json
 biome.jsonc

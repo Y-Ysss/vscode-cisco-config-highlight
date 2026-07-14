@@ -8,5 +8,8 @@
   "configuration.properties.symbols.classMap.description": "Group 'class-map {match-any|match-all} name'",
   "configuration.properties.symbols.policyMap.description": "Group 'policy-map {name}'",
   "configuration.properties.symbols.interface.description": "Interface 'interface {type, slot, port, etc...}'",
-  "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'"
+  "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'",
+  "configuration.properties.symbols.routeMap.description": "Route Map 'route-map {name} {permit|deny} {sequence-number}'",
+  "configuration.properties.symbols.ipPrefixList.description": "IPv4 Prefix List 'ip prefix-list {name} ...'",
+  "configuration.properties.outline.maxFileSizeForFullScan.description": "Above this UTF-8 byte size, Outline scans only the beginning of the file and shows a truncation symbol."
 }
