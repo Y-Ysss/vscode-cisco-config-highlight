@@ -30,6 +30,7 @@ This extension provides useful features for Cisco config text, including:
 
 - Syntax highlighting
 - Config outline (Experimental)
+- Configuration diagnostics (Experimental)
 
 
 ## Installation
@@ -282,6 +283,20 @@ Open the settings and enter a keyword in the search box. Select the check box to
 Prompt commands such as `hostname#show running-config` and `hostname>show ...` are recognized as command symbols. Output that follows a `show` command is grouped beneath that command when applicable. Configuration symbols are grouped into category nodes; sub-interfaces are nested under their parent interface, and BGP address families are nested under the corresponding BGP process.
 
 For files larger than `cisco-config-highlight.outline.maxFileSizeForFullScan` in UTF-8 bytes, Outline scans only the beginning of the file. A truncation symbol indicates that the remaining content was not scanned.
+
+### Diagnostics
+
+Diagnostics checks these supported scopes:
+
+- IPv4 routes, interface addresses, and prefix lists
+- IPv6 addresses, prefix lists, and ACL prefixes
+- IPv4 ACL wildcard masks
+- IOS and NX-OS network object-groups
+
+An **Error** indicates an invalid IPv4/IPv6 address or an invalid mask/wildcard value. **Warnings** include malformed or out-of-range prefix lengths, invalid prefix-list modifiers or relations, and disallowed non-contiguous subnet masks.
+
+Diagnostics does not validate every command or every platform-specific syntax. For files larger than `cisco-config-highlight.diagnostics.maxFileSizeForFullScan` in UTF-8 bytes, it silently validates only visible ranges plus a buffer around them; it does not show a notification.
+
 
 ### Multilingual support
 Currently, only the settings page is available.

@@ -11,5 +11,8 @@
   "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'",
   "configuration.properties.symbols.routeMap.description": "ルートマップ 'route-map {name} {permit|deny} {sequence-number}'",
   "configuration.properties.symbols.ipPrefixList.description": "IPv4プレフィックスリスト 'ip prefix-list {name} ...'",
-  "configuration.properties.outline.maxFileSizeForFullScan.description": "UTF-8バイト数がこの値を超える場合、アウトラインはファイルの先頭部分のみを走査し、切り詰めシンボルを表示します。"
+  "configuration.properties.outline.maxFileSizeForFullScan.description": "UTF-8バイト数がこの値を超える場合、アウトラインはファイルの先頭部分のみを走査し、切り詰めシンボルを表示します。",
+  "configuration.properties.diagnostics.maxFileSizeForFullScan.description": "UTF-8バイト数がこの値を超える場合、診断は表示中のバッファ範囲のみを検証します。",
+  "configuration.properties.diagnostics.allowNonContiguousMask.description": "非連続のサブネットマスクを許可します。ACLおよびNX-OSのワイルドカードマスクとルート照合用マスクには影響しません。",
+  "configuration.properties.diagnostics.enabled.description": "［実験的機能］Cisco設定ファイルの診断を有効にします。\n\nDiagnostics checks these supported scopes:\n  - IPv4 routes, interface addresses, and prefix lists\n  - IPv6 addresses, prefix lists, and ACL prefixes\n  - IPv4 ACL wildcard masks\n  - IOS and NX-OS network object-groups"
 }

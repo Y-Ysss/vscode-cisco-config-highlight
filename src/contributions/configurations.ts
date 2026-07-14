@@ -7,6 +7,9 @@ export const Configurations = {
   outlineShowSymbolsInOutlinePanel: 'outline.showSymbolsInOutlinePanel',
   outlineSymbolsList: 'outline.symbolsList',
   outlineMaxFileSizeForFullScan: 'outline.maxFileSizeForFullScan',
+  diagnosticsEnabled: 'diagnostics.enabled',
+  diagnosticsMaxFileSizeForFullScan: 'diagnostics.maxFileSizeForFullScan',
+  diagnosticsAllowNonContiguousMask: 'diagnostics.allowNonContiguousMask',
 } as const;
 
 export const toFullConfigKey = <T extends string>(config: T) => fq(config);

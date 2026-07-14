@@ -2,7 +2,7 @@
   "name": "cisco-config-highlight",
   "displayName": "Cisco Config Highlight",
   "description": "Cisco device configuration Syntax Highlighting for Visual Studio Code.",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "publisher": "Y-Ysss",
   "license": "MIT",
   "repository": {
@@ -124,6 +124,21 @@
             "type": "number",
             "default": 10485760,
             "description": "%configuration.properties.outline.maxFileSizeForFullScan.description%"
+          },
+          "cisco-config-highlight.diagnostics.maxFileSizeForFullScan": {
+            "type": "number",
+            "default": 10485760,
+            "description": "%configuration.properties.diagnostics.maxFileSizeForFullScan.description%"
+          },
+          "cisco-config-highlight.diagnostics.allowNonContiguousMask": {
+            "type": "boolean",
+            "default": false,
+            "description": "%configuration.properties.diagnostics.allowNonContiguousMask.description%"
+          },
+          "cisco-config-highlight.diagnostics.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "%configuration.properties.diagnostics.enabled.description%"
           }
         }
       }
@@ -131,7 +146,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "rollup --config rollup.config.ts --configPlugin esbuild",
+    "compile": "node -e \"require('node:fs').rmSync('out',{recursive:true,force:true})\" && rollup --config rollup.config.ts --configPlugin esbuild",
     "watch": "tsc -watch -p ./",
     "lint": "biome lint ./src",
     "lint:fix": "biome lint --write ./src",
@@ -141,6 +156,7 @@
     "check:fix": "biome check --write ./src",
     "test": "vitest",
     "bench:outline": "vitest bench src/providers/outline/outlineExtractor.test.bench.ts --run",
+    "bench:diagnostics": "vitest bench src/providers/diagnostics/diagnostics.test.bench.ts --run",
     "package": "vsce package",
     "publish:vsce": "vsce publish --packagePath ./*.vsix",
     "publish:vsce:pre-release": "vsce publish --packagePath ./*.vsix --pre-release",
