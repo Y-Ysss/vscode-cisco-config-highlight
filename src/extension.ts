@@ -1,7 +1,7 @@
 import type * as vscode from 'vscode';
 import { outputChannel } from './channel';
 import { registerUpdateInfo } from './providers/notification/registerUpdateInfo';
-import { registerOutlineSymbolProvider } from './providers/outline/registerOutlineSymbol';
+import { registerDocumentSymbolProvider } from './providers/outline/registerDocumentSymbol';
 
 export async function activate(
   context: vscode.ExtensionContext,
@@ -11,5 +11,5 @@ export async function activate(
   } catch (err) {
     outputChannel.append(String(err));
   }
-  registerOutlineSymbolProvider(context);
+  registerDocumentSymbolProvider(context);
 }
