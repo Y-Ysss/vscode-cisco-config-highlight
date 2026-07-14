@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   type EnabledOutlineCategories,
@@ -133,17 +134,15 @@ describe('extractOutlineSymbols', () => {
     },
   );
 
-  it('omits disabled categories without disturbing enabled declaration boundaries', () => {
+  it('uses disabled recognized categories as section boundaries', () => {
     const result = extractOutlineSymbols(
       source('interface Gi0/0', 'policy-map HIDDEN', 'interface Gi0/1'),
       enabled({ policy_map: false }),
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0].children.map((symbol) => symbol.name)).toEqual([
-      'Gi0/0',
-      'Gi0/1',
-    ]);
+    expect(result).toHaveLength(2);
+    expect(result[0].children.map((symbol) => symbol.name)).toEqual(['Gi0/0']);
+    expect(result[1].children.map((symbol) => symbol.name)).toEqual(['Gi0/1']);
     expect(result[0].children[0].range.end).toEqual({
       line: 0,
       character: 15,
@@ -193,6 +192,55 @@ describe('extractOutlineSymbols', () => {
       'Gi0/0',
       'Gi0/0',
     ]);
+  });
+
+  it('starts a new section whenever any defined category reappears', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'interface GigabitEthernet0/0/0.10',
+        'ip vrf VRFNAME',
+        'interface Vlan110',
+        'policy-map FIRST',
+        'route-map BETWEEN permit 10',
+        'policy-map SECOND',
+      ),
+      enabled(),
+    );
+
+    expect(result.map((symbol) => symbol.category)).toEqual([
+      'interface',
+      'ip_vrf',
+      'interface',
+      'policy_map',
+      'route_map',
+      'policy_map',
+    ]);
+    expect(result.map((symbol) => symbol.children[0].name)).toEqual([
+      'GigabitEthernet0/0/0.10',
+      'VRFNAME',
+      'Vlan110',
+      'FIRST',
+      'BETWEEN permit 10',
+      'SECOND',
+    ]);
+  });
+
+  it('does not attach a sub-interface across another category section', () => {
+    const result = extractOutlineSymbols(
+      source('interface Gi0/0', 'ip vrf VRFNAME', 'interface Gi0/0.10'),
+      enabled(),
+    );
+
+    expect(result.map((symbol) => symbol.category)).toEqual([
+      'interface',
+      'ip_vrf',
+      'interface',
+    ]);
+    expect(result[0].children[0].children).toEqual([]);
+    expect(result[2].children[0]).toMatchObject({
+      name: 'Gi0/0.10',
+      type: 'sub_interface',
+    });
   });
 
   it('keeps show vlan as a leaf when no declaration follows', () => {
@@ -258,7 +306,7 @@ describe('extractOutlineSymbols', () => {
     },
   );
 
-  it('treats configuration prompt contents as config instead of commands', () => {
+  it('ignores configuration-mode prompt contents', () => {
     const result = extractOutlineSymbols(
       source(
         'Router#conf t',
@@ -282,21 +330,9 @@ describe('extractOutlineSymbols', () => {
         .filter((symbol) => symbol.category === 'command')
         .map((symbol) => symbol.name),
     ).toEqual(['conf t']);
-    const interfaceCategory = result.find(
-      (symbol) => symbol.category === 'interface',
+    expect(result.some((symbol) => symbol.category === 'interface')).toBe(
+      false,
     );
-    expect(interfaceCategory?.children.map((symbol) => symbol.name)).toEqual([
-      'GigabitEthernet0/1/0',
-      'GigabitEthernet0/1/1',
-    ]);
-    expect(interfaceCategory?.children[0].range).toEqual({
-      start: { line: 4, character: 15 },
-      end: { line: 7, character: 18 },
-    });
-    expect(interfaceCategory?.children[1].range).toEqual({
-      start: { line: 8, character: 18 },
-      end: { line: 11, character: 18 },
-    });
   });
 
   it('uses empty configuration prompts as boundaries without emitting commands', () => {
@@ -314,10 +350,11 @@ describe('extractOutlineSymbols', () => {
     expect(
       result.filter((symbol) => symbol.category === 'command'),
     ).toHaveLength(1);
-    expect(result[1].children.map((symbol) => symbol.name)).toEqual([
-      'Gi0/0',
-      'Gi0/1',
-    ]);
+    expect(
+      result
+        .filter((symbol) => symbol.type === 'category')
+        .map((symbol) => symbol.children.map((child) => child.name)),
+    ).toEqual([['Gi0/0'], ['Gi0/1']]);
   });
 
   it('keeps an output candidate across blank, comment, and exit lines', () => {
@@ -342,14 +379,96 @@ describe('extractOutlineSymbols', () => {
       enabled(),
     );
 
-    const rootInterface = result.find((symbol) => symbol.type === 'category');
+    const rootInterfaces = result.filter(
+      (symbol) => symbol.type === 'category',
+    );
     const command = result.find((symbol) => symbol.type === 'command');
-    expect(rootInterface?.children.map((symbol) => symbol.name)).toEqual([
-      'Gi0/0',
-      'Gi0/2',
-    ]);
+    expect(
+      rootInterfaces.map((symbol) =>
+        symbol.children.map((child) => child.name),
+      ),
+    ).toEqual([['Gi0/0'], ['Gi0/2']]);
     expect(command?.children[0].children[0].name).toBe('Gi0/1');
-    expect(command?.children[0]).not.toBe(rootInterface);
+    expect(rootInterfaces).not.toContain(command?.children[0]);
+  });
+
+  it('does not merge the first interface section across prompts in sample-code.cisco', () => {
+    const lines = readFileSync(
+      new URL('../../../data/sample-code.cisco', import.meta.url),
+      'utf8',
+    ).split(/\r?\n/);
+    const result = extractOutlineSymbols(source(...lines), enabled());
+    const firstInterfaceSection = result.find(
+      (symbol) => symbol.type === 'category' && symbol.category === 'interface',
+    );
+
+    expect(
+      firstInterfaceSection?.children.map((symbol) => symbol.name),
+    ).toEqual(['Loopback100']);
+    expect(firstInterfaceSection?.range.end.line).toBeLessThan(9);
+  });
+
+  it('uses prompts as tree boundaries and ignores config-mode commands', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'interface Loopback0',
+        ' ip vrf forwarding VRF_TEST',
+        ' ip address 192.0.2.1 255.255.255.255',
+        ' ',
+        '!---------------------------',
+        '! show run',
+        '!---------------------------',
+        '',
+        'Router#show run',
+        '!',
+        'interface GigabitEthernet0/0/0',
+        '',
+        'interface GigabitEthernet0/0/0.10',
+        '',
+        'interface Vlan110',
+        '',
+        'Router(config)#interface GigabitEthernet0/1/0',
+        'Router(config-if)# switchport mode access',
+        'Router(config-if)# switchport access vlan 20',
+        'Router(config-if)#',
+        'Router(config-if)#interface GigabitEthernet0/1/1',
+        'Router(config-if)# switchport mode access',
+        'Router(config-if)# switchport access vlan 20',
+        'Router(config-if)#',
+        '',
+        'Router#show run',
+        'interface GigabitEthernet0/0/0.20',
+      ),
+      enabled(),
+    );
+
+    const rootInterface = result.find((symbol) => symbol.type === 'category');
+    const commands = result.filter((symbol) => symbol.type === 'command');
+    const firstOutputInterface = commands[0].children.find(
+      (symbol) => symbol.category === 'interface',
+    );
+    const secondOutputInterface = commands[1].children.find(
+      (symbol) => symbol.category === 'interface',
+    );
+
+    expect(rootInterface?.children.map((symbol) => symbol.name)).toEqual([
+      'Loopback0',
+    ]);
+    expect(commands.map((symbol) => symbol.name)).toEqual([
+      'show run',
+      'show run',
+    ]);
+    expect(firstOutputInterface?.children.map((symbol) => symbol.name)).toEqual(
+      ['GigabitEthernet0/0/0', 'Vlan110'],
+    );
+    expect(firstOutputInterface?.children[0].children[0].name).toBe(
+      'GigabitEthernet0/0/0.10',
+    );
+    expect(
+      secondOutputInterface?.children.map((symbol) => symbol.name),
+    ).toEqual(['GigabitEthernet0/0/0.20']);
+    expect(JSON.stringify(result)).not.toContain('GigabitEthernet0/1/0');
+    expect(JSON.stringify(result)).not.toContain('GigabitEthernet0/1/1');
   });
 
   it('places a parentless sub-interface directly under its category', () => {

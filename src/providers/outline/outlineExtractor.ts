@@ -104,6 +104,7 @@ interface Scope {
   symbols: OutlineSymbol[];
   categories: Map<OutlineCategory, OutlineSymbol>;
   interfaceBases: Map<string, OutlineSymbol>;
+  activeCategory?: Exclude<OutlineCategory, 'command'>;
   parent?: OutlineSymbol;
 }
 
@@ -224,11 +225,12 @@ export const extractOutlineSymbols = (
 ): OutlineSymbol[] => {
   const symbols: OutlineSymbol[] = [];
   const parents = new Map<OutlineSymbol, OutlineSymbol>();
-  const rootScope: Scope = {
+  const createRootScope = (): Scope => ({
     symbols,
     categories: new Map(),
     interfaceBases: new Map(),
-  };
+  });
+  let rootScope = createRootScope();
   let outputCandidate: OutputCandidate | undefined;
   let activeDeclaration: ActiveDeclaration | undefined;
   let activeAddressFamily: ActiveDeclaration | undefined;
@@ -308,6 +310,18 @@ export const extractOutlineSymbols = (
     return container;
   };
 
+  const startCategory = (
+    scope: Scope,
+    category: Exclude<OutlineCategory, 'command'>,
+  ): void => {
+    const treeCategory = category === 'sub_interface' ? 'interface' : category;
+    if (scope.activeCategory === treeCategory) return;
+
+    scope.activeCategory = treeCategory;
+    scope.categories.delete(treeCategory);
+    scope.interfaceBases.clear();
+  };
+
   const addDeclaration = (
     scope: Scope,
     match: DeclarationMatch,
@@ -365,45 +379,38 @@ export const extractOutlineSymbols = (
         .startsWith('config');
       const isOutputCommand = CONFIGURATION_SHOW_COMMAND_PATTERN.test(command);
 
-      if (!isConfigurationMode || isOutputCommand) {
-        closeDeclarations(previousEnd);
-        closeOutput(previousEnd);
-        if (command.length === 0) {
-          previousEnd = lineEnd;
-          continue;
-        }
-        const selectionRange: OutlineRange = {
-          start: { line: lineIndex, character: commandStart },
-          end: { line: lineIndex, character: line.trimEnd().length },
-        };
-        const commandSymbol = enabledCategories.command
-          ? makeSymbol('command', 'command', command, 'command', selectionRange)
-          : undefined;
-        if (commandSymbol) {
-          commandSymbol.range.start = { line: lineIndex, character: 0 };
-          symbols.push(commandSymbol);
-        }
-        if (SHOW_COMMAND_PATTERN.test(command)) {
-          outputCandidate = {
-            symbol: commandSymbol,
-            scope: {
-              symbols: commandSymbol?.children ?? symbols,
-              categories: new Map(),
-              interfaceBases: new Map(),
-              parent: commandSymbol,
-            },
-          };
-        }
+      closeDeclarations(previousEnd);
+      closeOutput(previousEnd);
+      rootScope = createRootScope();
+      if ((isConfigurationMode && !isOutputCommand) || command.length === 0) {
         previousEnd = lineEnd;
         continue;
       }
 
-      closeOutput(previousEnd);
-      if (command.length === 0) {
-        previousEnd = lineEnd;
-        continue;
+      const selectionRange: OutlineRange = {
+        start: { line: lineIndex, character: commandStart },
+        end: { line: lineIndex, character: line.trimEnd().length },
+      };
+      const commandSymbol = enabledCategories.command
+        ? makeSymbol('command', 'command', command, 'command', selectionRange)
+        : undefined;
+      if (commandSymbol) {
+        commandSymbol.range.start = { line: lineIndex, character: 0 };
+        symbols.push(commandSymbol);
       }
-      startCharacter = commandStart;
+      if (SHOW_COMMAND_PATTERN.test(command)) {
+        outputCandidate = {
+          symbol: commandSymbol,
+          scope: {
+            symbols: commandSymbol?.children ?? symbols,
+            categories: new Map(),
+            interfaceBases: new Map(),
+            parent: commandSymbol,
+          },
+        };
+      }
+      previousEnd = lineEnd;
+      continue;
     } else {
       startCharacter = skipLeadingWhitespace(line);
     }
@@ -439,6 +446,7 @@ export const extractOutlineSymbols = (
     }
 
     const scope = outputCandidate?.scope ?? rootScope;
+    startCategory(scope, match.category);
     closeDeclarations(previousEnd);
     let rangeParent: OutlineSymbol | undefined;
     let declaration: OutlineSymbol | undefined;
