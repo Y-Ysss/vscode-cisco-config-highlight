@@ -184,6 +184,41 @@ describe('scanAclWildcardCandidates', () => {
 });
 
 describe('scanAclWildcardFindings', () => {
+  it('validates complete negated numbered ACL entries', () => {
+    expect(
+      scanAclWildcardFindings(
+        source('no access-list 10 permit 999.0.0.1 0.0.0.255'),
+      ),
+    ).toMatchObject([{ line: 0, start: 25, end: 34, code: 'invalid-ipv4' }]);
+  });
+
+  it('keeps named ACL state across negated entries and sequence deletions', () => {
+    const findings = scanAclWildcardFindings(
+      source(
+        'ip access-list extended TEST',
+        ' no permit ip host 999.0.0.1 any',
+        ' no 10',
+        ' permit ip host 999.0.0.2 any',
+      ),
+    );
+
+    expect(findings.map(({ line, code }) => ({ line, code }))).toEqual([
+      { line: 1, code: 'invalid-ipv4' },
+      { line: 3, code: 'invalid-ipv4' },
+    ]);
+  });
+
+  it('does not open a named ACL from a negated header', () => {
+    expect(
+      scanAclWildcardFindings(
+        source(
+          'no ip access-list extended REMOVED',
+          ' permit ip host 999.0.0.1 any',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
   it('warns about subnet masks in wildcard positions and non-canonical pairs', () => {
     const findings = scanAclWildcardFindings(
       source(
