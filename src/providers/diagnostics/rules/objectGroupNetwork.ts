@@ -1,4 +1,10 @@
 import type { LineSource } from '../../../parser/lineScanUtils';
+import {
+  type DiagnosticCommand,
+  type DiagnosticToken,
+  parseDiagnosticCommand,
+} from '../diagnosticCommand';
+import type { DiagnosticLineContext } from '../diagnosticLineContext';
 import { isContiguousSubnetMask, parseIpv4 } from './ipPrefix';
 import { parseIpv6 } from './ipv6Prefix';
 import type { RuleFinding } from './ruleFinding';
@@ -10,11 +16,7 @@ export type NetworkObjectMemberKind =
   | 'prefix'
   | 'address-wildcard';
 
-export interface NetworkObjectToken {
-  readonly text: string;
-  readonly start: number;
-  readonly end: number;
-}
+export type NetworkObjectToken = DiagnosticToken;
 
 export interface NetworkObjectGroupCandidate {
   readonly line: number;
@@ -26,13 +28,6 @@ export interface NetworkObjectGroupCandidate {
   /** Member operands, excluding sequence and member keywords. */
   readonly operands: readonly NetworkObjectToken[];
 }
-
-const tokenize = (line: string): NetworkObjectToken[] =>
-  Array.from(line.matchAll(/[^ \t]+/g), (match) => ({
-    text: match[0],
-    start: match.index,
-    end: match.index + match[0].length,
-  }));
 
 const normalized = (
   token: NetworkObjectToken | undefined,
@@ -145,18 +140,90 @@ const candidateFor = (
 };
 
 const acceptedControl = (
-  text: string,
+  command: DiagnosticCommand,
   profile: NetworkObjectGroupProfile,
   tokens: readonly NetworkObjectToken[],
 ): 'continue' | 'exit' | undefined => {
-  if (tokens.length === 0 || text.trimStart().startsWith('!'))
+  if (command.tokens.length === 0 || command.text.trimStart().startsWith('!'))
     return 'continue';
+  if (
+    command.negated &&
+    tokens.length === 1 &&
+    /^\d+$/.test(tokens[0]?.text ?? '')
+  ) {
+    return 'continue';
+  }
   const start = profile === 'ios' ? 0 : nxosStart(tokens);
   const keyword = normalized(tokens[start]);
   if (keyword === 'description' || keyword === 'group-object')
     return 'continue';
-  if (start === 0 && tokens.length === 1 && keyword === 'exit') return 'exit';
+  if (
+    !command.negated &&
+    start === 0 &&
+    tokens.length === 1 &&
+    keyword === 'exit'
+  ) {
+    return 'exit';
+  }
   return undefined;
+};
+
+export interface NetworkObjectGroupScanState {
+  activeProfile?: NetworkObjectGroupProfile;
+}
+
+export const createNetworkObjectGroupScanState =
+  (): NetworkObjectGroupScanState => ({});
+
+export interface NetworkObjectGroupProcessResult {
+  readonly candidate?: NetworkObjectGroupCandidate;
+  readonly recognized: boolean;
+}
+
+export const processNetworkObjectGroupCommand = (
+  state: NetworkObjectGroupScanState,
+  context: DiagnosticLineContext,
+  options: NetworkObjectGroupRuleOptions = {},
+): NetworkObjectGroupProcessResult => {
+  const { command } = context;
+  const tokens = command.commandTokens;
+  let reprocess = true;
+
+  while (reprocess) {
+    reprocess = false;
+    if (state.activeProfile) {
+      const control = acceptedControl(command, state.activeProfile, tokens);
+      if (control) {
+        if (control === 'exit') state.activeProfile = undefined;
+        return { recognized: true };
+      }
+
+      const candidate = candidateFor(
+        context.line,
+        command.text,
+        state.activeProfile,
+        tokens,
+      );
+      if (candidate) {
+        if (context.collect) {
+          validateCandidate(context.findings, candidate, options);
+        }
+        return { candidate, recognized: true };
+      }
+
+      state.activeProfile = undefined;
+      reprocess = true;
+      continue;
+    }
+
+    const profile = command.negated ? undefined : headerProfile(tokens);
+    if (profile) {
+      state.activeProfile = profile;
+      return { recognized: true };
+    }
+  }
+
+  return { recognized: false };
 };
 
 /** Extracts network object-group members without validating address values. */
@@ -165,42 +232,19 @@ export const scanNetworkObjectGroupCandidates = (
   isCancelled: () => boolean = () => false,
 ): NetworkObjectGroupCandidate[] => {
   const candidates: NetworkObjectGroupCandidate[] = [];
-  let activeProfile: NetworkObjectGroupProfile | undefined;
+  const state = createNetworkObjectGroupScanState();
 
   for (let lineIndex = 0; lineIndex < source.lineCount; lineIndex += 1) {
     if ((lineIndex & 255) === 0 && isCancelled()) return [];
     const text = source.lineAt(lineIndex);
-    const tokens = tokenize(text);
-    let reprocess = true;
-
-    while (reprocess) {
-      reprocess = false;
-      if (activeProfile) {
-        const control = acceptedControl(text, activeProfile, tokens);
-        if (control) {
-          if (isCancelled()) return [];
-          if (control === 'exit') activeProfile = undefined;
-          continue;
-        }
-
-        const candidate = candidateFor(lineIndex, text, activeProfile, tokens);
-        if (candidate) {
-          candidates.push(candidate);
-          if (isCancelled()) return [];
-          continue;
-        }
-
-        activeProfile = undefined;
-        reprocess = true;
-        continue;
-      }
-
-      const profile = headerProfile(tokens);
-      if (profile) {
-        activeProfile = profile;
-        if (isCancelled()) return [];
-      }
-    }
+    const result = processNetworkObjectGroupCommand(state, {
+      line: lineIndex,
+      command: parseDiagnosticCommand(text),
+      collect: false,
+      findings: [],
+    });
+    if (result.candidate) candidates.push(result.candidate);
+    if (result.recognized && isCancelled()) return [];
   }
 
   return candidates;
@@ -382,11 +426,22 @@ export const scanNetworkObjectGroupFindings = (
   options: NetworkObjectGroupRuleOptions = {},
   isCancelled: () => boolean = () => false,
 ): RuleFinding[] => {
-  const candidates = scanNetworkObjectGroupCandidates(source, isCancelled);
   const findings: RuleFinding[] = [];
-  for (const candidate of candidates) {
-    validateCandidate(findings, candidate, options);
-    if (isCancelled()) return [];
+  const state = createNetworkObjectGroupScanState();
+  for (let line = 0; line < source.lineCount; line += 1) {
+    if ((line & 255) === 0 && isCancelled()) return [];
+    const result = processNetworkObjectGroupCommand(
+      state,
+      {
+        line,
+        command: parseDiagnosticCommand(source.lineAt(line)),
+        collect: true,
+        findings,
+      },
+      options,
+    );
+    if (result.recognized && isCancelled()) return [];
+    if (result.candidate && isCancelled()) return [];
   }
   return findings;
 };
