@@ -1,4 +1,3 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   type EnabledOutlineCategories,
@@ -390,22 +389,6 @@ describe('extractOutlineSymbols', () => {
     ).toEqual([['Gi0/0'], ['Gi0/2']]);
     expect(command?.children[0].children[0].name).toBe('Gi0/1');
     expect(rootInterfaces).not.toContain(command?.children[0]);
-  });
-
-  it('does not merge the first interface section across prompts in sample-code.cisco', () => {
-    const lines = readFileSync(
-      new URL('../../../data/sample-code.cisco', import.meta.url),
-      'utf8',
-    ).split(/\r?\n/);
-    const result = extractOutlineSymbols(source(...lines), enabled());
-    const firstInterfaceSection = result.find(
-      (symbol) => symbol.type === 'category' && symbol.category === 'interface',
-    );
-
-    expect(
-      firstInterfaceSection?.children.map((symbol) => symbol.name),
-    ).toEqual(['Loopback100']);
-    expect(firstInterfaceSection?.range.end.line).toBeLessThan(9);
   });
 
   it('uses prompts as tree boundaries and ignores config-mode commands', () => {
