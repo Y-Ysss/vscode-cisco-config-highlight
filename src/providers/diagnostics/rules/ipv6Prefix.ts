@@ -1,4 +1,6 @@
-import { getFirstToken, type LineSource } from '../../../parser/lineScanUtils';
+import type { LineSource } from '../../../parser/lineScanUtils';
+import { parseDiagnosticCommand } from '../diagnosticCommand';
+import type { DiagnosticLineContext } from '../diagnosticLineContext';
 import { parseIpv4 } from './ipPrefix';
 import {
   type PrefixListToken,
@@ -7,13 +9,6 @@ import {
 import type { RuleFinding } from './ruleFinding';
 
 type Token = PrefixListToken;
-
-const tokenize = (line: string): Token[] =>
-  Array.from(line.matchAll(/[^ \t]+/g), (match) => ({
-    text: match[0],
-    start: match.index,
-    end: match.index + match[0].length,
-  }));
 
 const lower = (token: Token | undefined): string | undefined =>
   token?.text.toLowerCase();
@@ -215,52 +210,88 @@ const isAclHeader = (tokens: readonly Token[]): boolean =>
   lower(tokens[1]) === 'access-list' &&
   tokens[2] !== undefined;
 
+export interface Ipv6ScanState {
+  inAcl: boolean;
+}
+
+export const createIpv6ScanState = (): Ipv6ScanState => ({ inAcl: false });
+
+const isNegatedSequenceDeletion = (
+  context: DiagnosticLineContext,
+  tokens: readonly Token[],
+): boolean =>
+  context.command.negated &&
+  ((tokens.length === 1 && /^\d+$/.test(tokens[0]?.text ?? '')) ||
+    (tokens.length === 2 &&
+      lower(tokens[0]) === 'sequence' &&
+      /^\d+$/.test(tokens[1]?.text ?? '')));
+
+export const processIpv6Command = (
+  state: Ipv6ScanState,
+  context: DiagnosticLineContext,
+): boolean => {
+  const tokens = context.command.commandTokens;
+
+  if (state.inAcl) {
+    const first = lower(tokens[0]);
+    let memberIndex = 0;
+    if (/^\d+$/.test(tokens[0]?.text ?? '')) memberIndex = 1;
+    else if (first === 'sequence' && tokens[1]) memberIndex = 2;
+    const memberFirst = lower(tokens[memberIndex]);
+    if (
+      context.command.tokens.length === 0 ||
+      context.command.text.trimStart().startsWith('!') ||
+      memberFirst === 'remark' ||
+      isNegatedSequenceDeletion(context, tokens)
+    ) {
+      return true;
+    }
+    if (!context.command.negated && first === 'exit') {
+      state.inAcl = false;
+      return true;
+    }
+    if (
+      validateAclMember(
+        context.collect ? context.findings : [],
+        context.line,
+        tokens,
+      )
+    ) {
+      return true;
+    }
+    state.inAcl = false;
+  }
+
+  if (!context.command.negated && isAclHeader(tokens)) {
+    state.inAcl = true;
+    return true;
+  }
+  if (lower(tokens[0]) !== 'ipv6') return false;
+  return validateStandalone(
+    context.collect ? context.findings : [],
+    context.line,
+    tokens,
+  );
+};
+
 /** Scans supported IPv6 prefix operands in one forward pass. */
 export const scanIpv6PrefixFindings = (
   source: LineSource,
   isCancelled: () => boolean = () => false,
 ): RuleFinding[] => {
   const findings: RuleFinding[] = [];
-  let inAcl = false;
+  const state = createIpv6ScanState();
 
   for (let line = 0; line < source.lineCount; line += 1) {
     if ((line & 255) === 0 && isCancelled()) return [];
     const text = source.lineAt(line);
-    let tokens: Token[] | undefined;
-
-    if (inAcl) {
-      tokens = tokenize(text);
-      const first = lower(tokens[0]);
-      let memberIndex = 0;
-      if (/^\d+$/.test(tokens[0]?.text ?? '')) memberIndex = 1;
-      else if (first === 'sequence' && tokens[1]) memberIndex = 2;
-      const memberFirst = lower(tokens[memberIndex]);
-      if (tokens.length === 0 || first === '!' || memberFirst === 'remark') {
-        if (isCancelled()) return [];
-        continue;
-      }
-      if (first === 'exit') {
-        inAcl = false;
-        if (isCancelled()) return [];
-        continue;
-      }
-      if (validateAclMember(findings, line, tokens)) {
-        if (isCancelled()) return [];
-        continue;
-      }
-      inAcl = false;
-    }
-
-    if (!tokens) {
-      if (getFirstToken(text).toLowerCase() !== 'ipv6') continue;
-      tokens = tokenize(text);
-    }
-    if (isAclHeader(tokens)) {
-      inAcl = true;
-      if (isCancelled()) return [];
-      continue;
-    }
-    if (validateStandalone(findings, line, tokens) && isCancelled()) return [];
+    const recognized = processIpv6Command(state, {
+      line,
+      command: parseDiagnosticCommand(text),
+      collect: true,
+      findings,
+    });
+    if (recognized && isCancelled()) return [];
   }
   return findings;
 };

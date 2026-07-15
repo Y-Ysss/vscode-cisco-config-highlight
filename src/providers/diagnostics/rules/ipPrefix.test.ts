@@ -30,6 +30,30 @@ describe('IPv4 primitives', () => {
 });
 
 describe('scanIpPrefixFindings', () => {
+  it('validates complete negated commands at physical line offsets', () => {
+    const negated = '  no ip address 999.0.0.1 255.255.255.0';
+
+    expect(scanIpPrefixFindings(source(negated))).toMatchObject([
+      { line: 0, start: 16, end: 25, code: 'invalid-ipv4' },
+    ]);
+    expect(
+      scanIpPrefixFindings(
+        source('no ip route 10.0.0.17 255.255.255.0 Null0'),
+      ).map(({ code }) => code),
+    ).toContain('host-bits-set');
+  });
+
+  it('ignores negated deletion forms without complete operands', () => {
+    for (const line of [
+      'no ip address',
+      'no ip prefix-list PL',
+      'no ip prefix-list PL seq 10',
+      'no network 10.0.0.0',
+    ]) {
+      expect(scanIpPrefixFindings(source(line))).toEqual([]);
+    }
+  });
+
   it.each([
     [
       'ip route 2.0.0.0 0.0.0.0 192.168.1.1',

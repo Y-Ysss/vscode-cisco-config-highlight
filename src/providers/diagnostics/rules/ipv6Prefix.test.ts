@@ -35,6 +35,49 @@ describe('parseIpv6', () => {
 });
 
 describe('scanIpv6PrefixFindings', () => {
+  it('validates complete negated standalone commands at physical offsets', () => {
+    expect(
+      scanIpv6PrefixFindings(source('no ipv6 address 2001:12345::1/129')),
+    ).toMatchObject([
+      { line: 0, start: 16, end: 29, code: 'invalid-ipv6' },
+      { line: 0, code: 'invalid-prefix-length' },
+    ]);
+  });
+
+  it('ignores negated deletion forms without complete operands', () => {
+    expect(scanIpv6PrefixFindings(source('no ipv6 address'))).toEqual([]);
+    expect(scanIpv6PrefixFindings(source('no ipv6 prefix-list PL'))).toEqual(
+      [],
+    );
+  });
+
+  it('keeps IPv6 ACL state across negated entries and sequence deletions', () => {
+    const findings = scanIpv6PrefixFindings(
+      source(
+        'ipv6 access-list V6',
+        ' no permit tcp host 2001:12345::1 any',
+        ' no sequence 10',
+        ' permit tcp host 2001:12345::2 any',
+      ),
+    );
+
+    expect(findings.map(({ line, code }) => ({ line, code }))).toEqual([
+      { line: 1, code: 'invalid-ipv6' },
+      { line: 3, code: 'invalid-ipv6' },
+    ]);
+  });
+
+  it('does not open an IPv6 ACL from a negated header', () => {
+    expect(
+      scanIpv6PrefixFindings(
+        source(
+          'no ipv6 access-list REMOVED',
+          ' permit tcp host 2001:12345::1 any',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
   it('validates address command operands and prefix boundaries with exact ranges', () => {
     const findings = scanIpv6PrefixFindings(
       source(
