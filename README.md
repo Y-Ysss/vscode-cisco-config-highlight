@@ -295,6 +295,8 @@ Diagnostics checks these supported scopes:
 
 An **Error** indicates an invalid IPv4/IPv6 address or an invalid mask/wildcard value. **Warnings** include malformed or out-of-range prefix lengths, invalid prefix-list modifiers or relations, and disallowed non-contiguous subnet masks.
 
+Complete `no ...` forms of supported commands are validated with the same rules. Deletion forms that omit operands, such as `no ip address` or `no <sequence>`, are recognized but do not produce diagnostics.
+
 Diagnostics does not validate every command or every platform-specific syntax. For files larger than `cisco-config-highlight.diagnostics.maxFileSizeForFullScan` in UTF-8 bytes, it silently validates only visible ranges plus a buffer around them; it does not show a notification.
 
 

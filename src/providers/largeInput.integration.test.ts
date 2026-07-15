@@ -36,7 +36,7 @@ const blockLines = [
 ];
 const blockText = `${blockLines.join('\n')}\n`;
 const repeatCount = Math.ceil(TWENTY_MIB / Buffer.byteLength(blockText));
-const scrolledDiagnosticText = 'ip address 999.0.0.2 255.255.255.0';
+const scrolledDiagnosticText = 'no ip address 999.0.0.2 255.255.255.0';
 const tailLine = 'interface TAIL-ONLY';
 let largeText = `${blockText.repeat(repeatCount)}${scrolledDiagnosticText}\n${tailLine}`;
 const largeLineCount = BLOCK_LINE_COUNT * repeatCount + 2;
