@@ -1,15 +1,17 @@
 import type { LineSource } from '../../../parser/lineScanUtils';
+import {
+  type DiagnosticCommand,
+  type DiagnosticToken,
+  parseDiagnosticCommand,
+} from '../diagnosticCommand';
+import type { DiagnosticLineContext } from '../diagnosticLineContext';
 import { parseIpv4 } from './ipPrefix';
 import type { RuleFinding } from './ruleFinding';
 
 export type NamedAclKind = 'standard' | 'extended';
 export type AclAction = 'permit' | 'deny';
 
-export interface AclToken {
-  readonly text: string;
-  readonly start: number;
-  readonly end: number;
-}
+export type AclToken = DiagnosticToken;
 
 export interface AclWildcardCandidate {
   readonly line: number;
@@ -21,13 +23,6 @@ export interface AclWildcardCandidate {
   /** Tokens after permit/deny, ready for Task 9's address validation. */
   readonly operands: readonly AclToken[];
 }
-
-const tokenize = (line: string): AclToken[] =>
-  Array.from(line.matchAll(/[^ \t]+/g), (match) => ({
-    text: match[0],
-    start: match.index,
-    end: match.index + match[0].length,
-  }));
 
 const normalized = (token: AclToken | undefined): string | undefined =>
   token?.text.toLowerCase();
@@ -103,16 +98,90 @@ const numberedCandidateFor = (
 };
 
 const acceptedControl = (
-  text: string,
+  command: DiagnosticCommand,
   tokens: readonly AclToken[],
 ): 'continue' | 'exit' | undefined => {
-  if (tokens.length === 0 || text.trimStart().startsWith('!'))
+  if (command.tokens.length === 0 || command.text.trimStart().startsWith('!'))
     return 'continue';
+  if (
+    command.negated &&
+    tokens.length === 1 &&
+    /^\d+$/.test(tokens[0]?.text ?? '')
+  ) {
+    return 'continue';
+  }
   const start = entryStart(tokens);
   const keyword = normalized(tokens[start]);
   if (keyword === 'remark') return 'continue';
-  if (start === 0 && tokens.length === 1 && keyword === 'exit') return 'exit';
+  if (
+    !command.negated &&
+    start === 0 &&
+    tokens.length === 1 &&
+    keyword === 'exit'
+  ) {
+    return 'exit';
+  }
   return undefined;
+};
+
+export interface Ipv4AclScanState {
+  activeKind?: NamedAclKind;
+}
+
+export const createIpv4AclScanState = (): Ipv4AclScanState => ({});
+
+export interface Ipv4AclProcessResult {
+  readonly candidate?: AclWildcardCandidate;
+  readonly recognized: boolean;
+}
+
+export const processIpv4AclCommand = (
+  state: Ipv4AclScanState,
+  context: DiagnosticLineContext,
+): Ipv4AclProcessResult => {
+  const { command } = context;
+  const tokens = command.commandTokens;
+  let reprocess = true;
+
+  while (reprocess) {
+    reprocess = false;
+    if (state.activeKind) {
+      const candidate = candidateFor(
+        context.line,
+        command.text,
+        state.activeKind,
+        tokens,
+      );
+      if (candidate) {
+        if (context.collect) validateCandidate(context.findings, candidate);
+        return { candidate, recognized: true };
+      }
+
+      const control = acceptedControl(command, tokens);
+      if (control) {
+        if (control === 'exit') state.activeKind = undefined;
+        return { recognized: true };
+      }
+
+      state.activeKind = undefined;
+      reprocess = true;
+      continue;
+    }
+
+    const kind = command.negated ? undefined : headerKind(tokens);
+    if (kind) {
+      state.activeKind = kind;
+      return { recognized: true };
+    }
+
+    const numbered = numberedCandidateFor(context.line, command.text, tokens);
+    if (numbered) {
+      if (context.collect) validateCandidate(context.findings, numbered);
+      return { candidate: numbered, recognized: true };
+    }
+  }
+
+  return { recognized: false };
 };
 
 /**
@@ -126,49 +195,19 @@ export const scanAclWildcardCandidates = (
   isCancelled: () => boolean = () => false,
 ): AclWildcardCandidate[] => {
   const candidates: AclWildcardCandidate[] = [];
-  let activeKind: NamedAclKind | undefined;
+  const state = createIpv4AclScanState();
 
   for (let lineIndex = 0; lineIndex < source.lineCount; lineIndex += 1) {
     if ((lineIndex & 255) === 0 && isCancelled()) return [];
     const text = source.lineAt(lineIndex);
-    const tokens = tokenize(text);
-    let reprocess = true;
-
-    while (reprocess) {
-      reprocess = false;
-      if (activeKind) {
-        const candidate = candidateFor(lineIndex, text, activeKind, tokens);
-        if (candidate) {
-          candidates.push(candidate);
-          if (isCancelled()) return [];
-          continue;
-        }
-
-        const control = acceptedControl(text, tokens);
-        if (control) {
-          if (isCancelled()) return [];
-          if (control === 'exit') activeKind = undefined;
-          continue;
-        }
-
-        activeKind = undefined;
-        reprocess = true;
-        continue;
-      }
-
-      const kind = headerKind(tokens);
-      if (kind) {
-        activeKind = kind;
-        if (isCancelled()) return [];
-        continue;
-      }
-
-      const numbered = numberedCandidateFor(lineIndex, text, tokens);
-      if (numbered) {
-        candidates.push(numbered);
-        if (isCancelled()) return [];
-      }
-    }
+    const result = processIpv4AclCommand(state, {
+      line: lineIndex,
+      command: parseDiagnosticCommand(text),
+      collect: false,
+      findings: [],
+    });
+    if (result.candidate) candidates.push(result.candidate);
+    if (result.recognized && isCancelled()) return [];
   }
 
   return candidates;
@@ -452,8 +491,17 @@ export const scanAclWildcardFindings = (
   source: LineSource,
   isCancelled: () => boolean = () => false,
 ): RuleFinding[] => {
-  const candidates = scanAclWildcardCandidates(source, isCancelled);
   const findings: RuleFinding[] = [];
-  for (const candidate of candidates) validateCandidate(findings, candidate);
+  const state = createIpv4AclScanState();
+  for (let line = 0; line < source.lineCount; line += 1) {
+    if ((line & 255) === 0 && isCancelled()) return [];
+    const result = processIpv4AclCommand(state, {
+      line,
+      command: parseDiagnosticCommand(source.lineAt(line)),
+      collect: true,
+      findings,
+    });
+    if (result.recognized && isCancelled()) return [];
+  }
   return findings;
 };

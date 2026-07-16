@@ -238,6 +238,48 @@ describe('scanNetworkObjectGroupCandidates', () => {
 });
 
 describe('scanNetworkObjectGroupFindings', () => {
+  it('validates negated IOS members without losing group state', () => {
+    const findings = scanNetworkObjectGroupFindings(
+      source(
+        'object-group network IOS-NETS',
+        ' no network-object host 999.0.0.1',
+        ' network-object host 999.0.0.2',
+      ),
+    );
+
+    expect(findings.map(({ line, code }) => ({ line, code }))).toEqual([
+      { line: 1, code: 'invalid-ipv4' },
+      { line: 2, code: 'invalid-ipv4' },
+    ]);
+  });
+
+  it('validates negated NX-OS members across sequence deletions', () => {
+    const findings = scanNetworkObjectGroupFindings(
+      source(
+        'object-group ipv6 address NX6',
+        ' no host 2001:12345::1',
+        ' no 10',
+        ' host 2001:12345::2',
+      ),
+    );
+
+    expect(findings.map(({ line, code }) => ({ line, code }))).toEqual([
+      { line: 1, code: 'invalid-ipv6' },
+      { line: 3, code: 'invalid-ipv6' },
+    ]);
+  });
+
+  it('does not open an object-group from a negated header', () => {
+    expect(
+      scanNetworkObjectGroupFindings(
+        source(
+          'no object-group network REMOVED',
+          ' network-object host 999.0.0.1',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
   it('accepts all supported IOS and NX-OS member forms and boundaries', () => {
     expect(
       scanNetworkObjectGroupFindings(

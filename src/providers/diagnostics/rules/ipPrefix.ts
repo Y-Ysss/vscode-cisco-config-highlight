@@ -1,9 +1,12 @@
-import { getFirstToken, type LineSource } from '../../../parser/lineScanUtils';
+import type { LineSource } from '../../../parser/lineScanUtils';
+import { parseDiagnosticCommand } from '../diagnosticCommand';
+import type { DiagnosticLineContext } from '../diagnosticLineContext';
 import { validatePrefixListModifiers } from './prefixListModifiers';
 import type { RuleFinding, RuleFindingSeverity } from './ruleFinding';
 
 interface Token {
   readonly text: string;
+  readonly lower?: string;
   readonly start: number;
   readonly end: number;
 }
@@ -12,15 +15,8 @@ export interface IpPrefixRuleOptions {
   readonly allowNonContiguousMask?: boolean;
 }
 
-const tokenize = (line: string): Token[] =>
-  Array.from(line.matchAll(/[^ \t]+/g), (match) => ({
-    text: match[0],
-    start: match.index,
-    end: match.index + match[0].length,
-  }));
-
 const lower = (token: Token | undefined): string | undefined =>
-  token?.text.toLowerCase();
+  token?.lower ?? token?.text.toLowerCase();
 
 /** Parses exactly four decimal IPv4 octets in the range 0..255. */
 export const parseIpv4 = (
@@ -312,12 +308,11 @@ const validatePrefixList = (
 const validateCandidate = (
   findings: RuleFinding[],
   line: number,
-  text: string,
+  tokens: readonly Token[],
   options: IpPrefixRuleOptions,
 ): boolean => {
-  const first = getFirstToken(text).toLowerCase();
+  const first = lower(tokens[0]);
   if (first !== 'ip' && first !== 'network') return false;
-  const tokens = tokenize(text);
 
   if (first === 'network') {
     if (lower(tokens[2]) !== 'mask' || !tokens[1] || !tokens[3]) return false;
@@ -374,6 +369,22 @@ const validateCandidate = (
   return true;
 };
 
+export const processIpPrefixCommand = (
+  context: DiagnosticLineContext,
+  options: IpPrefixRuleOptions = {},
+): boolean => {
+  const tokens = context.command.commandTokens;
+  const first = lower(tokens[0]);
+  if (first !== 'ip' && first !== 'network') return false;
+
+  return validateCandidate(
+    context.collect ? context.findings : [],
+    context.line,
+    tokens,
+    options,
+  );
+};
+
 /** Scans supported IPv4 prefix/mask command operands in one forward pass. */
 export const scanIpPrefixFindings = (
   source: LineSource,
@@ -384,7 +395,16 @@ export const scanIpPrefixFindings = (
   for (let line = 0; line < source.lineCount; line += 1) {
     if ((line & 255) === 0 && isCancelled()) return [];
     const text = source.lineAt(line);
-    if (validateCandidate(findings, line, text, options) && isCancelled()) {
+    const matched = processIpPrefixCommand(
+      {
+        line,
+        command: parseDiagnosticCommand(text),
+        collect: true,
+        findings,
+      },
+      options,
+    );
+    if (matched && isCancelled()) {
       return [];
     }
   }

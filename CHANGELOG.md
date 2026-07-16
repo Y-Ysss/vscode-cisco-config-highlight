@@ -3,6 +3,11 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## Unreleased
+
+### Changed
+- Diagnostics now validates complete `no ...` forms of supported commands while ignoring operand-free deletion forms.
+
 ## 0.8.0 (2026-07-15)
 
 ### Added

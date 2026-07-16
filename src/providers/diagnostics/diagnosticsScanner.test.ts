@@ -6,6 +6,29 @@ import {
 } from './diagnosticsScanner';
 
 describe('combined Diagnostics scanner', () => {
+  it('scans negated forms once while preserving state and deletion exemptions', () => {
+    const lines = [
+      'no ip address 999.0.0.1 255.255.255.0',
+      'no ipv6 address 2001:12345::1/129',
+      'ip access-list extended TEST',
+      ' no permit ip host 999.0.0.2 any',
+      ' no 10',
+      ' permit ip host 999.0.0.3 any',
+      'no ip prefix-list PL',
+    ];
+    const lineAt = vi.fn((line: number) => lines[line]);
+
+    const findings = scanDiagnosticFindings({
+      lineCount: lines.length,
+      lineAt,
+    });
+
+    expect(new Set(findings.map(({ line }) => line))).toEqual(
+      new Set([0, 1, 3, 5]),
+    );
+    expect(lineAt).toHaveBeenCalledTimes(lines.length);
+  });
+
   it('emits ACL wildcard intent warnings through the single-pass dispatcher', () => {
     const line = 'access-list 10 permit 192.168.1.0 255.255.255.0';
     const lineAt = vi.fn(() => line);
