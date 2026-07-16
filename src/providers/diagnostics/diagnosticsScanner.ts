@@ -19,15 +19,8 @@ import {
 } from './rules/objectGroupNetwork';
 import type { RuleFinding } from './rules/ruleFinding';
 
-export interface DiagnosticsLineRange {
-  readonly start: number;
-  readonly end: number;
-}
-
 export interface DiagnosticsScanOptions {
   readonly allowNonContiguousMask?: boolean;
-  /** Omit to validate every line. State is tracked outside included ranges. */
-  readonly includedRanges?: readonly DiagnosticsLineRange[];
 }
 
 interface ScanState {
@@ -42,13 +35,6 @@ const createScanState = (): ScanState => ({
   objectGroup: createNetworkObjectGroupScanState(),
 });
 
-const isIncluded = (
-  line: number,
-  ranges: readonly DiagnosticsLineRange[] | undefined,
-): boolean =>
-  ranges === undefined ||
-  ranges.some((range) => line >= range.start && line <= range.end);
-
 const processLine = (
   state: ScanState,
   findings: RuleFinding[],
@@ -59,7 +45,7 @@ const processLine = (
   const context: DiagnosticLineContext = {
     line,
     command: parseDiagnosticCommand(text),
-    collect: isIncluded(line, options.includedRanges),
+    collect: true,
     findings,
   };
 

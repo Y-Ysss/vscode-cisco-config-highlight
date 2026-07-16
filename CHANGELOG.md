@@ -7,6 +7,7 @@
 
 ### Changed
 - Diagnostics now validates complete `no ...` forms of supported commands while ignoring operand-free deletion forms.
+- Diagnostics now performs complete asynchronous scans instead of visible-range scans.
 
 ## 0.8.0 (2026-07-15)
 

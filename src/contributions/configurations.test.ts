@@ -1,10 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import {
-  DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN,
-  DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN,
-} from '../config';
+import { DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN } from '../config';
 import {
   Configurations,
   EXTENSION_ID,
@@ -42,7 +39,6 @@ const expectedConfigurationSuffixes = [
   'outline.symbolsList',
   'outline.maxFileSizeForFullScan',
   'diagnostics.enabled',
-  'diagnostics.maxFileSizeForFullScan',
   'diagnostics.allowNonContiguousMask',
 ] as const;
 
@@ -78,13 +74,6 @@ const expectedSettings = [
     defaultValue: DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN,
     placeholder:
       'configuration.properties.outline.maxFileSizeForFullScan.description',
-  },
-  {
-    internal: Configurations.diagnosticsMaxFileSizeForFullScan,
-    type: 'number',
-    defaultValue: DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN,
-    placeholder:
-      'configuration.properties.diagnostics.maxFileSizeForFullScan.description',
   },
   {
     internal: Configurations.diagnosticsAllowNonContiguousMask,

@@ -193,22 +193,16 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     }
   }, 30_000);
 
-  it('merges visible buffers, replaces scrolled Diagnostics after 400 ms, and excludes off-range values', async () => {
+  it('publishes complete Diagnostics for a large document independently of visible ranges', async () => {
     vi.useFakeTimers();
     const document = makeLargeDocument();
-    let visibleRanges = [new vscode.Range(0, 0, 0, 0)];
-    let secondVisibleRanges = [new vscode.Range(401, 0, 401, 0)];
     const editor = {
       document,
-      get visibleRanges() {
-        return visibleRanges;
-      },
+      visibleRanges: [new vscode.Range(0, 0, 0, 0)],
     };
     const secondEditor = {
       document,
-      get visibleRanges() {
-        return secondVisibleRanges;
-      },
+      visibleRanges: [new vscode.Range(401, 0, 401, 0)],
     };
     vi.spyOn(vscode.workspace, 'textDocuments', 'get').mockReturnValue([
       document,
@@ -217,8 +211,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
       () => [editor, secondEditor] as never,
     );
     vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
-      get: (key: string, fallback: unknown) =>
-        key === 'diagnostics.maxFileSizeForFullScan' ? 1 : fallback,
+      get: (_key: string, fallback: unknown) => fallback,
     } as never);
     const collection = diagnosticCollection();
     vi.spyOn(vscode.languages, 'createDiagnosticCollection').mockReturnValue(
@@ -226,14 +219,10 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     );
     const notification = vi.spyOn(vscode.window, 'showInformationMessage');
     const warning = vi.spyOn(vscode.window, 'showWarningMessage');
-    let visible: ((event: { textEditor: typeof editor }) => void) | undefined;
-    vi.spyOn(
+    const visibleListener = vi.spyOn(
       vscode.window,
       'onDidChangeTextEditorVisibleRanges',
-    ).mockImplementation(((listener: typeof visible) => {
-      visible = listener;
-      return { dispose: vi.fn() };
-    }) as never);
+    );
 
     registerDiagnostics({ subscriptions: [] } as never);
     await vi.advanceTimersByTimeAsync(400);
@@ -243,33 +232,12 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     );
     expect(initialLines.length).toBeGreaterThanOrEqual(4);
     expect(initialLines).toContain(5);
-    expect(initialLines).not.toContain(BLOCK_LINE_COUNT + 5);
-    expect(initialLines).not.toContain(scrolledDiagnosticLine);
-    expect(initialLines.every((line: number) => line <= 601)).toBe(true);
+    expect(initialLines).toContain(BLOCK_LINE_COUNT + 5);
+    expect(initialLines).toContain(scrolledDiagnosticLine);
     expect(document.lineAt).toHaveBeenCalledTimes(largeLineCount);
     expect(document.lineAt.mock.calls[0][0]).toBe(0);
     expect(document.lineAt.mock.calls.at(-1)?.[0]).toBe(largeLineCount - 1);
-
-    document.lineAt.mockClear();
-    visibleRanges = [
-      new vscode.Range(largeLineCount - 1, 0, largeLineCount - 1, 0),
-    ];
-    secondVisibleRanges = visibleRanges;
-    visible?.({ textEditor: editor });
-    await vi.advanceTimersByTimeAsync(399);
-    expect(collection.set).toHaveBeenCalledOnce();
-    await vi.advanceTimersByTimeAsync(1);
-    await vi.runAllTimersAsync();
-    expect(collection.set).toHaveBeenCalledTimes(2);
-    const replacementLines = collection.set.mock.calls[1][1].map(
-      (diagnostic: vscode.Diagnostic) => diagnostic.range.start.line,
-    );
-    expect(
-      replacementLines.every((line: number) => line >= largeLineCount - 201),
-    ).toBe(true);
-    expect(replacementLines).toEqual([scrolledDiagnosticLine]);
-    expect(replacementLines).not.toContain(5);
-    expect(replacementLines).not.toContain(BLOCK_LINE_COUNT + 5);
+    expect(visibleListener).not.toHaveBeenCalled();
     expect(notification).not.toHaveBeenCalled();
     expect(warning).not.toHaveBeenCalled();
   });
@@ -288,8 +256,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
       editor,
     ] as never);
     vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
-      get: (key: string, fallback: unknown) =>
-        key === 'diagnostics.maxFileSizeForFullScan' ? 1 : fallback,
+      get: (_key: string, fallback: unknown) => fallback,
     } as never);
     const collection = diagnosticCollection();
     vi.spyOn(vscode.languages, 'createDiagnosticCollection').mockReturnValue(
@@ -318,7 +285,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     expect(collection.set).toHaveBeenCalledOnce();
   });
 
-  it('retains distant ACL and object-group context but publishes only visible buffered findings', async () => {
+  it('retains distant ACL and object-group context while publishing all findings', async () => {
     vi.useFakeTimers();
     const lines = Array.from({ length: 2_700 }, () => 'ordinary');
     lines[0] = 'ip access-list standard FAR-V4';
@@ -352,8 +319,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
       editors as never,
     );
     vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
-      get: (key: string, fallback: unknown) =>
-        key === 'diagnostics.maxFileSizeForFullScan' ? 1 : fallback,
+      get: (_key: string, fallback: unknown) => fallback,
     } as never);
     const collection = diagnosticCollection();
     vi.spyOn(vscode.languages, 'createDiagnosticCollection').mockReturnValue(
@@ -368,8 +334,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     const findingLines = collection.set.mock.calls[0][1].map(
       (diagnostic: vscode.Diagnostic) => diagnostic.range.start.line,
     );
-    expect(findingLines).toEqual([250, 1_250, 2_250]);
-    expect(findingLines).not.toContain(700);
+    expect(findingLines).toEqual([250, 700, 1_250, 2_250]);
     expect(lineAt).toHaveBeenCalledTimes(lines.length);
     expect(notification).not.toHaveBeenCalled();
   });
