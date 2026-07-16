@@ -53,6 +53,7 @@ const makeLargeDocument = (id = 'file:///large.cisco') => {
   const lineAt = vi.fn((line: number) => ({ text: textAt(line) }));
   return {
     languageId: 'cisco',
+    version: 1,
     lineCount: largeLineCount,
     uri: { toString: () => id },
     getText: vi.fn(() => largeText),
@@ -193,7 +194,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     }
   }, 30_000);
 
-  it('publishes complete Diagnostics for a large document independently of visible ranges', async () => {
+  it('skips Diagnostics for a 20 MiB document without reading its lines', async () => {
     vi.useFakeTimers();
     const document = makeLargeDocument();
     const editor = {
@@ -227,16 +228,10 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     registerDiagnostics({ subscriptions: [] } as never);
     await vi.advanceTimersByTimeAsync(400);
     await vi.runAllTimersAsync();
-    const initialLines = collection.set.mock.calls[0][1].map(
-      (diagnostic: vscode.Diagnostic) => diagnostic.range.start.line,
-    );
-    expect(initialLines.length).toBeGreaterThanOrEqual(4);
-    expect(initialLines).toContain(5);
-    expect(initialLines).toContain(BLOCK_LINE_COUNT + 5);
-    expect(initialLines).toContain(scrolledDiagnosticLine);
-    expect(document.lineAt).toHaveBeenCalledTimes(largeLineCount);
-    expect(document.lineAt.mock.calls[0][0]).toBe(0);
-    expect(document.lineAt.mock.calls.at(-1)?.[0]).toBe(largeLineCount - 1);
+    expect(document.getText).toHaveBeenCalledOnce();
+    expect(document.lineAt).not.toHaveBeenCalled();
+    expect(collection.set).not.toHaveBeenCalled();
+    expect(collection.delete).toHaveBeenCalledWith(document.uri);
     expect(visibleListener).not.toHaveBeenCalled();
     expect(notification).not.toHaveBeenCalled();
     expect(warning).not.toHaveBeenCalled();
@@ -256,7 +251,8 @@ describe('20 MiB Outline and Diagnostics integration', () => {
       editor,
     ] as never);
     vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
-      get: (_key: string, fallback: unknown) => fallback,
+      get: (key: string, fallback: unknown) =>
+        key === 'diagnostics.maxFileSize' ? largeBytes : fallback,
     } as never);
     const collection = diagnosticCollection();
     vi.spyOn(vscode.languages, 'createDiagnosticCollection').mockReturnValue(
@@ -273,6 +269,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     document.lineAt.mockImplementation((line) => {
       if (!interrupted) {
         interrupted = true;
+        document.version += 1;
         change?.({ document });
       }
       return { text: textAt(line) };
@@ -303,6 +300,7 @@ describe('20 MiB Outline and Diagnostics integration', () => {
     const lineAt = vi.fn((line: number) => ({ text: lines[line] }));
     const document = {
       languageId: 'cisco',
+      version: 1,
       lineCount: lines.length,
       uri: { toString: () => 'file:///state-context.cisco' },
       getText: vi.fn(() => lines.join('\n')),

@@ -49,6 +49,20 @@ export function getConfigDiagnosticsEnabled(): boolean {
   return getConfig().get<boolean>(Conf.diagnosticsEnabled, true) ?? true;
 }
 
+export const DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE = 1048576;
+
+export function getConfigDiagnosticsMaxFileSize(): number {
+  const configured = getConfig().get<number>(
+    Conf.diagnosticsMaxFileSize,
+    DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE,
+  );
+  return typeof configured === 'number' &&
+    Number.isFinite(configured) &&
+    configured > 0
+    ? configured
+    : DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE;
+}
+
 export function getConfigDiagnosticsAllowNonContiguousMask(): boolean {
   return (
     getConfig().get<boolean>(Conf.diagnosticsAllowNonContiguousMask, false) ??

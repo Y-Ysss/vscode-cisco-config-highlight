@@ -7,6 +7,7 @@ const makeDocument = (lines: string[], id = 'file:///config.cisco') => {
   const lineAt = vi.fn((line: number) => ({ text: lines[line] }));
   return {
     languageId: 'cisco',
+    version: 1,
     lineCount: lines.length,
     uri: { toString: () => id },
     getText: vi.fn(() => lines.join('\n')),
@@ -173,7 +174,7 @@ describe('registerDiagnostics lifecycle', () => {
     expect(collection.set).toHaveBeenCalledTimes(5);
   });
 
-  it('full-scans every document regardless of its UTF-8 size', async () => {
+  it('scans at the exact UTF-8 limit and skips at limit plus one', async () => {
     const exact = makeDocument(['abc'], 'file:///exact.cisco');
     const plusOne = makeDocument(['abcd'], 'file:///plus-one.cisco');
     vi.spyOn(vscode.workspace, 'textDocuments', 'get').mockReturnValue([
@@ -182,7 +183,8 @@ describe('registerDiagnostics lifecycle', () => {
     ] as never);
     vi.spyOn(vscode.window, 'visibleTextEditors', 'get').mockReturnValue([]);
     vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
-      get: (_key: string, fallback: unknown) => fallback,
+      get: (key: string, fallback: unknown) =>
+        key === 'diagnostics.maxFileSize' ? 3 : fallback,
     } as never);
     const collection = {
       set: vi.fn(),
@@ -199,8 +201,57 @@ describe('registerDiagnostics lifecycle', () => {
 
     expect(exact.lineAt).toHaveBeenCalledOnce();
     expect(collection.set).toHaveBeenCalledWith(exact.uri, []);
-    expect(plusOne.lineAt).toHaveBeenCalledOnce();
-    expect(collection.set).toHaveBeenCalledWith(plusOne.uri, []);
+    expect(plusOne.lineAt).not.toHaveBeenCalled();
+    expect(collection.delete).toHaveBeenCalledWith(plusOne.uri);
+  });
+
+  it('caches size, logs once per skipped period, and resumes after shrinking', async () => {
+    const document = makeDocument(['abcd']);
+    vi.spyOn(vscode.workspace, 'textDocuments', 'get').mockReturnValue([
+      document,
+    ] as never);
+    vi.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
+      get: (key: string, fallback: unknown) =>
+        key === 'diagnostics.maxFileSize' ? 3 : fallback,
+    } as never);
+    const collection = {
+      set: vi.fn(),
+      delete: vi.fn(),
+      clear: vi.fn(),
+      dispose: vi.fn(),
+    };
+    vi.spyOn(vscode.languages, 'createDiagnosticCollection').mockReturnValue(
+      collection as never,
+    );
+    const appendLine = vi.spyOn(outputChannel, 'appendLine');
+    let change: ((event: { document: typeof document }) => void) | undefined;
+    vi.spyOn(vscode.workspace, 'onDidChangeTextDocument').mockImplementation(((
+      listener: typeof change,
+    ) => {
+      change = listener;
+      return { dispose: vi.fn() };
+    }) as never);
+
+    registerDiagnostics({ subscriptions: [] } as never);
+    await vi.advanceTimersByTimeAsync(400);
+    change?.({ document });
+    await vi.advanceTimersByTimeAsync(400);
+
+    expect(document.getText).toHaveBeenCalledOnce();
+    expect(appendLine).toHaveBeenCalledOnce();
+    expect(collection.set).not.toHaveBeenCalled();
+
+    document.version += 1;
+    document.getText.mockReturnValue('a');
+    change?.({ document });
+    await vi.advanceTimersByTimeAsync(400);
+    expect(collection.set).toHaveBeenCalledWith(document.uri, []);
+
+    document.version += 1;
+    document.getText.mockReturnValue('abcde');
+    change?.({ document });
+    await vi.advanceTimersByTimeAsync(400);
+    expect(appendLine).toHaveBeenCalledTimes(2);
   });
 
   it('publishes complete findings and does not subscribe to scrolling', async () => {

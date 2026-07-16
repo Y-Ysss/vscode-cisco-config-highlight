@@ -3,6 +3,7 @@ import { outputChannel } from '../../channel';
 import {
   getConfigDiagnosticsAllowNonContiguousMask,
   getConfigDiagnosticsEnabled,
+  getConfigDiagnosticsMaxFileSize,
 } from '../../config';
 import { EXTENSION_ID } from '../../contributions/configurations';
 import type { LineSource } from '../../parser/lineScanUtils';
@@ -15,6 +16,11 @@ interface UriWork {
   generation: number;
   timer?: ReturnType<typeof setTimeout>;
   tokenSource?: vscode.CancellationTokenSource;
+  byteSize?: {
+    readonly version: number;
+    readonly value: number;
+  };
+  skipLogged?: boolean;
 }
 
 const uriKey = (document: vscode.TextDocument): string =>
@@ -22,6 +28,9 @@ const uriKey = (document: vscode.TextDocument): string =>
 
 const isCiscoDocument = (document: vscode.TextDocument): boolean =>
   document.languageId === 'cisco';
+
+const utf8ByteSize = (document: vscode.TextDocument): number =>
+  Buffer.byteLength(document.getText(), 'utf8');
 
 export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
   const collection = vscode.languages.createDiagnosticCollection(EXTENSION_ID);
@@ -55,6 +64,24 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
       work.generation !== generation;
 
     try {
+      const byteSize =
+        work.byteSize?.version === document.version
+          ? work.byteSize.value
+          : utf8ByteSize(document);
+      work.byteSize = { version: document.version, value: byteSize };
+      const maxFileSize = getConfigDiagnosticsMaxFileSize();
+      if (stale()) return;
+      if (byteSize > maxFileSize) {
+        collection.delete(document.uri);
+        if (!work.skipLogged) {
+          outputChannel.appendLine(
+            `Diagnostics skipped for ${document.uri.toString()}: ${byteSize} UTF-8 bytes exceeds the configured maximum of ${maxFileSize} bytes.`,
+          );
+          work.skipLogged = true;
+        }
+        return;
+      }
+      work.skipLogged = false;
       const source: LineSource = {
         lineCount: document.lineCount,
         lineAt: (line) => document.lineAt(line).text,

@@ -8,6 +8,7 @@ export const Configurations = {
   outlineSymbolsList: 'outline.symbolsList',
   outlineMaxFileSizeForFullScan: 'outline.maxFileSizeForFullScan',
   diagnosticsEnabled: 'diagnostics.enabled',
+  diagnosticsMaxFileSize: 'diagnostics.maxFileSize',
   diagnosticsAllowNonContiguousMask: 'diagnostics.allowNonContiguousMask',
 } as const;
 
