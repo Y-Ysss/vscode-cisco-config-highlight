@@ -297,7 +297,7 @@ An **Error** indicates an invalid IPv4/IPv6 address or an invalid mask/wildcard 
 
 Complete `no ...` forms of supported commands are validated with the same rules. Deletion forms that omit operands, such as `no ip address` or `no <sequence>`, are recognized but do not produce diagnostics.
 
-Diagnostics does not validate every command or every platform-specific syntax. For files larger than `cisco-config-highlight.diagnostics.maxFileSizeForFullScan` in UTF-8 bytes, it silently validates only visible ranges plus a buffer around them; it does not show a notification.
+Diagnostics does not validate every command or every platform-specific syntax. Documents larger than `cisco-config-highlight.diagnostics.maxFileSize` in UTF-8 bytes are not diagnosed because large documents are more likely to be device output than planned configurations. The default limit is 1 MiB and can be changed in Settings. Skipping does not show a notification.
 
 
 ### Multilingual support

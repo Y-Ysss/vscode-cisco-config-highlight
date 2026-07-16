@@ -1,30 +1,26 @@
 import * as vscode from 'vscode';
+import { outputChannel } from '../../channel';
 import {
   getConfigDiagnosticsAllowNonContiguousMask,
   getConfigDiagnosticsEnabled,
-  getConfigDiagnosticsMaxFileSizeForFullScan,
+  getConfigDiagnosticsMaxFileSize,
 } from '../../config';
 import { EXTENSION_ID } from '../../contributions/configurations';
 import type { LineSource } from '../../parser/lineScanUtils';
-import {
-  scanDiagnosticFindings,
-  scanDiagnosticFindingsAsync,
-} from './diagnosticsScanner';
+import { scanDiagnosticFindingsAsync } from './diagnosticsScanner';
 import { diagnosticToVscode } from './diagnosticToVscode';
-import type { RuleFinding } from './rules/ruleFinding';
 
 const DEBOUNCE_MILLISECONDS = 400;
-const VISIBLE_RANGE_BUFFER_LINES = 200;
-
-interface LineRange {
-  readonly start: number;
-  readonly end: number;
-}
 
 interface UriWork {
   generation: number;
   timer?: ReturnType<typeof setTimeout>;
   tokenSource?: vscode.CancellationTokenSource;
+  byteSize?: {
+    readonly version: number;
+    readonly value: number;
+  };
+  skipLogged?: boolean;
 }
 
 const uriKey = (document: vscode.TextDocument): string =>
@@ -35,89 +31,6 @@ const isCiscoDocument = (document: vscode.TextDocument): boolean =>
 
 const utf8ByteSize = (document: vscode.TextDocument): number =>
   Buffer.byteLength(document.getText(), 'utf8');
-
-const visibleLineRanges = (document: vscode.TextDocument): LineRange[] => {
-  if (document.lineCount === 0) return [];
-  const ranges = vscode.window.visibleTextEditors
-    .filter((editor) => uriKey(editor.document) === uriKey(document))
-    .flatMap((editor) => editor.visibleRanges)
-    .map((range) => ({
-      start: Math.max(0, range.start.line - VISIBLE_RANGE_BUFFER_LINES),
-      end: Math.min(
-        document.lineCount - 1,
-        range.end.line + VISIBLE_RANGE_BUFFER_LINES,
-      ),
-    }))
-    .sort((left, right) => left.start - right.start || left.end - right.end);
-
-  const merged: LineRange[] = [];
-  for (const range of ranges) {
-    const previous = merged[merged.length - 1];
-    if (!previous || range.start > previous.end + 1) {
-      merged.push(range);
-    } else if (range.end > previous.end) {
-      merged[merged.length - 1] = { start: previous.start, end: range.end };
-    }
-  }
-  return merged;
-};
-
-const fullDocumentRange = (document: vscode.TextDocument): LineRange[] =>
-  document.lineCount === 0 ? [] : [{ start: 0, end: document.lineCount - 1 }];
-
-const snapshotRanges = (
-  document: vscode.TextDocument,
-  ranges: readonly LineRange[],
-  isCancelled: () => boolean,
-): ReadonlyArray<{
-  readonly start: number;
-  readonly lines: readonly string[];
-}> | null => {
-  const snapshots: Array<{ start: number; lines: string[] }> = [];
-  let linesRead = 0;
-  for (const range of ranges) {
-    const lines: string[] = [];
-    for (let line = range.start; line <= range.end; line += 1) {
-      if ((linesRead & 255) === 0 && isCancelled()) return null;
-      lines.push(document.lineAt(line).text);
-      linesRead += 1;
-    }
-    snapshots.push({ start: range.start, lines });
-  }
-  return snapshots;
-};
-
-const offsetFindings = (
-  findings: readonly RuleFinding[],
-  lineOffset: number,
-): RuleFinding[] =>
-  findings.map((finding) => ({ ...finding, line: finding.line + lineOffset }));
-
-const scanSnapshots = (
-  snapshots: ReadonlyArray<{
-    readonly start: number;
-    readonly lines: readonly string[];
-  }>,
-  allowNonContiguousMask: boolean,
-  isCancelled: () => boolean,
-): RuleFinding[] | null => {
-  const findings: RuleFinding[] = [];
-  for (const snapshot of snapshots) {
-    const source: LineSource = {
-      lineCount: snapshot.lines.length,
-      lineAt: (line) => snapshot.lines[line],
-    };
-    findings.push(
-      ...offsetFindings(
-        scanDiagnosticFindings(source, { allowNonContiguousMask }, isCancelled),
-        snapshot.start,
-      ),
-    );
-    if (isCancelled()) return null;
-  }
-  findings.sort((left, right) => left.line - right.line);
-  return findings;
-};
 
 export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
   const collection = vscode.languages.createDiagnosticCollection(EXTENSION_ID);
@@ -148,20 +61,27 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
     const stale = () =>
       disposed ||
       tokenSource.token.isCancellationRequested ||
-      work.generation !== generation ||
-      !getConfigDiagnosticsEnabled();
+      work.generation !== generation;
 
     try {
-      const threshold = getConfigDiagnosticsMaxFileSizeForFullScan();
-      const isLarge = utf8ByteSize(document) > threshold;
-      const ranges = isLarge
-        ? visibleLineRanges(document)
-        : fullDocumentRange(document);
+      const byteSize =
+        work.byteSize?.version === document.version
+          ? work.byteSize.value
+          : utf8ByteSize(document);
+      work.byteSize = { version: document.version, value: byteSize };
+      const maxFileSize = getConfigDiagnosticsMaxFileSize();
       if (stale()) return;
-      if (isLarge && ranges.length === 0) {
+      if (byteSize > maxFileSize) {
         collection.delete(document.uri);
+        if (!work.skipLogged) {
+          outputChannel.appendLine(
+            `Diagnostics skipped for ${document.uri.toString()}: ${byteSize} UTF-8 bytes exceeds the configured maximum of ${maxFileSize} bytes.`,
+          );
+          work.skipLogged = true;
+        }
         return;
       }
+      work.skipLogged = false;
       const source: LineSource = {
         lineCount: document.lineCount,
         lineAt: (line) => document.lineAt(line).text,
@@ -170,12 +90,18 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
         source,
         {
           allowNonContiguousMask: getConfigDiagnosticsAllowNonContiguousMask(),
-          includedRanges: isLarge ? ranges : undefined,
         },
         stale,
       );
       if (findings === null || stale()) return;
       collection.set(document.uri, findings.map(diagnosticToVscode));
+    } catch (error) {
+      if (!stale()) {
+        collection.delete(document.uri);
+        outputChannel.appendLine(
+          `Diagnostics failed for ${document.uri.toString()}: ${String(error)}`,
+        );
+      }
     } finally {
       if (work.generation === generation && work.tokenSource === tokenSource) {
         work.tokenSource = undefined;
@@ -209,11 +135,6 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
     workByUri.delete(uriKey(document));
     collection.delete(document.uri);
   });
-  const visibleRangesListener =
-    vscode.window.onDidChangeTextEditorVisibleRanges((event) => {
-      if (!isCiscoDocument(event.textEditor.document)) return;
-      schedule(event.textEditor.document);
-    });
   const configurationListener = vscode.workspace.onDidChangeConfiguration(
     (event) => {
       if (!event.affectsConfiguration(`${EXTENSION_ID}.diagnostics`)) return;
@@ -245,15 +166,7 @@ export const registerDiagnostics = (context: vscode.ExtensionContext): void => {
     changeListener,
     closeListener,
     configurationListener,
-    visibleRangesListener,
     cleanup,
   );
   for (const document of vscode.workspace.textDocuments) schedule(document);
-};
-
-export const diagnosticsInternalsForTest = {
-  snapshotRanges,
-  scanSnapshots,
-  visibleLineRanges,
-  utf8ByteSize,
 };

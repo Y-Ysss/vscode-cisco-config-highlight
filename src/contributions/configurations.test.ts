@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN,
+  DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE,
   DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN,
 } from '../config';
 import {
@@ -42,7 +42,7 @@ const expectedConfigurationSuffixes = [
   'outline.symbolsList',
   'outline.maxFileSizeForFullScan',
   'diagnostics.enabled',
-  'diagnostics.maxFileSizeForFullScan',
+  'diagnostics.maxFileSize',
   'diagnostics.allowNonContiguousMask',
 ] as const;
 
@@ -80,11 +80,10 @@ const expectedSettings = [
       'configuration.properties.outline.maxFileSizeForFullScan.description',
   },
   {
-    internal: Configurations.diagnosticsMaxFileSizeForFullScan,
+    internal: Configurations.diagnosticsMaxFileSize,
     type: 'number',
-    defaultValue: DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN,
-    placeholder:
-      'configuration.properties.diagnostics.maxFileSizeForFullScan.description',
+    defaultValue: DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE,
+    placeholder: 'configuration.properties.diagnostics.maxFileSize.description',
   },
   {
     internal: Configurations.diagnosticsAllowNonContiguousMask,
@@ -158,6 +157,13 @@ describe('configuration contribution manifest', () => {
       expect(english[placeholder]).toEqual(expect.any(String));
       expect(japanese[placeholder]).toEqual(expect.any(String));
     }
+  });
+
+  it('requires a positive Diagnostics maximum file size', () => {
+    const setting = configurationProperties[
+      toFullConfigKey(Configurations.diagnosticsMaxFileSize)
+    ] as JsonObject;
+    expect(setting.minimum).toBe(1);
   });
 
   it('has no unresolved or unused configuration localization placeholders', () => {

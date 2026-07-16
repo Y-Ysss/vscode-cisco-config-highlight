@@ -45,22 +45,22 @@ export function getConfigOutlineMaxFileSizeForFullScan(): number {
     : DEFAULT_OUTLINE_MAX_FILE_SIZE_FOR_FULL_SCAN;
 }
 
-export const DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN = 10485760;
-
 export function getConfigDiagnosticsEnabled(): boolean {
   return getConfig().get<boolean>(Conf.diagnosticsEnabled, true) ?? true;
 }
 
-export function getConfigDiagnosticsMaxFileSizeForFullScan(): number {
+export const DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE = 1048576;
+
+export function getConfigDiagnosticsMaxFileSize(): number {
   const configured = getConfig().get<number>(
-    Conf.diagnosticsMaxFileSizeForFullScan,
-    DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN,
+    Conf.diagnosticsMaxFileSize,
+    DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE,
   );
   return typeof configured === 'number' &&
     Number.isFinite(configured) &&
     configured > 0
     ? configured
-    : DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE_FOR_FULL_SCAN;
+    : DEFAULT_DIAGNOSTICS_MAX_FILE_SIZE;
 }
 
 export function getConfigDiagnosticsAllowNonContiguousMask(): boolean {
