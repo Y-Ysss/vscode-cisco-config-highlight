@@ -242,8 +242,15 @@ string.other.key-string
 
 ## Experimental Features
 
+Experimental features are available in this extension. You can enable them in the settings.
+
+
+> [!NOTE]  
+> Those features are still under development and may change in future versions.
+
+
 - Show symbols in outline panel
-- Multilingual support (settings page)
+- Diagnostics
 
 
 ### Show symbols in outline panel
@@ -300,12 +307,12 @@ Complete `no ...` forms of supported commands are validated with the same rules.
 Diagnostics does not validate every command or every platform-specific syntax. Documents larger than `cisco-config-highlight.diagnostics.maxFileSize` in UTF-8 bytes are not diagnosed because large documents are more likely to be device output than planned configurations. The default limit is 1 MiB and can be changed in Settings. Skipping does not show a notification.
 
 
-### Multilingual support
-Currently, only the settings page is available.
+## Supported Languages in the Settings
+For the settings page, the following languages are supported:
 
-The following languages are supported:
 - English
 - Japanese
+
 
 ## Notes
 ### Highlighting in large files
