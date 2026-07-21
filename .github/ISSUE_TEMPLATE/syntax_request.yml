@@ -1,0 +1,96 @@
+name: New Syntax Request
+description: Request support for new Cisco syntax or keyword patterns
+labels:
+  - syntax
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to request new syntax highlighting or parser support.
+
+  - type: textarea
+    id: syntax-summary
+    attributes:
+      label: Syntax Summary
+      description: What syntax should be added?
+      placeholder: e.g. New command family under route-map / policy-map
+    validations:
+      required: true
+
+  - type: dropdown
+    # 新規のSynaxの追加、既存Synaxの修正、改善、etc.を選択する
+    id: request-type
+    attributes:
+      label: Request Type
+      description: What type of request is this?
+      options:
+        - Add new syntax
+        - Modify existing syntax
+        - Improve existing syntax
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device-family
+    attributes:
+      label: Device Family
+      options:
+        - IOS
+        - IOS-XE
+        - IOS-XR
+        - NX-OS
+        - ASA
+        - Linux (Guest Shell or similar)
+        - Other (Cisco compatible)
+    validations:
+      required: true
+
+  - type: textarea
+    id: real-config
+    attributes:
+      label: Real Config Example
+      description: Paste a real-world config snippet containing the syntax.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-tokenization
+    attributes:
+      label: Expected Highlighting / Parsing
+      description: Explain what should be recognized and how.
+      placeholder: |
+        - keyword: ...
+        - value: ...
+        - block start/end: ...
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Vendor References
+      description: Cisco docs or references proving the syntax.
+      placeholder: Add documentation links.
+
+  - type: dropdown
+    id: syntax-criticality
+    attributes:
+      label: Syntax Criticality
+      description: How critical is this syntax for production configs?
+      options:
+        - Minor syntax, rarely used
+        - Commonly used syntax, but not critical
+        - Critical syntax, widely used in production
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I understand that this extension focuses on Cisco configuration files, and support for non-Cisco files is out of scope.
+          required: true
+        - label: I included a minimal reproducible config snippet.
+          required: true
+        - label: I searched existing issues and did not find a duplicate.
+          required: true
