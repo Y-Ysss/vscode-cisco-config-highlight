@@ -111,9 +111,42 @@ describe('extractOutlineSymbols', () => {
     );
     expect(result[0].children.map((symbol) => symbol.name)).toEqual(['MGMT']);
     expect(result[6].children[0]).toMatchObject({
-      name: 'DEFAULT permit 0.0.0.0/0',
+      name: 'DEFAULT',
       detail: 'ip prefix-list',
       type: 'ip_prefix_list',
+    });
+    expect(result[6].children[0].children[0].name).toBe('permit 0.0.0.0/0');
+  });
+
+  it('groups IP prefix-list rules by list name and keeps seq in rule labels', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'ip prefix-list ALLOW-DEFAULT permit 0.0.0.0/0',
+        '',
+        'ip prefix-list PRIVATE-NETWORKS seq 10 permit 10.0.0.0/8 le 24',
+        'ip prefix-list PRIVATE-NETWORKS seq 20 permit 172.16.0.0/12 le 24',
+        'ip prefix-list PRIVATE-NETWORKS seq 30 permit 192.168.0.0/16 le 24',
+      ),
+      enabled(),
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('ip prefix-list');
+    expect(result[0].children.map(({ name }) => name)).toEqual([
+      'ALLOW-DEFAULT',
+      'PRIVATE-NETWORKS',
+    ]);
+    expect(result[0].children[0].children.map(({ name }) => name)).toEqual([
+      'permit 0.0.0.0/0',
+    ]);
+    expect(result[0].children[1].children.map(({ name }) => name)).toEqual([
+      'seq 10 permit 10.0.0.0/8 le 24',
+      'seq 20 permit 172.16.0.0/12 le 24',
+      'seq 30 permit 192.168.0.0/16 le 24',
+    ]);
+    expect(result[0].children[1].range.end).toEqual({
+      line: 4,
+      character: 66,
     });
   });
 

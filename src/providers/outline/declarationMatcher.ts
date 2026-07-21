@@ -4,6 +4,7 @@ export interface DeclarationMatch {
   category: Exclude<OutlineCategory, 'command'>;
   detail: string;
   name: string;
+  childName?: string;
   startCharacter: number;
   endCharacter: number;
 }
@@ -74,7 +75,9 @@ export const matchDeclaration = (
         category = 'ip_vrf';
         detail = 'ip vrf';
       } else {
-        match = text.match(/^ip[ \t]+prefix-list[ \t]+(?<name>.+?)\s*$/i);
+        match = text.match(
+          /^ip[ \t]+prefix-list[ \t]+(?<name>\S+)(?:[ \t]+(?<childName>.+?))?\s*$/i,
+        );
         category = 'ip_prefix_list';
         detail = 'ip prefix-list';
       }
@@ -110,6 +113,7 @@ export const matchDeclaration = (
     category,
     detail,
     name: match.groups.name,
+    childName: match.groups.childName,
     startCharacter,
     endCharacter: line.trimEnd().length,
   };
