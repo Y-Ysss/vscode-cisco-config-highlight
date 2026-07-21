@@ -26,6 +26,7 @@ export const CATEGORY_NAMES: Record<
 > = {
   ip_vrf: 'ip vrf',
   router_bgp: 'router bgp',
+  router_ospf: 'router ospf',
   address_family: 'address-family',
   class_map: 'class-map',
   policy_map: 'policy-map',
@@ -89,9 +90,15 @@ export const matchDeclaration = (
         category = 'router_bgp';
         detail = 'router bgp';
       } else {
-        match = text.match(/^route-map[ \t]+(?<name>.+?)\s*$/i);
-        category = 'route_map';
-        detail = 'route-map';
+        match = text.match(/^router[ \t]+ospf[ \t]+(?<name>.+?)\s*$/i);
+        if (match) {
+          category = 'router_ospf';
+          detail = 'router ospf';
+        } else {
+          match = text.match(/^route-map[ \t]+(?<name>.+?)\s*$/i);
+          category = 'route_map';
+          detail = 'route-map';
+        }
       }
       break;
     default:

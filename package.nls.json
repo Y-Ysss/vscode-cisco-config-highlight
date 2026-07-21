@@ -4,6 +4,7 @@
   "configuration.properties.symbols.command.description": "Command (e.g. 'hostname#show running-config')",
   "configuration.properties.symbols.ipVrf.description": "Virtual Routing and Forwarding(VRF) 'ip vrf {vrf-name}'",
   "configuration.properties.symbols.routerBgp.description": "Border Gateway Protocol(BGP) 'router bgp {autonomous-system-number}'",
+  "configuration.properties.symbols.routerOspf.description": "Open Shortest Path First(OSPF) 'router ospf {process-id}'",
   "configuration.properties.symbols.addressFamily.description": "Border Gateway Protocol(BGP) 'address-family ipv4 {unicast|multicast|vrf vrf-name }'",
   "configuration.properties.symbols.classMap.description": "Group 'class-map {match-any|match-all} name'",
   "configuration.properties.symbols.policyMap.description": "Group 'policy-map {name}'",

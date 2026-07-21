@@ -28,6 +28,7 @@ describe('symbolToDocumentSymbol', () => {
     ['command', SymbolKind.Event],
     ['ip_vrf', SymbolKind.Field],
     ['router_bgp', SymbolKind.Class],
+    ['router_ospf', SymbolKind.Class],
     ['address_family', SymbolKind.Field],
     ['class_map', SymbolKind.Variable],
     ['policy_map', SymbolKind.Variable],

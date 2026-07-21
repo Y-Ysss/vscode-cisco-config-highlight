@@ -16,6 +16,7 @@ const enabled = (
   command: true,
   ip_vrf: true,
   router_bgp: true,
+  router_ospf: true,
   address_family: true,
   class_map: true,
   policy_map: true,
@@ -31,6 +32,7 @@ const allDisabled = (): EnabledOutlineCategories =>
     command: false,
     ip_vrf: false,
     router_bgp: false,
+    router_ospf: false,
     address_family: false,
     class_map: false,
     policy_map: false,
@@ -84,6 +86,7 @@ describe('extractOutlineSymbols', () => {
         'ip vrf MGMT',
         '\tip vrf forwarding MGMT',
         ' router bgp 65000',
+        'router ospf 100',
         '\tclass-map match-any VOICE',
         'policy-map WAN',
         '  route-map EXPORT permit 10',
@@ -96,6 +99,7 @@ describe('extractOutlineSymbols', () => {
     expect(result.map((symbol) => symbol.category)).toEqual([
       'ip_vrf',
       'router_bgp',
+      'router_ospf',
       'class_map',
       'policy_map',
       'route_map',
@@ -103,10 +107,10 @@ describe('extractOutlineSymbols', () => {
       'interface',
     ]);
     expect(result.map((symbol) => symbol.type)).toEqual(
-      Array(7).fill('category'),
+      Array(8).fill('category'),
     );
     expect(result[0].children.map((symbol) => symbol.name)).toEqual(['MGMT']);
-    expect(result[5].children[0]).toMatchObject({
+    expect(result[6].children[0]).toMatchObject({
       name: 'DEFAULT permit 0.0.0.0/0',
       detail: 'ip prefix-list',
       type: 'ip_prefix_list',
@@ -141,6 +145,7 @@ describe('extractOutlineSymbols', () => {
     ['command', ['Router#show vlan']],
     ['ip_vrf', ['ip vrf MGMT']],
     ['router_bgp', ['router bgp 1', 'address-family ipv4']],
+    ['router_ospf', ['router ospf 100']],
     ['address_family', ['router bgp 1', 'address-family ipv4']],
     ['class_map', ['class-map CLASS']],
     ['policy_map', ['policy-map POLICY']],

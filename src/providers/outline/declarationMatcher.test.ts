@@ -10,6 +10,7 @@ describe('matchDeclaration', () => {
   it.each([
     ['ip vrf MGMT', 'ip_vrf', 'MGMT', 'ip vrf'],
     ['router bgp 65000', 'router_bgp', '65000', 'router bgp'],
+    ['router ospf 100', 'router_ospf', '100', 'router ospf'],
     [
       'address-family ipv4 unicast',
       'address_family',
@@ -49,6 +50,14 @@ describe('matchDeclaration', () => {
       detail,
       startCharacter: 0,
       endCharacter: line.length,
+    });
+  });
+
+  it('recognizes OSPF with tabs, mixed case, and optional VRF arguments', () => {
+    expect(matchDeclaration('RoUtEr\tOsPf\t100 vrf BLUE', 0)).toMatchObject({
+      category: 'router_ospf',
+      name: '100 vrf BLUE',
+      detail: 'router ospf',
     });
   });
 

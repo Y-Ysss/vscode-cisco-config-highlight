@@ -272,6 +272,8 @@ Open the settings and enter a keyword in the search box. Select the check box to
 - Border Gateway Protocol(BGP)
   - `router bgp {autonomous-system-number}`
   - `address-family ipv4 {unicast|multicast|vrf vrf-name }`
+- Open Shortest Path First(OSPF)
+  - `router ospf {process-id}`
 - Group
   - `class-map {match-any|match-all} name`
   - `policy-map {name}`

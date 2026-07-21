@@ -270,6 +270,8 @@ string.other.key-string
 - ボーダーゲートウェイプロトコル(BGP)
   - `router bgp {autonomous-system-number}`
   - `address-family ipv4 {unicast|multicast|vrf vrf-name }`
+- Open Shortest Path First（OSPF）
+  - `router ospf {process-id}`
 - グループ
   - `class-map {match-any|match-all} name`
   - `policy-map {name}`
