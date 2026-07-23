@@ -3,6 +3,13 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.8.2 (2026-07-24)
+
+### Changed
+- Change diagnostics feature
+  - Added handling for static-route control commands in IP prefix validation
+
+
 ## 0.8.1 (2026-07-17)
 
 ### Changed
