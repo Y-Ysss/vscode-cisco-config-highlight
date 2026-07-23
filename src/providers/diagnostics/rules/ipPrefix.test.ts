@@ -55,6 +55,15 @@ describe('scanIpPrefixFindings', () => {
   });
 
   it.each([
+    'ip route static inter-vrf',
+    'ip route static adjust-time 60',
+    'ip route static aadjust-time 60',
+    'no ip route static inter-vrf',
+  ])('ignores static-route control commands: %s', (line) => {
+    expect(scanIpPrefixFindings(source(line))).toEqual([]);
+  });
+
+  it.each([
     [
       'ip route 2.0.0.0 0.0.0.0 192.168.1.1',
       '2.0.0.0 0.0.0.0',

@@ -342,6 +342,7 @@ const validateCandidate = (
   if (!tokens[2] || !tokens[3]) return false;
   const addressKeyword = lower(tokens[2]);
   if (
+    (lower(tokens[1]) === 'route' && addressKeyword === 'static') ||
     addressKeyword === 'vrf' ||
     addressKeyword === 'dhcp' ||
     addressKeyword === 'negotiated' ||
