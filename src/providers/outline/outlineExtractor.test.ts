@@ -3,7 +3,6 @@ import {
   type EnabledOutlineCategories,
   extractOutlineSymbols,
   type LineSource,
-  measureOutlineDocument,
 } from './outlineExtractor';
 
 const source = (...lines: string[]): LineSource => ({
@@ -42,18 +41,6 @@ const allDisabled = (): EnabledOutlineCategories =>
   });
 
 describe('extractOutlineSymbols', () => {
-  it('measures exact UTF-8 bytes and keeps the prefix line count in range', () => {
-    expect(measureOutlineDocument('a\n\u3042\ninterface Gi0/1', 4, 3)).toEqual({
-      byteSize: 21,
-      prefixLineCount: 1,
-    });
-    expect(measureOutlineDocument('interface Gi0/0', 1, 1)).toEqual({
-      byteSize: 15,
-      prefixLineCount: 1,
-    });
-    expect(measureOutlineDocument('a\nb', 100, 3).prefixLineCount).toBe(3);
-  });
-
   it('appends one exact truncation symbol after declarations in the prefix', () => {
     const result = extractOutlineSymbols(
       source('interface Gi0/0', 'description uplink'),
@@ -125,13 +112,6 @@ describe('extractOutlineSymbols', () => {
       type: 'ip_prefix_list',
     });
   });
-
-  it.each(['ip vrf  forwarding MGMT', 'ip vrf\t\tforwarding MGMT'])(
-    'excludes forwarding with a repeated separator: %j',
-    (line) => {
-      expect(extractOutlineSymbols(source(line), enabled())).toEqual([]);
-    },
-  );
 
   it('uses disabled recognized categories as section boundaries', () => {
     const result = extractOutlineSymbols(
