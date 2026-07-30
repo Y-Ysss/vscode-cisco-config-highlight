@@ -69,6 +69,11 @@
                 "default": true,
                 "description": "%configuration.properties.symbols.routerBgp.description%"
               },
+              "router_ospf": {
+                "type": "boolean",
+                "default": true,
+                "description": "%configuration.properties.symbols.routerOspf.description%"
+              },
               "address_family": {
                 "type": "boolean",
                 "default": true,
@@ -110,6 +115,7 @@
               "command": true,
               "ip_vrf": true,
               "router_bgp": true,
+              "router_ospf": true,
               "address_family": true,
               "class_map": true,
               "policy_map": true,

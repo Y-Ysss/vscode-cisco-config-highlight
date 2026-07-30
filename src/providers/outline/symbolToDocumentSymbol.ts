@@ -20,6 +20,7 @@ const toSymbolKind = (symbol: OutlineSymbol): vscode.SymbolKind => {
     truncation: vscode.SymbolKind.String,
     ip_vrf: vscode.SymbolKind.Field,
     router_bgp: vscode.SymbolKind.Class,
+    router_ospf: vscode.SymbolKind.Class,
     address_family: vscode.SymbolKind.Field,
     class_map: vscode.SymbolKind.Variable,
     policy_map: vscode.SymbolKind.Variable,

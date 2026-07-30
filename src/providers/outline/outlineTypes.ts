@@ -4,6 +4,7 @@ export const OUTLINE_CATEGORIES = [
   'command',
   'ip_vrf',
   'router_bgp',
+  'router_ospf',
   'address_family',
   'class_map',
   'policy_map',

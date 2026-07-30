@@ -20,6 +20,7 @@ export function getConfigOutlineSymbolsList(): Record<string, boolean> {
       command: true,
       ip_vrf: true,
       router_bgp: true,
+      router_ospf: true,
       address_family: true,
       class_map: true,
       policy_map: true,
