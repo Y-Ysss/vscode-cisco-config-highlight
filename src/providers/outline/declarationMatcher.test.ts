@@ -40,7 +40,7 @@ describe('matchDeclaration', () => {
     [
       'ip prefix-list DEFAULT permit 0.0.0.0/0',
       'ip_prefix_list',
-      'DEFAULT permit 0.0.0.0/0',
+      'DEFAULT',
       'ip prefix-list',
     ],
   ] as const)('recognizes %s', (line, category, name, detail) => {
@@ -58,6 +58,25 @@ describe('matchDeclaration', () => {
       category: 'router_ospf',
       name: '100 vrf BLUE',
       detail: 'router ospf',
+    });
+  });
+
+  it('separates an IP prefix-list name from its rule', () => {
+    expect(
+      matchDeclaration('ip prefix-list DEFAULT permit 0.0.0.0/0', 0),
+    ).toMatchObject({
+      category: 'ip_prefix_list',
+      name: 'DEFAULT',
+      childName: 'permit 0.0.0.0/0',
+      detail: 'ip prefix-list',
+    });
+  });
+
+  it('keeps recognizing an IP prefix-list declaration without a rule', () => {
+    expect(matchDeclaration('ip prefix-list EMPTY', 0)).toMatchObject({
+      category: 'ip_prefix_list',
+      name: 'EMPTY',
+      detail: 'ip prefix-list',
     });
   });
 

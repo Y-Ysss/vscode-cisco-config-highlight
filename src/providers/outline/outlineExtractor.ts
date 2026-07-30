@@ -170,6 +170,28 @@ export const extractOutlineSymbols = (
       if (enabledCategories.sub_interface) {
         declaration = tree.addDeclaration(scope, match, lineIndex, base);
       }
+    } else if (
+      match.category === 'ip_prefix_list' &&
+      enabledCategories.ip_prefix_list
+    ) {
+      let prefixList = scope.ipPrefixLists.get(match.name);
+      if (!prefixList) {
+        prefixList = tree.addDeclaration(scope, match, lineIndex);
+        scope.ipPrefixLists.set(match.name, prefixList);
+      }
+      declaration = match.childName
+        ? tree.addDeclaration(
+            scope,
+            {
+              ...match,
+              name: match.childName,
+              childName: undefined,
+              detail: 'prefix-list entry',
+            },
+            lineIndex,
+            prefixList,
+          )
+        : prefixList;
     } else if (enabledCategories[match.category]) {
       declaration = tree.addDeclaration(scope, match, lineIndex);
     }

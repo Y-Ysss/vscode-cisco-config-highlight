@@ -11,6 +11,7 @@ export interface OutlineScope {
   symbols: OutlineSymbol[];
   categories: Map<OutlineCategory, OutlineSymbol>;
   interfaceBases: Map<string, OutlineSymbol>;
+  ipPrefixLists: Map<string, OutlineSymbol>;
   activeCategory?: Exclude<OutlineCategory, 'command'>;
   parent?: OutlineSymbol;
 }
@@ -31,12 +32,14 @@ export class OutlineTreeBuilder {
     symbols: this.symbols,
     categories: new Map(),
     interfaceBases: new Map(),
+    ipPrefixLists: new Map(),
   });
 
   createOutputScope = (parent?: OutlineSymbol): OutlineScope => ({
     symbols: parent?.children ?? this.symbols,
     categories: new Map(),
     interfaceBases: new Map(),
+    ipPrefixLists: new Map(),
     parent,
   });
 
@@ -77,6 +80,7 @@ export class OutlineTreeBuilder {
     scope.activeCategory = treeCategory;
     scope.categories.delete(treeCategory);
     scope.interfaceBases.clear();
+    scope.ipPrefixLists.clear();
   };
 
   addDeclaration = (
