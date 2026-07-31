@@ -29,6 +29,8 @@ const toSymbolKind = (symbol: OutlineSymbol): vscode.SymbolKind => {
     sub_interface: vscode.SymbolKind.Interface,
     route_map: vscode.SymbolKind.Variable,
     ip_prefix_list: vscode.SymbolKind.Variable,
+    ip_access_list: vscode.SymbolKind.Array,
+    access_list_entry: vscode.SymbolKind.Field,
   };
   return kinds[symbol.type];
 };

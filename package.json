@@ -113,6 +113,16 @@
                 "type": "boolean",
                 "default": true,
                 "description": "%configuration.properties.symbols.ipPrefixList.description%"
+              },
+              "ip_access_list": {
+                "type": "boolean",
+                "default": true,
+                "description": "%configuration.properties.symbols.ipAccessList.description%"
+              },
+              "access_list_entry": {
+                "type": "boolean",
+                "default": true,
+                "description": "%configuration.properties.symbols.accessListEntry.description%"
               }
             },
             "additionalProperties": false,
@@ -128,7 +138,9 @@
               "interface": true,
               "sub_interface": true,
               "route_map": true,
-              "ip_prefix_list": true
+              "ip_prefix_list": true,
+              "ip_access_list": true,
+              "access_list_entry": true
             },
             "description": "%configuration.properties.showEnableDisableSymbols.description%"
           },

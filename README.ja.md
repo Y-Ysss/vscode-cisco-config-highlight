@@ -285,10 +285,14 @@ string.other.key-string
   - `route-map {name} {permit|deny} {sequence-number}`
 - IPv4プレフィックスリスト
   - `ip prefix-list {name} ...`
+- IPv4標準・拡張アクセスリスト
+  - `ip access-list {standard|extended} {name}`
+  - `access-list {number} ...`
+  - 配下のエントリ: `[sequence-number] {permit|deny|remark} ...`
 
 #### アウトラインの階層構造と大きなファイル
 
-`hostname#show running-config`や`hostname>show ...`などのプロンプトコマンドは、コマンドシンボルとして認識されます。`show`コマンドに続く出力は、該当する場合、そのコマンドの配下にグループ化されます。設定シンボルはカテゴリノードにまとめられ、サブインターフェイスは親インターフェイスの配下に、BGPアドレスファミリは対応するBGPプロセスの配下に、ポリシーマップのクラスは対応するポリシーマップの配下にネストされ、IPv4プレフィックスリストの各ルールはリスト名の配下にまとめられます。
+`hostname#show running-config`や`hostname>show ...`などのプロンプトコマンドは、コマンドシンボルとして認識されます。`show`コマンドに続く出力は、該当する場合、そのコマンドの配下にグループ化されます。設定シンボルはカテゴリノードにまとめられ、サブインターフェイスは親インターフェイスの配下に、BGPアドレスファミリは対応するBGPプロセスの配下に、ポリシーマップのクラスは対応するポリシーマップの配下にネストされ、IPv4プレフィックスリストの各ルールはリスト名の配下に、IPv4 ACLエントリはACL名または番号の配下にまとめられます。
 
 UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を超えるファイルでは、アウトラインはファイルの先頭部分のみを走査します。切り詰めシンボルは、残りの内容が走査されていないことを示します。
 

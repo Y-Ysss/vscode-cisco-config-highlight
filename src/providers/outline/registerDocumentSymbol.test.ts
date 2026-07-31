@@ -37,6 +37,8 @@ describe('normalizeEnabledCategories', () => {
       sub_interface: true,
       route_map: true,
       ip_prefix_list: true,
+      ip_access_list: true,
+      access_list_entry: true,
     } satisfies EnabledOutlineCategories);
   });
 });

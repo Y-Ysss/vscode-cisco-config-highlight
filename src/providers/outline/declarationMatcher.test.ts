@@ -82,6 +82,71 @@ describe('matchDeclaration', () => {
   });
 
   it.each([
+    [
+      'ip access-list standard MGMT',
+      'ip_access_list',
+      'MGMT',
+      undefined,
+      'standard access-list',
+    ],
+    [
+      'ip access-list extended EDGE-IN',
+      'ip_access_list',
+      'EDGE-IN',
+      undefined,
+      'extended access-list',
+    ],
+    [
+      'access-list 10 permit any',
+      'ip_access_list',
+      '10',
+      'permit any',
+      'standard access-list',
+    ],
+    [
+      'access-list 100 permit ip any any',
+      'ip_access_list',
+      '100',
+      'permit ip any any',
+      'extended access-list',
+    ],
+    [
+      '10 remark trusted sources',
+      'access_list_entry',
+      '10 remark trusted sources',
+      undefined,
+      'access-list entry',
+    ],
+    [
+      'permit tcp any host 192.0.2.10 eq 443',
+      'access_list_entry',
+      'permit tcp any host 192.0.2.10 eq 443',
+      undefined,
+      'access-list entry',
+    ],
+  ] as const)(
+    'recognizes IPv4 ACL syntax: %s',
+    (line, category, name, childName, detail) => {
+      expect(matchDeclaration(line, 0)).toMatchObject({
+        category,
+        name,
+        childName,
+        detail,
+      });
+    },
+  );
+
+  it.each([
+    'access-list 0 permit any',
+    'access-list 200 permit ip any any',
+    'access-list 1299 permit any',
+    'access-list 2700 permit ip any any',
+    'ipv6 access-list V6',
+  ])('excludes unsupported ACL syntax: %s', (line) => {
+    expect(matchDeclaration(line, 0)).toBeUndefined();
+  });
+
+  it.each([
     'ip vrf forwarding MGMT',
     'ip vrf  forwarding MGMT',
     'ip vrf\t\tforwarding MGMT',

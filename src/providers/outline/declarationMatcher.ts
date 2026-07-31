@@ -36,6 +36,22 @@ export const CATEGORY_NAMES: Record<
   sub_interface: 'interface',
   route_map: 'route-map',
   ip_prefix_list: 'ip prefix-list',
+  ip_access_list: 'IPv4 access-list',
+  access_list_entry: 'access-list entry',
+};
+
+const numberedAclKind = (
+  value: string,
+): 'standard' | 'extended' | undefined => {
+  if (!/^\d+$/.test(value)) return undefined;
+  const number = Number(value);
+  if ((number >= 1 && number <= 99) || (number >= 1300 && number <= 1999)) {
+    return 'standard';
+  }
+  if ((number >= 100 && number <= 199) || (number >= 2000 && number <= 2699)) {
+    return 'extended';
+  }
+  return undefined;
 };
 
 export const matchDeclaration = (
@@ -44,11 +60,37 @@ export const matchDeclaration = (
 ): DeclarationMatch | undefined => {
   const text = line.slice(startCharacter);
   const prefix = text.slice(0, 2).toLowerCase();
+  const aclEntryMatch = text.match(
+    /^(?<name>(?:\d+[ \t]+)?(?:permit|deny|remark)(?:[ \t]+.*?)?)\s*$/i,
+  );
+  if (aclEntryMatch?.groups) {
+    return {
+      category: 'access_list_entry',
+      detail: 'access-list entry',
+      name: aclEntryMatch.groups.name,
+      childName: undefined,
+      startCharacter,
+      endCharacter: line.trimEnd().length,
+    };
+  }
   let match: RegExpMatchArray | null = null;
   let category: DeclarationMatch['category'] | undefined;
   let detail = '';
 
   switch (prefix) {
+    case 'ac': {
+      match = text.match(
+        /^access-list[ \t]+(?<name>\d+)[ \t]+(?<childName>.+?)\s*$/i,
+      );
+      const aclKind = match?.groups
+        ? numberedAclKind(match.groups.name)
+        : undefined;
+      if (aclKind) {
+        category = 'ip_access_list';
+        detail = `${aclKind} access-list`;
+      }
+      break;
+    }
     case 'ad':
       match = text.match(/^address-family[ \t]+(?<name>.+?)\s*$/i);
       category = 'address_family';
@@ -83,10 +125,18 @@ export const matchDeclaration = (
         detail = 'ip vrf';
       } else {
         match = text.match(
-          /^ip[ \t]+prefix-list[ \t]+(?<name>\S+)(?:[ \t]+(?<childName>.+?))?\s*$/i,
+          /^ip[ \t]+access-list[ \t]+(?<aclKind>standard|extended)[ \t]+(?<name>\S+)\s*$/i,
         );
-        category = 'ip_prefix_list';
-        detail = 'ip prefix-list';
+        if (match?.groups) {
+          category = 'ip_access_list';
+          detail = `${match.groups.aclKind.toLowerCase()} access-list`;
+        } else {
+          match = text.match(
+            /^ip[ \t]+prefix-list[ \t]+(?<name>\S+)(?:[ \t]+(?<childName>.+?))?\s*$/i,
+          );
+          category = 'ip_prefix_list';
+          detail = 'ip prefix-list';
+        }
       }
       break;
     case 'po':

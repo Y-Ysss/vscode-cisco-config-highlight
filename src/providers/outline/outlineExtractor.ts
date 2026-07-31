@@ -19,9 +19,13 @@ export { measureOutlineDocument } from './documentMeasurement';
 export * from './outlineTypes';
 
 interface ActiveDeclaration {
-  kind: Exclude<OutlineCategory, 'command' | 'address_family' | 'policy_class'>;
+  kind: Exclude<
+    OutlineCategory,
+    'command' | 'address_family' | 'policy_class' | 'access_list_entry'
+  >;
   symbol?: OutlineSymbol;
   rangeParent?: OutlineSymbol;
+  acceptsNestedEntries?: boolean;
 }
 
 interface OutputCandidate {
@@ -139,11 +143,19 @@ export const extractOutlineSymbols = (
 
     if (
       match.category === 'address_family' ||
-      match.category === 'policy_class'
+      match.category === 'policy_class' ||
+      match.category === 'access_list_entry'
     ) {
       const parentKind =
-        match.category === 'address_family' ? 'router_bgp' : 'policy_map';
-      if (activeDeclaration?.kind === parentKind) {
+        match.category === 'address_family'
+          ? 'router_bgp'
+          : match.category === 'policy_class'
+            ? 'policy_map'
+            : 'ip_access_list';
+      const acceptsEntry =
+        match.category !== 'access_list_entry' ||
+        activeDeclaration?.acceptsNestedEntries;
+      if (activeDeclaration?.kind === parentKind && acceptsEntry) {
         finish(activeNestedDeclaration, previousEnd);
         const scope = outputCandidate?.scope ?? rootScope;
         const parent = activeDeclaration.symbol;
@@ -197,6 +209,40 @@ export const extractOutlineSymbols = (
             prefixList,
           )
         : prefixList;
+    } else if (
+      match.category === 'ip_access_list' &&
+      enabledCategories.ip_access_list
+    ) {
+      if (match.childName) {
+        const key = `${match.detail}:${match.name}`;
+        let accessList = scope.accessLists.get(key);
+        if (!accessList) {
+          accessList = tree.addDeclaration(
+            scope,
+            { ...match, childName: undefined },
+            lineIndex,
+          );
+          scope.accessLists.set(key, accessList);
+        }
+        if (enabledCategories.access_list_entry) {
+          declaration = tree.addDeclaration(
+            scope,
+            {
+              ...match,
+              category: 'access_list_entry',
+              name: match.childName,
+              childName: undefined,
+              detail: 'access-list entry',
+            },
+            lineIndex,
+            accessList,
+          );
+        } else {
+          rangeParent = accessList;
+        }
+      } else {
+        declaration = tree.addDeclaration(scope, match, lineIndex);
+      }
     } else if (enabledCategories[match.category]) {
       declaration = tree.addDeclaration(scope, match, lineIndex);
     }
@@ -205,6 +251,8 @@ export const extractOutlineSymbols = (
       kind: match.category,
       symbol: declaration,
       rangeParent,
+      acceptsNestedEntries:
+        match.category === 'ip_access_list' && match.childName === undefined,
     };
     if (match.category === 'interface' && declaration) {
       scope.interfaceBases.set(match.name, declaration);
