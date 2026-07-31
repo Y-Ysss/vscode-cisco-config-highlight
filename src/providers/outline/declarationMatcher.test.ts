@@ -18,6 +18,7 @@ describe('matchDeclaration', () => {
       'address-family',
     ],
     ['class-map match-any VOICE', 'class_map', 'match-any VOICE', 'class-map'],
+    ['class REALTIME', 'policy_class', 'REALTIME', 'class'],
     ['policy-map WAN', 'policy_map', 'WAN', 'policy-map'],
     [
       'interface GigabitEthernet0/0',

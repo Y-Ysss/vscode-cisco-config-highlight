@@ -20,6 +20,7 @@ const enabled = (
   address_family: true,
   class_map: true,
   policy_map: true,
+  policy_class: true,
   interface: true,
   sub_interface: true,
   route_map: true,
@@ -36,6 +37,7 @@ const allDisabled = (): EnabledOutlineCategories =>
     address_family: false,
     class_map: false,
     policy_map: false,
+    policy_class: false,
     interface: false,
     sub_interface: false,
     route_map: false,
@@ -182,6 +184,7 @@ describe('extractOutlineSymbols', () => {
     ['address_family', ['router bgp 1', 'address-family ipv4']],
     ['class_map', ['class-map CLASS']],
     ['policy_map', ['policy-map POLICY']],
+    ['policy_class', ['policy-map POLICY', 'class REALTIME']],
     ['interface', ['interface Gi0/0']],
     ['sub_interface', ['interface Gi0/0', 'interface Gi0/0.10']],
     ['route_map', ['route-map ROUTE permit 10']],
@@ -514,6 +517,48 @@ describe('extractOutlineSymbols', () => {
 
     expect(rootBase.children).toEqual([]);
     expect(outputSub.name).toBe('Gi0/0.10');
+  });
+
+  it('nests classes under the active policy-map with exact block ranges', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'policy-map WAN-EDGE',
+        ' class REALTIME',
+        '  priority percent 20',
+        ' class class-default',
+        '  fair-queue',
+        'interface Gi0/0',
+      ),
+      enabled(),
+    );
+
+    const policy = result[0].children[0];
+    expect(policy.children.map(({ name }) => name)).toEqual([
+      'REALTIME',
+      'class-default',
+    ]);
+    expect(policy.children[0].range.end).toEqual({ line: 2, character: 21 });
+    expect(policy.children[1].range.end).toEqual({ line: 4, character: 12 });
+    expect(policy.range.end).toEqual({ line: 4, character: 12 });
+  });
+
+  it('ignores orphan policy classes', () => {
+    expect(extractOutlineSymbols(source('class ORPHAN'), enabled())).toEqual(
+      [],
+    );
+  });
+
+  it('extends a policy-map range through hidden policy classes', () => {
+    const result = extractOutlineSymbols(
+      source('policy-map WAN', ' class HIDDEN', '  priority percent 20'),
+      enabled({ policy_class: false }),
+    );
+
+    expect(result[0].children[0].children).toEqual([]);
+    expect(result[0].children[0].range.end).toEqual({
+      line: 2,
+      character: 21,
+    });
   });
 
   it('nests address families only under the active BGP declaration', () => {

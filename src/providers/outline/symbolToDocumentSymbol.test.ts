@@ -32,6 +32,7 @@ describe('symbolToDocumentSymbol', () => {
     ['address_family', SymbolKind.Field],
     ['class_map', SymbolKind.Variable],
     ['policy_map', SymbolKind.Variable],
+    ['policy_class', SymbolKind.Field],
     ['interface', SymbolKind.Class],
     ['sub_interface', SymbolKind.Interface],
     ['route_map', SymbolKind.Variable],

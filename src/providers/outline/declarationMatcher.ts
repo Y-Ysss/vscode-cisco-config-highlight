@@ -31,6 +31,7 @@ export const CATEGORY_NAMES: Record<
   address_family: 'address-family',
   class_map: 'class-map',
   policy_map: 'policy-map',
+  policy_class: 'class',
   interface: 'interface',
   sub_interface: 'interface',
   route_map: 'route-map',
@@ -55,8 +56,14 @@ export const matchDeclaration = (
       break;
     case 'cl':
       match = text.match(/^class-map[ \t]+(?<name>.+?)\s*$/i);
-      category = 'class_map';
-      detail = 'class-map';
+      if (match) {
+        category = 'class_map';
+        detail = 'class-map';
+      } else {
+        match = text.match(/^class[ \t]+(?<name>.+?)\s*$/i);
+        category = 'policy_class';
+        detail = 'class';
+      }
       break;
     case 'in':
       match = text.match(/^interface[ \t]+(?<name>.+?)\s*$/i);

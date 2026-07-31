@@ -8,6 +8,7 @@ export const OUTLINE_CATEGORIES = [
   'address_family',
   'class_map',
   'policy_map',
+  'policy_class',
   'interface',
   'sub_interface',
   'route_map',

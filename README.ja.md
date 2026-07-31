@@ -275,6 +275,7 @@ string.other.key-string
 - グループ
   - `class-map {match-any|match-all} name`
   - `policy-map {name}`
+    - `class {class-name}`
 - インターフェイス
   - `interface {type, slot, port, etc...}`
   - 例: `interface GigabitEthernet0/0`
@@ -287,7 +288,7 @@ string.other.key-string
 
 #### アウトラインの階層構造と大きなファイル
 
-`hostname#show running-config`や`hostname>show ...`などのプロンプトコマンドは、コマンドシンボルとして認識されます。`show`コマンドに続く出力は、該当する場合、そのコマンドの配下にグループ化されます。設定シンボルはカテゴリノードにまとめられ、サブインターフェイスは親インターフェイスの配下に、BGPアドレスファミリは対応するBGPプロセスの配下にネストされ、IPv4プレフィックスリストの各ルールはリスト名の配下にまとめられます。
+`hostname#show running-config`や`hostname>show ...`などのプロンプトコマンドは、コマンドシンボルとして認識されます。`show`コマンドに続く出力は、該当する場合、そのコマンドの配下にグループ化されます。設定シンボルはカテゴリノードにまとめられ、サブインターフェイスは親インターフェイスの配下に、BGPアドレスファミリは対応するBGPプロセスの配下に、ポリシーマップのクラスは対応するポリシーマップの配下にネストされ、IPv4プレフィックスリストの各ルールはリスト名の配下にまとめられます。
 
 UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を超えるファイルでは、アウトラインはファイルの先頭部分のみを走査します。切り詰めシンボルは、残りの内容が走査されていないことを示します。
 

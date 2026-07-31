@@ -19,7 +19,7 @@ export { measureOutlineDocument } from './documentMeasurement';
 export * from './outlineTypes';
 
 interface ActiveDeclaration {
-  kind: Exclude<OutlineCategory, 'command' | 'address_family'>;
+  kind: Exclude<OutlineCategory, 'command' | 'address_family' | 'policy_class'>;
   symbol?: OutlineSymbol;
   rangeParent?: OutlineSymbol;
 }
@@ -39,7 +39,7 @@ export const extractOutlineSymbols = (
   let rootScope = tree.createRootScope();
   let outputCandidate: OutputCandidate | undefined;
   let activeDeclaration: ActiveDeclaration | undefined;
-  let activeAddressFamily: ActiveDeclaration | undefined;
+  let activeNestedDeclaration: ActiveDeclaration | undefined;
   let previousEnd: OutlinePosition = { line: 0, character: 0 };
 
   const finish = (
@@ -51,9 +51,9 @@ export const extractOutlineSymbols = (
   };
 
   const closeDeclarations = (end: OutlinePosition): void => {
-    finish(activeAddressFamily, end);
+    finish(activeNestedDeclaration, end);
     finish(activeDeclaration, end);
-    activeAddressFamily = undefined;
+    activeNestedDeclaration = undefined;
     activeDeclaration = undefined;
   };
 
@@ -137,19 +137,24 @@ export const extractOutlineSymbols = (
     }
     if (isCancelled()) return [];
 
-    if (match.category === 'address_family') {
-      if (activeDeclaration?.kind === 'router_bgp') {
-        finish(activeAddressFamily, previousEnd);
+    if (
+      match.category === 'address_family' ||
+      match.category === 'policy_class'
+    ) {
+      const parentKind =
+        match.category === 'address_family' ? 'router_bgp' : 'policy_map';
+      if (activeDeclaration?.kind === parentKind) {
+        finish(activeNestedDeclaration, previousEnd);
         const scope = outputCandidate?.scope ?? rootScope;
-        const router = activeDeclaration.symbol;
-        const addressFamily =
-          router && enabledCategories.address_family
-            ? tree.addDeclaration(scope, match, lineIndex, router)
+        const parent = activeDeclaration.symbol;
+        const child =
+          parent && enabledCategories[match.category]
+            ? tree.addDeclaration(scope, match, lineIndex, parent)
             : undefined;
-        activeAddressFamily = {
-          kind: 'router_bgp',
-          symbol: addressFamily,
-          rangeParent: router,
+        activeNestedDeclaration = {
+          kind: parentKind,
+          symbol: child,
+          rangeParent: parent,
         };
       }
       previousEnd = lineEnd;

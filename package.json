@@ -89,6 +89,11 @@
                 "default": true,
                 "description": "%configuration.properties.symbols.policyMap.description%"
               },
+              "policy_class": {
+                "type": "boolean",
+                "default": true,
+                "description": "%configuration.properties.symbols.policyClass.description%"
+              },
               "interface": {
                 "type": "boolean",
                 "default": true,
@@ -119,6 +124,7 @@
               "address_family": true,
               "class_map": true,
               "policy_map": true,
+              "policy_class": true,
               "interface": true,
               "sub_interface": true,
               "route_map": true,

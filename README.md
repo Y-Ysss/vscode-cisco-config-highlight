@@ -277,6 +277,7 @@ Open the settings and enter a keyword in the search box. Select the check box to
 - Group
   - `class-map {match-any|match-all} name`
   - `policy-map {name}`
+    - `class {class-name}`
 - Interface
   - `interface {type, slot, port, etc...}`
   - e.g. `interface GigabitEthernet0/0`
@@ -289,7 +290,7 @@ Open the settings and enter a keyword in the search box. Select the check box to
 
 #### Outline hierarchy and large files
 
-Prompt commands such as `hostname#show running-config` and `hostname>show ...` are recognized as command symbols. Output that follows a `show` command is grouped beneath that command when applicable. Configuration symbols are grouped into category nodes; sub-interfaces are nested under their parent interface, BGP address families are nested under the corresponding BGP process, and IPv4 prefix-list rules are grouped beneath their list names.
+Prompt commands such as `hostname#show running-config` and `hostname>show ...` are recognized as command symbols. Output that follows a `show` command is grouped beneath that command when applicable. Configuration symbols are grouped into category nodes; sub-interfaces are nested under their parent interface, BGP address families are nested under the corresponding BGP process, policy-map classes are nested under their policy map, and IPv4 prefix-list rules are grouped beneath their list names.
 
 For files larger than `cisco-config-highlight.outline.maxFileSizeForFullScan` in UTF-8 bytes, Outline scans only the beginning of the file. A truncation symbol indicates that the remaining content was not scanned.
 

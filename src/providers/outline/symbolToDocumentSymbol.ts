@@ -24,6 +24,7 @@ const toSymbolKind = (symbol: OutlineSymbol): vscode.SymbolKind => {
     address_family: vscode.SymbolKind.Field,
     class_map: vscode.SymbolKind.Variable,
     policy_map: vscode.SymbolKind.Variable,
+    policy_class: vscode.SymbolKind.Field,
     interface: vscode.SymbolKind.Class,
     sub_interface: vscode.SymbolKind.Interface,
     route_map: vscode.SymbolKind.Variable,
