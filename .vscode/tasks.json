@@ -6,11 +6,38 @@
     {
       "type": "npm",
       "script": "watch",
+      "problemMatcher": {
+        "owner": "rolldown",
+        "pattern": {
+          "regexp": "a^"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Waiting for changes\\.\\.\\.",
+          "endsPattern": "Rebuilt out in .* ms\\."
+        }
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never",
+        "group": "watch"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "watch:types",
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
       "presentation": {
-        "reveal": "never"
-      },
+        "reveal": "never",
+        "group": "watch"
+      }
+    },
+    {
+      "label": "watch",
+      "dependsOrder": "parallel",
+      "dependsOn": ["npm: watch", "npm: watch:types"],
+      "problemMatcher": [],
       "group": {
         "kind": "build",
         "isDefault": true

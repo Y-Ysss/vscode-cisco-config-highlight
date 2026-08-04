@@ -174,8 +174,10 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "node -e \"require('node:fs').rmSync('out',{recursive:true,force:true})\" && rollup --config rollup.config.ts --configPlugin esbuild",
-    "watch": "tsc -watch -p ./",
+    "check-types": "tsc --noEmit -p ./",
+    "compile": "npm run check-types && rolldown --config rolldown.config.ts",
+    "watch": "rolldown --config rolldown.config.ts --watch",
+    "watch:types": "tsc --noEmit --watch -p ./",
     "lint": "biome lint ./src",
     "lint:fix": "biome lint --write ./src",
     "format": "biome format ./src",
@@ -196,16 +198,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.6",
-    "@rollup/plugin-commonjs": "^29.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.3",
     "@types/node": "^25.6.0",
     "@types/semver": "^7.8.0",
     "@types/vscode": "^1.63.0",
     "@vscode/test-cli": "^0.0.15",
     "@vscode/vsce": "^3.9.2",
     "ovsx": "^1.1.0",
-    "rollup": "^4.60.3",
-    "rollup-plugin-esbuild": "^6.2.1",
+    "rolldown": "^1.2.1",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10"
   }
