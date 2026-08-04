@@ -25,6 +25,8 @@ const enabled = (
   sub_interface: true,
   route_map: true,
   ip_prefix_list: true,
+  ip_access_list: true,
+  access_list_entry: true,
   ...overrides,
 });
 
@@ -42,6 +44,8 @@ const allDisabled = (): EnabledOutlineCategories =>
     sub_interface: false,
     route_map: false,
     ip_prefix_list: false,
+    ip_access_list: false,
+    access_list_entry: false,
   });
 
 describe('extractOutlineSymbols', () => {
@@ -189,6 +193,8 @@ describe('extractOutlineSymbols', () => {
     ['sub_interface', ['interface Gi0/0', 'interface Gi0/0.10']],
     ['route_map', ['route-map ROUTE permit 10']],
     ['ip_prefix_list', ['ip prefix-list PREFIX permit 10.0.0.0/8']],
+    ['ip_access_list', ['ip access-list standard ACL']],
+    ['access_list_entry', ['ip access-list standard ACL', 'permit any']],
   ] as const)('omits the %s symbol type when disabled', (category, lines) => {
     const result = extractOutlineSymbols(
       source(...lines),
@@ -517,6 +523,96 @@ describe('extractOutlineSymbols', () => {
 
     expect(rootBase.children).toEqual([]);
     expect(outputSub.name).toBe('Gi0/0.10');
+  });
+
+  it('nests named ACL entries without relying on indentation or exit', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'ip access-list standard MGMT',
+        '10 remark trusted sources',
+        '\t20 permit 10.0.0.0 0.255.255.255',
+        ' deny any',
+        'exit',
+        'permit host 192.0.2.1',
+        'ip access-list extended EDGE-IN',
+        'permit tcp any host 192.0.2.10 eq 443',
+      ),
+      enabled(),
+    );
+
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe('IPv4 access-list');
+    expect(result[0].children.map(({ name }) => name)).toEqual([
+      'MGMT',
+      'EDGE-IN',
+    ]);
+    expect(result[0].children[0]).toMatchObject({
+      detail: 'standard access-list',
+    });
+    expect(result[0].children[0].children.map(({ name }) => name)).toEqual([
+      '10 remark trusted sources',
+      '20 permit 10.0.0.0 0.255.255.255',
+      'deny any',
+      'permit host 192.0.2.1',
+    ]);
+    expect(result[0].children[1]).toMatchObject({
+      detail: 'extended access-list',
+    });
+    expect(result[0].children[1].children.map(({ name }) => name)).toEqual([
+      'permit tcp any host 192.0.2.10 eq 443',
+    ]);
+  });
+
+  it('groups numbered standard and extended ACL rules by number', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'access-list 10 permit 192.168.0.0 0.0.255.255',
+        'access-list 10 deny any',
+        '',
+        'access-list 100 remark HTTPS ingress',
+        'access-list 100 permit tcp any host 192.0.2.10 eq 443',
+      ),
+      enabled(),
+    );
+
+    expect(result[0].children.map(({ name }) => name)).toEqual(['10', '100']);
+    expect(result[0].children[0]).toMatchObject({
+      detail: 'standard access-list',
+    });
+    expect(result[0].children[0].children.map(({ name }) => name)).toEqual([
+      'permit 192.168.0.0 0.0.255.255',
+      'deny any',
+    ]);
+    expect(result[0].children[1]).toMatchObject({
+      detail: 'extended access-list',
+    });
+    expect(result[0].children[1].children.map(({ name }) => name)).toEqual([
+      'remark HTTPS ingress',
+      'permit tcp any host 192.0.2.10 eq 443',
+    ]);
+  });
+
+  it('ignores orphan ACL entries', () => {
+    expect(
+      extractOutlineSymbols(source('permit any', '10 deny any'), enabled()),
+    ).toEqual([]);
+  });
+
+  it('extends a named ACL range through hidden entries', () => {
+    const result = extractOutlineSymbols(
+      source(
+        'ip access-list standard HIDDEN-ENTRIES',
+        'permit 10.0.0.0 0.255.255.255',
+        'deny any',
+      ),
+      enabled({ access_list_entry: false }),
+    );
+
+    expect(result[0].children[0].children).toEqual([]);
+    expect(result[0].children[0].range.end).toEqual({
+      line: 2,
+      character: 8,
+    });
   });
 
   it('nests classes under the active policy-map with exact block ranges', () => {

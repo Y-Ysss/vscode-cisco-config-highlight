@@ -37,6 +37,8 @@ const canonicalOutlineCategories = [
   'sub_interface',
   'route_map',
   'ip_prefix_list',
+  'ip_access_list',
+  'access_list_entry',
 ] as const;
 
 const expectedConfigurationSuffixes = [
@@ -72,6 +74,8 @@ const expectedSettings = [
       sub_interface: true,
       route_map: true,
       ip_prefix_list: true,
+      ip_access_list: true,
+      access_list_entry: true,
     },
     placeholder:
       'configuration.properties.showEnableDisableSymbols.description',

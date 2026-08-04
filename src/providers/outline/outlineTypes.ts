@@ -13,6 +13,8 @@ export const OUTLINE_CATEGORIES = [
   'sub_interface',
   'route_map',
   'ip_prefix_list',
+  'ip_access_list',
+  'access_list_entry',
 ] as const;
 
 export type OutlineCategory = (typeof OUTLINE_CATEGORIES)[number];

@@ -13,6 +13,8 @@
   "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'",
   "configuration.properties.symbols.routeMap.description": "ルートマップ 'route-map {name} {permit|deny} {sequence-number}'",
   "configuration.properties.symbols.ipPrefixList.description": "IPv4プレフィックスリスト 'ip prefix-list {name} ...'",
+  "configuration.properties.symbols.ipAccessList.description": "IPv4標準・拡張ACL 'ip access-list {standard|extended} {name}' または 'access-list {number} ...'",
+  "configuration.properties.symbols.accessListEntry.description": "IPv4 ACLエントリ 'permit ...'、'deny ...'、'remark ...'",
   "configuration.properties.outline.maxFileSizeForFullScan.description": "UTF-8バイト数がこの値を超える場合、アウトラインはファイルの先頭部分のみを走査し、切り詰めシンボルを表示します。",
   "configuration.properties.diagnostics.maxFileSize.description": "UTF-8バイト数がこの値を超える文書は診断しません。大容量文書は設定予定Configではなく、実機からの取得ログである可能性が高いためです。",
   "configuration.properties.diagnostics.allowNonContiguousMask.description": "非連続のサブネットマスクを許可します。ACLおよびNX-OSのワイルドカードマスクとルート照合用マスクには影響しません。",

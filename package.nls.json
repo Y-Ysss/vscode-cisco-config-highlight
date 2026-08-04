@@ -13,6 +13,8 @@
   "configuration.properties.symbols.subInterface.description": "Sub Interface 'interface {type, slot, port, etc...}.{number}'",
   "configuration.properties.symbols.routeMap.description": "Route Map 'route-map {name} {permit|deny} {sequence-number}'",
   "configuration.properties.symbols.ipPrefixList.description": "IPv4 Prefix List 'ip prefix-list {name} ...'",
+  "configuration.properties.symbols.ipAccessList.description": "IPv4 Standard/Extended ACL 'ip access-list {standard|extended} {name}' or 'access-list {number} ...'",
+  "configuration.properties.symbols.accessListEntry.description": "IPv4 ACL entries 'permit ...', 'deny ...', and 'remark ...'",
   "configuration.properties.outline.maxFileSizeForFullScan.description": "Above this UTF-8 byte size, Outline scans only the beginning of the file and shows a truncation symbol.",
   "configuration.properties.diagnostics.maxFileSize.description": "Diagnostics does not validate documents above this UTF-8 byte size. Large documents are often device output rather than planned configurations.",
   "configuration.properties.diagnostics.allowNonContiguousMask.description": "Allow non-contiguous subnet masks. ACL and NX-OS wildcard masks and route-match masks are unaffected.",
