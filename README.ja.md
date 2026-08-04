@@ -313,11 +313,22 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 
 
 ## 注意事項
+### ファイルパターンへのLanguage Modeの紐づけ
+
+デフォルトでは `.cisco` ファイルのみが認識されます。異なる拡張子のファイル（例: `.txt`）にもシンタックスハイライトなどの機能を適用したい場合は、`settings.json` に `files.associations` を追加してください:
+
+```json
+  "files.associations": {
+    "*.txt": "cisco-config",
+    "*.cisco.log": "cisco-config",
+  }
+```
+
 ### 大きなファイルでのハイライト
 
 大きなファイルでハイライトを有効にしたい場合は、以下の設定をfalseに変更してください:
-```
-"editor.largeFileOptimizations": false
+```json
+  "editor.largeFileOptimizations": false
 ```
 ただし、VSCodeはパフォーマンス上の理由から、大きなファイルではハイライト機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
 

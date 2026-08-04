@@ -2,12 +2,15 @@
   "name": "cisco-config-highlight",
   "displayName": "Cisco Config Highlight",
   "description": "Cisco device configuration Syntax Highlighting for Visual Studio Code.",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "publisher": "Y-Ysss",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Y-Ysss/vscode-cisco-config-highlight.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Y-Ysss/vscode-cisco-config-highlight/issues"
   },
   "engines": {
     "vscode": "^1.63.0"

@@ -3,6 +3,20 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+## 0.9.0 (2026-08-04)
+
+### Added
+- Add new outline symbol categories:
+  - Added support for `router ospf` declarations as an outline symbol category (#36)
+  - Added support for `policy-map` class entries (`class {name}`) as nested outline symbols (#38)
+  - Added support for IPv4 access-list (`ip access-list standard|extended`) and numbered access-list entries as outline symbols, with entries nested under their list name or number (#39)
+
+### Changed
+- Outline feature enhancements:
+  - Enhanced IP prefix-list outline: individual rules are now grouped beneath their list name in the hierarchy (#37)
+  - Refactored outline provider into separate modules (`declarationMatcher`, `outlineTreeBuilder`, `outlineTypes`, `documentMeasurement`) for maintainability (#35)
+
+
 ## 0.8.2 (2026-07-24)
 
 ### Changed

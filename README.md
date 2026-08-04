@@ -322,11 +322,22 @@ For the settings page, the following languages are supported:
 
 
 ## Notes
+### Associating file patterns with Cisco Config
+
+By default, only `.cisco` files are recognized. To apply syntax highlighting and other features to files with different extensions (e.g., `.txt`), add a `files.associations` entry to your `settings.json`:
+
+```json
+  "files.associations": {
+    "*.txt": "cisco-config",
+    "*.cisco.log": "cisco-config",
+  }
+```
+
 ### Highlighting in large files
 
 If you want to enable highlighting in large files, change the following setting to false:
-```
-"editor.largeFileOptimizations": false
+```json
+  "editor.largeFileOptimizations": false
 ```
 However, VSCode disables features on large files for performance reasons, and forcing VSCode to syntax highlight large files may result in poor editor performance.
 
