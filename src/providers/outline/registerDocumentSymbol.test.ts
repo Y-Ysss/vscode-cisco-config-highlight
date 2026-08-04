@@ -32,6 +32,7 @@ describe('normalizeEnabledCategories', () => {
       address_family: true,
       class_map: true,
       policy_map: true,
+      policy_class: true,
       interface: false,
       sub_interface: true,
       route_map: true,
