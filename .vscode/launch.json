@@ -28,9 +28,10 @@
       "name": "Extension Tests",
       "type": "extensionHost",
       "request": "launch",
-      "testConfiguration": "${workspaceFolder}/.vscode-test.js",
+      "testConfiguration": "${workspaceFolder}/.vscode-test.mjs",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/out/**/*.js"]
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "compile:vscode-tests"
     }
   ]
 }

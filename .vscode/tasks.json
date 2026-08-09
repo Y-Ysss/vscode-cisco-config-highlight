@@ -5,6 +5,28 @@
   "tasks": [
     {
       "type": "npm",
+      "script": "compile",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+    {
+      "type": "npm",
+      "script": "compile:test:vscode",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "silent"
+      }
+    },
+    {
+      "label": "compile:vscode-tests",
+      "dependsOrder": "sequence",
+      "dependsOn": ["npm: compile", "npm: compile:test:vscode"],
+      "problemMatcher": []
+    },
+    {
+      "type": "npm",
       "script": "watch",
       "problemMatcher": {
         "owner": "rolldown",
