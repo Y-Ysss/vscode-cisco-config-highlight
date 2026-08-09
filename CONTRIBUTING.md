@@ -13,12 +13,15 @@ npm ci
 
 ## Building the Extension
 
-## Launching the Extension in VS Code
+If you want to build and run the extension locally, follow these steps:
+
+
+### Launching the Extension in VS Code
 
 1. Set up the development environment by opening the project in VS Code.
 2. Press `F5` to launch a new Extension Development Host instance of VS Code with the extension loaded.
 
-### Build and install locally
+### Build and install packaged file locally
 
 1. Build the extension
 ```bash
