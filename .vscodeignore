@@ -31,7 +31,7 @@ src/**
 .vscode-test.mjs
 tsconfig*.json
 biome.jsonc
-rollup.config.ts
+rolldown.config.ts
 vitest.config.ts
 
 # README files (keep only main README)

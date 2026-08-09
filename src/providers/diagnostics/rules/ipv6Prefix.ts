@@ -108,7 +108,7 @@ const validatePrefixList = (
   const action = lower(tokens[index]);
   if (action !== 'permit' && action !== 'deny') return false;
   const operand = tokens[index + 1];
-  if (!operand || !operand.text.includes('/')) return false;
+  if (!operand?.text.includes('/')) return false;
   const prefix = validatePrefixOperand(findings, line, operand);
   validatePrefixListModifiers(
     findings,
@@ -131,7 +131,7 @@ const validateStandalone = (
   }
   if (lower(tokens[1]) !== 'address') return false;
   const operand = tokens[2];
-  if (!operand || !operand.text.includes('/')) return false;
+  if (!operand?.text.includes('/')) return false;
   validatePrefixOperand(findings, line, operand);
   return true;
 };
