@@ -5,6 +5,7 @@ data/
 
 # Development files
 node_modules
+.vscode-test/
 
 # Build outputs to exclude
 out
