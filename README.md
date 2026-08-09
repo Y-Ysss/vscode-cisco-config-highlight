@@ -8,9 +8,9 @@
 
 **日本語版: [README.ja.md](README.ja.md)**
 
-This project is in the development stages.
+![GitHub Release](https://img.shields.io/github/v/release/Y-Ysss/vscode-cisco-config-highlight)
+[![CI](https://github.com/Y-Ysss/vscode-cisco-config-highlight/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Y-Ysss/vscode-cisco-config-highlight/actions/workflows/ci.yml)
 
-Definitions may change in future versions.
 
 > [!NOTE]  
 > Experimental Tool Release  
@@ -347,10 +347,14 @@ I recommend the following extensions for a better visual experience:
 - [Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)
 - [Jarvis Prestidge/Sublime Material Theme](https://marketplace.visualstudio.com/items?itemName=jprestidge.theme-material-theme)
 
-## Requests or Issues
-If you have any requests or issues, please open an Issue or submit a Pull Request on GitHub.
 
-[GitHub - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
+## Contributing
+
+If you would like to contribute to this project, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to get started. We welcome contributions from the community and appreciate your support in improving this extension.
+
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [GitHub Repository - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
+
 
 ## License
 MIT License Copyright (c) 2021 Y-Ysss

@@ -345,10 +345,14 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 - [Y-Ysss/Daybreak Theme](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.vscode-daybreak-theme)
 - [Jarvis Prestidge/Sublime Material Theme](https://marketplace.visualstudio.com/items?itemName=jprestidge.theme-material-theme)
 
-## リクエストまたは問題報告
-リクエストや問題がある場合は、GitHubでIssueを開くか、プルリクエストを送信してください。
 
-[GitHub - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
+## Contributing
+
+このプロジェクトに貢献したい場合は、[CONTRIBUTING.md](CONTRIBUTING.md) ファイルを参照して、開始方法のガイドラインを確認してください。コミュニティからの貢献を歓迎し、この拡張機能の改善にご協力いただけると幸いです。
+
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [GitHub Repository - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
+
 
 ## ライセンス
 MIT License Copyright (c) 2021 Y-Ysss
