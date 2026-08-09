@@ -1,5 +1,5 @@
-name: New Syntax Request
-description: Request support for new Cisco syntax or keyword patterns
+name: New Syntax Request or Enhancement
+description: Request support for new Cisco syntax or keyword patterns or enhancements
 labels:
   - syntax
   - enhancement
