@@ -104,6 +104,18 @@ export class CancellationTokenSource {
   dispose(): void {}
 }
 
+export class Uri {
+  private constructor(public readonly value: string) {}
+
+  static parse(value: string): Uri {
+    return new Uri(value);
+  }
+
+  toString(): string {
+    return this.value;
+  }
+}
+
 export const workspace = {
   textDocuments: [] as unknown[],
   getConfiguration: (_section?: string) => ({
@@ -136,4 +148,8 @@ export const window = {
     show: () => {},
     dispose: () => {},
   }),
+};
+
+export const env = {
+  openExternal: (_uri: Uri) => Promise.resolve(true),
 };
