@@ -20,7 +20,7 @@ export interface AclWildcardCandidate {
   readonly action: AclAction;
   readonly sequence?: AclToken;
   readonly tokens: readonly AclToken[];
-  /** Tokens after permit/deny, ready for Task 9's address validation. */
+  /** Tokens after permit/deny, ready for address validation. */
   readonly operands: readonly AclToken[];
 }
 
