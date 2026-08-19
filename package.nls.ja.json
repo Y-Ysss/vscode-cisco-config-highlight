@@ -1,5 +1,5 @@
 {
-  "configuration.properties.showSymbolsInOutlinePanel.description": "［実験的機能］ドキュメント内のシンボル定義をアウトラインパネルに表示し、シンボル定義を素早く表示できるようにする。",
+  "configuration.properties.showSymbolsInOutlinePanel.description": "［実験的機能］ドキュメント内のシンボル定義をアウトラインパネルに表示し、任意のシンボル定義へ素早く移動できるようにします。",
   "configuration.properties.showEnableDisableSymbols.description": "［実験的機能］アウトラインパネルに表示するシンボルの有効・無効を設定する。\nこのオプションは、Show Symbols In Outline Panelを有効にする必要があります。",
   "configuration.properties.symbols.command.description": "Command (e.g. 'hostname#show running-config')",
   "configuration.properties.symbols.ipVrf.description": "Virtual Routing and Forwarding(VRF) 'ip vrf {vrf-name}'",
@@ -15,8 +15,8 @@
   "configuration.properties.symbols.ipPrefixList.description": "IPv4プレフィックスリスト 'ip prefix-list {name} ...'",
   "configuration.properties.symbols.ipAccessList.description": "IPv4標準・拡張ACL 'ip access-list {standard|extended} {name}' または 'access-list {number} ...'",
   "configuration.properties.symbols.accessListEntry.description": "IPv4 ACLエントリ 'permit ...'、'deny ...'、'remark ...'",
-  "configuration.properties.outline.maxFileSizeForFullScan.description": "UTF-8バイト数がこの値を超える場合、アウトラインはファイルの先頭部分のみを走査し、切り詰めシンボルを表示します。",
-  "configuration.properties.diagnostics.maxFileSize.description": "UTF-8バイト数がこの値を超える文書は診断しません。大容量文書は設定予定Configではなく、実機からの取得ログである可能性が高いためです。",
+  "configuration.properties.outline.maxFileSizeForFullScan.description": "ファイルバイト数(UTF-8)がこの値を超える場合、アウトラインはファイルの先頭部分のみを走査し、切り詰めたシンボルを表示します。",
+  "configuration.properties.diagnostics.maxFileSize.description": "ファイルバイト数(UTF-8)がこの値を超えるファイルはDiagnosticsを表示しません。大容量ファイルは投入予定の設定ファイルではなく、実機からの取得ログである可能性が高いためです。",
   "configuration.properties.diagnostics.allowNonContiguousMask.description": "非連続のサブネットマスクを許可します。ACLおよびNX-OSのワイルドカードマスクとルート照合用マスクには影響しません。",
   "configuration.properties.diagnostics.enabled.description": "［実験的機能］Cisco設定ファイルの診断を有効にします。\n\n診断対象:\n- IPv4のルート、インターフェイスアドレス、プレフィックスリスト\n- IPv6のアドレス、プレフィックスリスト、ACLプレフィックス\n- IPv4 ACLのワイルドカードマスク\n- IOSおよびNX-OSのネットワークオブジェクトグループ\n\n対応済みコマンドの完全な「no ...」形式にも同じ診断を適用します。"
 }

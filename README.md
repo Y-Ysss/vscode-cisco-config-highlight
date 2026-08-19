@@ -21,7 +21,7 @@
 >
 > The theme editor is a web application that runs in the browser.
 > 
-> <img src="https://raw.githubusercontent.com/yuyosy/textmate-theme-editor/refs/heads/main/public/screenshot.png" alt="theme icon" width="480px">
+> <img src="https://raw.githubusercontent.com/yuyosy/textmate-theme-editor/refs/heads/main/public/screenshot.png" alt="theme icon">
 
 
 
@@ -44,7 +44,7 @@ The extension for VS Code is available on the Visual Studio Marketplace and the 
 Syntaxes commonly used in configuration files are supported.
 - IOS
 - IOS-XE
-- NXOS
+- NX-OS
 
 The following platforms provide similar syntax highlighting for constructs that overlap with IOS:
 - IOS-XR
@@ -62,7 +62,7 @@ I would like to expand support for these platforms in the future.
 
 The color of syntax highlighting depends on the theme you have enabled.
 
-Not all highlighting settings are enabled in VSCode's default theme. For a better experience, I recommend using a custom theme or defining your own token color customizations.
+Not all highlighting settings are enabled in VS Code's default theme. For a better experience, I recommend using a custom theme or defining your own token color customizations.
 
 If the colors are not defined in the currently activated theme, or if you want to customize the colors and style to your liking, you will need to edit the `settings.json`.
 
@@ -89,7 +89,7 @@ The customization will apply to all tokens under that scope.
 The higher (shallower) the level in the hierarchy, the broader the range of tokens affected.
 
 
-### VSCode settings.json customize sample
+### VS Code settings.json customization example
 ``` json
     "editor.tokenColorCustomizations": {
         "textMateRules": [
@@ -324,12 +324,12 @@ For the settings page, the following languages are supported:
 ## Notes
 ### Associating file patterns with Cisco Config
 
-By default, only `.cisco` files are recognized. To apply syntax highlighting and other features to files with different extensions (e.g., `.txt`), add a `files.associations` entry to your `settings.json`:
+By default, `.cisco` and `.config` files are recognized. To apply syntax highlighting and other features to files with different extensions (e.g., `.txt`), add a `files.associations` entry to your `settings.json`:
 
 ```json
   "files.associations": {
-    "*.txt": "cisco-config",
-    "*.cisco.log": "cisco-config",
+    "*.txt": "cisco",
+    "*.cisco.log": "cisco",
   }
 ```
 
@@ -339,7 +339,7 @@ If you want to enable highlighting in large files, change the following setting 
 ```json
   "editor.largeFileOptimizations": false
 ```
-However, VSCode disables features on large files for performance reasons, and forcing VSCode to syntax highlight large files may result in poor editor performance.
+However, VS Code disables features on large files for performance reasons, and forcing VS Code to syntax highlight large files may result in poor editor performance.
 
 
 ## Recommended Extensions

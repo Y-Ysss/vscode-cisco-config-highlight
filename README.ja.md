@@ -21,7 +21,7 @@
 >
 > テーマエディタはブラウザで動作するWebアプリケーションです。
 > 
-> <img src="https://raw.githubusercontent.com/yuyosy/textmate-theme-editor/refs/heads/main/public/screenshot.png" alt="theme icon" width="480px">
+> <img src="https://raw.githubusercontent.com/yuyosy/textmate-theme-editor/refs/heads/main/public/screenshot.png" alt="theme icon">
 
 
 ## 機能
@@ -43,7 +43,7 @@ VS Code用の拡張機能は、Visual Studio MarketplaceおよびOpen VSX Regist
 設定ファイルで一般的に使用される構文をサポートしています。
 - IOS
 - IOS-XE
-- NXOS
+- NX-OS
 
 以下のプラットフォームについても、IOSと共通する構文に対してシンタックスハイライトを提供します:
 - IOS-XR
@@ -62,7 +62,7 @@ VS Code用の拡張機能は、Visual Studio MarketplaceおよびOpen VSX Regist
 
 シンタックスハイライトの色は、有効にしているテーマに依存します。
 
-VSCodeのデフォルトテーマでは、すべてのハイライト設定が有効化されていません。より良い体験のために、カスタムテーマの使用を推奨します。
+VS Codeのデフォルトテーマでは、すべてのハイライト設定が有効化されていません。より良い体験のために、カスタムテーマの使用を推奨します。
 
 また、現在有効なテーマで色が定義されていない場合、または色やスタイルを好みに合わせてカスタマイズしたい場合は、`settings.json`を編集する必要があります。
 
@@ -89,7 +89,7 @@ settings.jsonファイルのカスタマイズ方法の詳細については、�
 階層が上位（浅い）ほど、影響を受けるトークンの範囲が広くなります。
 
 
-### VSCode settings.json カスタマイズサンプル
+### VS Code settings.json カスタマイズ例
 ``` json
     "editor.tokenColorCustomizations": {
         "textMateRules": [
@@ -309,18 +309,18 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 
 対応済みコマンドの完全な`no ...`形式にも同じ診断を適用します。`no ip address`や`no <sequence>`のようにオペランドを省略する削除形式は認識しますが、診断は生成しません。
 
-診断は、すべてのコマンドやプラットフォーム固有構文を検証するものではありません。大容量文書は設定予定Configではなく実機からの取得ログである可能性が高いため、UTF-8バイト数が`cisco-config-highlight.diagnostics.maxFileSize`を超える文書は診断しません。既定の上限は1 MiBで、Settingsから変更できます。スキップ時に通知は表示しません。
+診断は、すべてのコマンドやプラットフォーム固有構文を検証するものではありません。大容量文書は投入予定の設定ファイルではなく実機からの取得ログである可能性が高いため、UTF-8バイト数が`cisco-config-highlight.diagnostics.maxFileSize`を超える文書は診断しません。既定の上限は1 MiBで、Settingsから変更できます。スキップ時に通知は表示しません。
 
 
-## 注意事項
+## 特記事項
 ### ファイルパターンへのLanguage Modeの紐づけ
 
-デフォルトでは `.cisco` ファイルのみが認識されます。異なる拡張子のファイル（例: `.txt`）にもシンタックスハイライトなどの機能を適用したい場合は、`settings.json` に `files.associations` を追加してください:
+デフォルトでは `.cisco` ファイルと `.config` ファイルが認識されます。異なる拡張子のファイル（例: `.txt`）にもシンタックスハイライトなどの機能を適用したい場合は、`settings.json` に `files.associations` を追加してください:
 
 ```json
   "files.associations": {
-    "*.txt": "cisco-config",
-    "*.cisco.log": "cisco-config",
+    "*.txt": "cisco",
+    "*.cisco.log": "cisco",
   }
 ```
 
@@ -330,7 +330,7 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 ```json
   "editor.largeFileOptimizations": false
 ```
-ただし、VSCodeはパフォーマンス上の理由から、大きなファイルではハイライト機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
+ただし、VS Codeはパフォーマンス上の理由から、大きなファイルではハイライト機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
 
 
 ### 設定画面でサポートされている言語

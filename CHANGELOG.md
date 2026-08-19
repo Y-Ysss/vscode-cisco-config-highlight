@@ -43,7 +43,7 @@
 
 ## Changed
 - Refactoring and improvements:
-  - Added minimal Position and Range classes to the VSCode mocks for improved test compatibility.
+  - Added minimal Position and Range classes to the VS Code mocks for improved test compatibility.
   - Refactored outline provider registration in the extension entry point for clarity.
 
 
@@ -83,7 +83,7 @@
   - Improved banner pattern to handle various delimiters and banner types more robustly.
   - Improved password and secret patterns to support Nexus syntax (e.g., for Nexus configuration, `username user-id [password [0 | 5] password] [expire date] [role role-name]`).
   - Improved ACL pattern to support `resequence` keyword.
- - Improved interface pattern to reduce false positives for keywords consisting only of the letter "E".
+  - Improved interface pattern to reduce false positives for keywords consisting only of the letter "E".
   - Added MAC address pattern to support Cisco dotted Style (e.g., 001A.2B3C.4D5E).
   - Added `use-vrf`, `ip vrf context`, and `ip vrf member` patterns to support VRF name highlighting in more contexts.
 - Removed scopes that were not correctly captured by the regular expression.
