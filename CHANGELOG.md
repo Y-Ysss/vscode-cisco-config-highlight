@@ -3,6 +3,13 @@
 
 [marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
 
+
+## 0.9.1 (2026-08-20)
+
+### Changed
+- Refined documentation and localized wording.
+
+
 ## 0.9.0 (2026-08-04)
 
 ### Added
