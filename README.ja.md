@@ -8,9 +8,9 @@
 
 **English version: [README.md](README.md)**
 
-このプロジェクトは開発中です。
+![GitHub Release](https://img.shields.io/github/v/release/Y-Ysss/vscode-cisco-config-highlight)
+[![CI](https://github.com/Y-Ysss/vscode-cisco-config-highlight/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Y-Ysss/vscode-cisco-config-highlight/actions/workflows/ci.yml)
 
-将来のバージョンで定義が変更される可能性があります。
 
 > [!NOTE]  
 > 実験的なツールをリリース  
@@ -64,28 +64,24 @@ VS Code用の拡張機能は、Visual Studio MarketplaceおよびOpen VSX Regist
 
 VS Codeのデフォルトテーマでは、すべてのハイライト設定が有効化されていません。より良い体験のために、カスタムテーマの使用を推奨します。
 
-また、現在有効なテーマで色が定義されていない場合、または色やスタイルを好みに合わせてカスタマイズしたい場合は、`settings.json`を編集する必要があります。
+現在有効なテーマで色が定義されていない場合や、色やスタイルを好みに合わせてカスタマイズしたい場合は、`settings.json`を編集してください。
 
-設定を開き、カスタマイズオプションをJSONに追加してください。
-（コマンドパレットで`Preferences: Open Settings (JSON)`と入力すると`settings.json`ファイルを開くことができます。）
+コマンドパレットで`Preferences: Open Settings (JSON)`と入力して`settings.json`を開き、カスタマイズオプションを追加してください。
 
-settings.jsonファイルのカスタマイズ方法の詳細については、以下のURLを参照してください。
+`settings.json`のカスタマイズ方法は、以下のドキュメントを参照してください。
 
 [Visual Studio Code ドキュメント - カラーテーマ](https://code.visualstudio.com/docs/getstarted/themes)
 
 ### スコープの階層構造
-トークンは階層構造に従っており、カスタマイズ時にスコープを省略することができます。
+トークンのスコープには階層があり、カスタマイズ時には上位のスコープを指定できます。
 
-例として以下の2つのスコープを指定した場合:
+たとえば、以下の完全なスコープを指定すると、カスタマイズは指定したトークンにのみ適用されます。
 - `entity.name.class.interface.ethernet`
 - `entity.name.class.interface.loopback`
 
-上記の完全なスコープを指定すると、カスタマイズは指定のトークンにのみ適用されます。
-
-また、以下のような上位レベルのスコープを使用すると:
+上位のスコープを指定すると、その配下のすべてのトークンに適用されます。
 - `entity.name.class.interface`
 
-カスタマイズはそのスコープ配下のすべてのトークンに適用されます。
 階層が上位（浅い）ほど、影響を受けるトークンの範囲が広くなります。
 
 
@@ -242,7 +238,7 @@ string.other.key-string
 
 ## 実験的機能
 
-以下の実験的機能が利用可能です。この拡張機能の設定で有効化できます。
+以下の実験的機能は、この拡張機能の設定で有効にできます。
 
 > [!NOTE]  
 > 以下の実験的機能はまだ開発中であり、今後のバージョンで変更される可能性があります。
@@ -255,7 +251,7 @@ string.other.key-string
 
 <img src="images/outline.png" alt="screenshot">
 
-設定を開き、検索ボックスにキーワードを入力してください。チェックボックスを選択することで有効化できます。
+設定を開き、検索ボックスに以下のキーワードを入力してください。チェックボックスを選択すると有効になります。
 
 ```
 @ext:Y-Ysss.cisco-config-highlight showSymbolsInOutlinePanel
@@ -292,7 +288,15 @@ string.other.key-string
 
 #### アウトラインの階層構造と大きなファイル
 
-`hostname#show running-config`や`hostname>show ...`などのプロンプトコマンドは、コマンドシンボルとして認識されます。`show`コマンドに続く出力は、該当する場合、そのコマンドの配下にグループ化されます。設定シンボルはカテゴリノードにまとめられ、サブインターフェイスは親インターフェイスの配下に、BGPアドレスファミリは対応するBGPプロセスの配下に、ポリシーマップのクラスは対応するポリシーマップの配下にネストされ、IPv4プレフィックスリストの各ルールはリスト名の配下に、IPv4 ACLエントリはACL名または番号の配下にまとめられます。
+`hostname#show running-config`や`hostname>show ...`などのプロンプトコマンドは、コマンドシンボルとして認識されます。`show`コマンドに続く出力は、該当する場合、そのコマンドの配下にグループ化されます。
+
+設定シンボルはカテゴリノードにまとめられます。以下のシンボルは、それぞれ対応する親の配下に配置されます。
+
+- サブインターフェイスは、親インターフェイスの配下
+- BGPアドレスファミリは、対応するBGPプロセスの配下
+- ポリシーマップのクラスは、対応するポリシーマップの配下
+- IPv4プレフィックスリストの各ルールは、リスト名の配下
+- IPv4 ACLエントリは、ACL名または番号の配下
 
 UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を超えるファイルでは、アウトラインはファイルの先頭部分のみを走査します。切り詰めシンボルは、残りの内容が走査されていないことを示します。
 
@@ -305,11 +309,17 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 - IPv4 ACLのワイルドカードマスク
 - IOSおよびNX-OSのネットワークオブジェクトグループ
 
-**エラー**は、IPv4/IPv6アドレスまたはマスク／ワイルドカードの値が不正であることを示します。**警告**には、プレフィックス長の形式不正または範囲外、不正なプレフィックスリスト修飾子や修飾子間の関係、許可されていない非連続サブネットマスクが含まれます。
+**エラー**は、IPv4/IPv6アドレスまたはマスク／ワイルドカードの値が不正であることを示します。**警告**は、以下の場合に表示されます。
+
+- プレフィックス長の形式が不正、または範囲外である
+- プレフィックスリストの修飾子、または修飾子間の関係が不正である
+- 許可されていない非連続サブネットマスクが使われている
 
 対応済みコマンドの完全な`no ...`形式にも同じ診断を適用します。`no ip address`や`no <sequence>`のようにオペランドを省略する削除形式は認識しますが、診断は生成しません。
 
-診断は、すべてのコマンドやプラットフォーム固有構文を検証するものではありません。大容量文書は投入予定の設定ファイルではなく実機からの取得ログである可能性が高いため、UTF-8バイト数が`cisco-config-highlight.diagnostics.maxFileSize`を超える文書は診断しません。既定の上限は1 MiBで、Settingsから変更できます。スキップ時に通知は表示しません。
+診断は、すべてのコマンドやプラットフォーム固有構文を検証するものではありません。
+
+大容量文書は、投入予定の設定ファイルではなく、実機からの取得ログである可能性が高いと考えられます。そのため、UTF-8バイト数が`cisco-config-highlight.diagnostics.maxFileSize`を超える文書は診断しません。既定の上限は1 MiBで、Settingsから変更できます。診断をスキップした場合、通知は表示しません。
 
 
 ## 特記事項
@@ -330,7 +340,7 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 ```json
   "editor.largeFileOptimizations": false
 ```
-ただし、VS Codeはパフォーマンス上の理由から、大きなファイルではハイライト機能を無効化しており、強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
+VS Codeはパフォーマンス上の理由から、大きなファイルではハイライト機能を無効化しています。強制的にシンタックスハイライトを有効にすると、エディタのパフォーマンスが低下する可能性があります。
 
 
 ### 設定画面でサポートされている言語
@@ -348,7 +358,7 @@ UTF-8バイト数が`cisco-config-highlight.outline.maxFileSizeForFullScan`を�
 
 ## Contributing
 
-このプロジェクトに貢献したい場合は、[CONTRIBUTING.md](CONTRIBUTING.md) ファイルを参照して、開始方法のガイドラインを確認してください。コミュニティからの貢献を歓迎し、この拡張機能の改善にご協力いただけると幸いです。
+このプロジェクトへの貢献方法は、[CONTRIBUTING.md](CONTRIBUTING.md) を参照してください。コミュニティからの貢献を歓迎します。この拡張機能の改善にご協力いただけると幸いです。
 
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [GitHub Repository - Y-Ysss/vscode-cisco-config-highlight](https://github.com/Y-Ysss/vscode-cisco-config-highlight)
