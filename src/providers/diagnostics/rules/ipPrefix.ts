@@ -191,6 +191,34 @@ const validateSubnetMask = (
   }
 };
 
+const validateInterfaceAddressCidr = (
+  findings: RuleFinding[],
+  line: number,
+  operand: Token,
+  slash: number,
+): void => {
+  validateAddress(findings, line, {
+    text: operand.text.slice(0, slash),
+    start: operand.start,
+    end: operand.start + slash,
+  });
+  const prefix: Token = {
+    text: operand.text.slice(slash + 1),
+    start: operand.start + slash + 1,
+    end: operand.end,
+  };
+  if (!/^\d+$/.test(prefix.text) || Number(prefix.text) > 32) {
+    pushFinding(
+      findings,
+      line,
+      prefix,
+      'invalid-prefix-length',
+      'Invalid IPv4 prefix length.',
+      'warning',
+    );
+  }
+};
+
 const modifierWarning = (
   findings: RuleFinding[],
   line: number,
@@ -339,7 +367,7 @@ const validateCandidate = (
   if (lower(tokens[1]) !== 'route' && lower(tokens[1]) !== 'address') {
     return false;
   }
-  if (!tokens[2] || !tokens[3]) return false;
+  if (!tokens[2]) return false;
   const addressKeyword = lower(tokens[2]);
   if (
     (lower(tokens[1]) === 'route' && addressKeyword === 'static') ||
@@ -350,6 +378,12 @@ const validateCandidate = (
   ) {
     return false;
   }
+  const slash = tokens[2].text.indexOf('/');
+  if (lower(tokens[1]) === 'address' && slash >= 0) {
+    validateInterfaceAddressCidr(findings, line, tokens[2], slash);
+    return true;
+  }
+  if (!tokens[3]) return false;
   validateAddress(findings, line, tokens[2]);
   validateSubnetMask(
     findings,

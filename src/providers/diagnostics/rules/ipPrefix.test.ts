@@ -394,4 +394,62 @@ describe('scanIpPrefixFindings', () => {
     });
     expect(calls).toEqual([1, 1, 1]);
   });
+
+  it.each([
+    'ip address 192.0.2.1/24',
+    'ip address 192.0.2.1/24 secondary',
+    'no ip address 192.0.2.1/24 secondary',
+    'IP ADDRESS 192.0.2.1/24 SECONDARY',
+    'ip address 0.0.0.0/0',
+    'ip address 192.0.2.1/32',
+    'ip address 192.0.2.1 255.255.255.0 secondary',
+  ])(
+    'accepts interface address syntax without network-boundary warnings: %s',
+    (line) => {
+      expect(scanIpPrefixFindings(source(line))).toEqual([]);
+    },
+  );
+
+  it.each(['', ' secondary'])(
+    'validates CIDR address octets with exact ranges%s',
+    (suffix) => {
+      const line = `  no ip address 999.0.2.1/24${suffix}`;
+      expect(scanIpPrefixFindings(source(line))).toEqual([
+        {
+          line: 0,
+          start: 16,
+          end: 25,
+          code: 'invalid-ipv4',
+          message: 'Invalid IPv4 address.',
+          severity: 'error',
+        },
+      ]);
+    },
+  );
+
+  it.each(['33', '-1', 'x', '', '24/1', '2.4', '999999999999999999999'])(
+    'validates CIDR prefix length %s independently of the address',
+    (prefix) => {
+      const line = `ip address 192.0.2.1/${prefix} secondary`;
+      expect(scanIpPrefixFindings(source(line))).toEqual([
+        {
+          line: 0,
+          start: 21,
+          end: 21 + prefix.length,
+          code: 'invalid-prefix-length',
+          message: 'Invalid IPv4 prefix length.',
+          severity: 'warning',
+        },
+      ]);
+    },
+  );
+
+  it('reports invalid CIDR address and prefix separately', () => {
+    expect(
+      scanIpPrefixFindings(source('ip address 999.0.2.1/33')),
+    ).toMatchObject([
+      { start: 11, end: 20, code: 'invalid-ipv4' },
+      { start: 21, end: 23, code: 'invalid-prefix-length' },
+    ]);
+  });
 });
