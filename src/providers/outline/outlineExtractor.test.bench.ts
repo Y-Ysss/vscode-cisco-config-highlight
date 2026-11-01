@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
-import { performance } from 'node:perf_hooks';
-import { bench, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import {
   type EnabledOutlineCategories,
   extractOutlineSymbols,
@@ -99,7 +98,6 @@ interface BenchmarkInput {
   bytes: number;
   label: string;
   source: LineSource;
-  timings: number[];
 }
 
 const toInput = (label: string, text: string): BenchmarkInput => {
@@ -111,7 +109,6 @@ const toInput = (label: string, text: string): BenchmarkInput => {
       lineCount: lines.length,
       lineAt: (index) => lines[index],
     },
-    timings: [],
   };
 };
 
@@ -145,27 +142,26 @@ const percentile = (values: number[], fraction: number): number => {
 
 describe('extractOutlineSymbols throughput', () => {
   for (const input of inputs) {
-    bench(
-      `${input.label}: ${input.bytes} bytes, ${input.source.lineCount} lines`,
-      () => {
-        const start = performance.now();
-        const symbols = extractOutlineSymbols(input.source, enabledCategories);
-        input.timings.push(performance.now() - start);
-        expect(symbols.length).toBeGreaterThan(0);
-
-        if (input.timings.length === WARMUP_ITERATIONS + MEASURED_ITERATIONS) {
-          const samples = input.timings.slice(WARMUP_ITERATIONS);
-          const p95 = percentile(samples, 0.95);
-          expect(samples).toHaveLength(MEASURED_ITERATIONS);
-          expect(p95).toBeLessThan(p95LimitMs);
-        }
-      },
-      {
+    test(`${input.label}: ${input.bytes} bytes, ${input.source.lineCount} lines`, {
+      timeout: 60_000,
+    }, async ({ bench }) => {
+      expect(
+        extractOutlineSymbols(input.source, enabledCategories).length,
+      ).toBeGreaterThan(0);
+      const result = await bench(input.label, () => {
+        extractOutlineSymbols(input.source, enabledCategories);
+      }).run({
+        retainSamples: true,
         iterations: MEASURED_ITERATIONS,
         time: 0,
         warmupIterations: WARMUP_ITERATIONS,
         warmupTime: 0,
-      },
-    );
+      });
+
+      const samples = result.latency.samples ?? [];
+      const p95 = percentile(samples, 0.95);
+      expect(samples).toHaveLength(MEASURED_ITERATIONS);
+      expect(p95).toBeLessThan(p95LimitMs);
+    });
   }
 });

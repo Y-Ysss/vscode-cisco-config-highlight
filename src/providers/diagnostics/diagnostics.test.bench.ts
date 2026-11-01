@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
-import { performance } from 'node:perf_hooks';
-import { bench, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import type { LineSource } from '../../parser/lineScanUtils';
 import { scanDiagnosticFindings } from './diagnosticsScanner';
 
@@ -44,7 +43,6 @@ interface BenchmarkInput {
   readonly label: string;
   readonly minimumFindings: number;
   readonly source: LineSource;
-  readonly timings: number[];
 }
 
 const toInput = (
@@ -61,7 +59,6 @@ const toInput = (
       lineCount: lines.length,
       lineAt: (index) => lines[index],
     },
-    timings: [],
   };
 };
 
@@ -95,32 +92,31 @@ const nearestRankP95 = (values: readonly number[]): number => {
 describe('complete diagnostics throughput', () => {
   expect(inputs[0].bytes).toBe(TEN_MIB);
   for (const input of inputs) {
-    bench(
-      `${input.label}: ${input.bytes} bytes, ${input.source.lineCount} lines`,
-      () => {
-        const start = performance.now();
-        const findings = scanDiagnosticFindings(input.source);
-        input.timings.push(performance.now() - start);
-        expect(findings.length).toBeGreaterThanOrEqual(input.minimumFindings);
-
-        if (input.timings.length === WARMUP_ITERATIONS + MEASURED_ITERATIONS) {
-          const samples = input.timings.slice(WARMUP_ITERATIONS);
-          const p95 = nearestRankP95(samples);
-          process.stdout.write(
-            `\nDIAGNOSTICS_BENCH ${input.label} samples_ms=${samples
-              .map((sample) => sample.toFixed(2))
-              .join(',')} p95_ms=${p95.toFixed(2)} limit_ms=${p95LimitMs}\n`,
-          );
-          expect(samples).toHaveLength(MEASURED_ITERATIONS);
-          expect(p95).toBeLessThan(p95LimitMs);
-        }
-      },
-      {
+    test(`${input.label}: ${input.bytes} bytes, ${input.source.lineCount} lines`, {
+      timeout: 60_000,
+    }, async ({ bench }) => {
+      expect(
+        scanDiagnosticFindings(input.source).length,
+      ).toBeGreaterThanOrEqual(input.minimumFindings);
+      const result = await bench(input.label, () => {
+        scanDiagnosticFindings(input.source);
+      }).run({
+        retainSamples: true,
         iterations: MEASURED_ITERATIONS,
         time: 0,
         warmupIterations: WARMUP_ITERATIONS,
         warmupTime: 0,
-      },
-    );
+      });
+
+      const samples = result.latency.samples ?? [];
+      const p95 = nearestRankP95(samples);
+      process.stdout.write(
+        `\nDIAGNOSTICS_BENCH ${input.label} samples_ms=${samples
+          .map((sample) => sample.toFixed(2))
+          .join(',')} p95_ms=${p95.toFixed(2)} limit_ms=${p95LimitMs}\n`,
+      );
+      expect(samples).toHaveLength(MEASURED_ITERATIONS);
+      expect(p95).toBeLessThan(p95LimitMs);
+    });
   }
 });
