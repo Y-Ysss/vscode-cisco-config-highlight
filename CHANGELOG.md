@@ -1,68 +1,87 @@
 # Changelog
-## Visual Studio Marketplace Released Version History
 
-[marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history](https://marketplace.visualstudio.com/items?itemName=Y-Ysss.cisco-config-highlight&ssr=false#version-history)
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+Refer to the GitHub main branch for the latest changes after release.
 
 
-## 0.9.1 (2026-08-20)
+## [0.9.2] - 2026-11-02
+
+### Fixed
+
+- Fixed false diagnostics for CIDR notation in `ip address` commands (e.g., `ip address 192.0.2.1/24 secondary`).
+
+## [0.9.1] - 2026-08-20
 
 ### Changed
+
 - Refined documentation and localized wording.
 
-
-## 0.9.0 (2026-08-04)
+## [0.9.0] - 2026-08-04
 
 ### Added
+
 - Add new outline symbol categories:
   - Added support for `router ospf` declarations as an outline symbol category (#36)
   - Added support for `policy-map` class entries (`class {name}`) as nested outline symbols (#38)
   - Added support for IPv4 access-list (`ip access-list standard|extended`) and numbered access-list entries as outline symbols, with entries nested under their list name or number (#39)
 
 ### Changed
+
 - Outline feature enhancements:
   - Enhanced IP prefix-list outline: individual rules are now grouped beneath their list name in the hierarchy (#37)
   - Refactored outline provider into separate modules (`declarationMatcher`, `outlineTreeBuilder`, `outlineTypes`, `documentMeasurement`) for maintainability (#35)
 
-
-## 0.8.2 (2026-07-24)
+## [0.8.2] - 2026-07-24
 
 ### Changed
+
 - Change diagnostics feature
   - Added handling for static-route control commands in IP prefix validation
 
-
-## 0.8.1 (2026-07-17)
+## [0.8.1] - 2026-07-17
 
 ### Changed
+
 - Change diagnostics feature
   - Diagnostics now validates complete `no ...` forms of supported commands while ignoring operand-free deletion forms.
   - Diagnostics now performs complete asynchronous scans instead of visible-range scans.
   - Diagnostics skips documents larger than the configurable 1 MiB default limit.
 
-
-## 0.8.0 (2026-07-15)
+## [0.8.0] - 2026-07-15
 
 ### Added
+
 - Add diagnostics feature
   - Added an experimental diagnostics feature that validates Cisco configuration files for errors and warnings, including checks for IPv4/IPv6 addresses, prefix lists, ACL wildcard masks, and object-groups.
 - Outline feature enhancements:
   - Added support for route-map and ip prefix-list as outline symbol categories
 
-## Changed
+### Changed
+
 - Refactoring and improvements:
   - Added minimal Position and Range classes to the VS Code mocks for improved test compatibility.
   - Refactored outline provider registration in the extension entry point for clarity.
 
-
-## 0.7.1 (2026-06-29)
+## [0.7.1] - 2026-06-29
 
 ### Changed
+
 - Update syntax highlighting patterns.
   - Improved keyword patterns
-  - Fixed an issue where the `use-vrf` command was not highlighted correctly.
 
-## 0.7.0 (2026-05-11)
+### Fixed
+
+- Fixed an issue where the `use-vrf` command was not highlighted correctly.
+
+## [0.7.0] - 2026-05-11
+
 ### Added
+
 - Add syntax highlighting patterns.
   - entity.name.class.interface.bdi
   - entity.name.class.interface.nvi
@@ -84,6 +103,7 @@
   - keyword.other.config-keyword.enable-disable.disable
 
 ### Changed
+
 - Improve syntax highlighting patterns.
   - Removed the beginning-of-line constraint for line comments.
   - Improved domain name pattern to handle `ip domain-name` command.
@@ -93,33 +113,39 @@
   - Improved interface pattern to reduce false positives for keywords consisting only of the letter "E".
   - Added MAC address pattern to support Cisco dotted Style (e.g., 001A.2B3C.4D5E).
   - Added `use-vrf`, `ip vrf context`, and `ip vrf member` patterns to support VRF name highlighting in more contexts.
-- Removed scopes that were not correctly captured by the regular expression.
-  - entity.other.vrf.definition
-  - entity.other.vrf.forwarding
 
-### Contributions to extension:
-- Improvements to syntax highlighting patterns, partially based on contributions by [@CantiFirestarter](https://github.com/CantiFirestarter)'s contribution in #21.
+- Improved syntax highlighting patterns based in part on contributions by [@CantiFirestarter](https://github.com/CantiFirestarter) (#21).
   - entity.name.tag.config-string.name
   - entity.name.class.interface.app-gigabitethernet
   - Improved MAC address pattern
 
+### Removed
 
-## 0.6.1 (2025-06-19)
+- Removed scopes that were not correctly captured by the regular expression.
+  - entity.other.vrf.definition
+  - entity.other.vrf.forwarding
+
+## [0.6.1] - 2025-06-19
+
 ### Added
+
 - Add syntax highlighting patterns.
   - entity.name.tag.group.policy-list.name
   - entity.name.tag.group.traffic-filter.name
   - entity.name.tag.group.community.name
 
 ### Changed
+
 - IPv6 regex now supports uppercase address representations.
 
-### Contributions to extension:
-- [@ReverseTelnet](https://github.com/ReverseTelnet)
+- Updated syntax highlighting with contributions by [@ReverseTelnet](https://github.com/ReverseTelnet).
 
+## [0.6.0] - 2024-08-01
 
-## Prereleased 0.6.0 (2024-08-01)
+Pre-release.
+
 ### Added
+
 - Add syntax highlighting patterns.
   - entity.name.tag.crypto.ipsec-profile.name
   - entity.name.tag.crypto.isakmp-profile.name
@@ -128,7 +154,9 @@
   - entity.name.tag.crypto.transform-set.name
   - entity.name.tag.group.pool.name
 
-- Change syntax highlighting patterns. Refer to following section.
+### Changed
+
+- Changed syntax highlighting patterns. Refer to the following scopes.
   - keyword.other.config-keyword.add-remove.add
   - keyword.other.config-keyword.add-remove.except
   - keyword.other.config-keyword.add-remove.remove
@@ -152,7 +180,6 @@
   - keyword.other.config-keyword.switchport-mode.dynamic
   - keyword.other.config-keyword.switchport-mode.trunk
 
-### Changed
 - Refined and subdivided several syntax highlighting patterns into more specific categories.
 
   - Notice
@@ -192,14 +219,17 @@
       - keyword.other.config-keyword.switchport-mode.dynamic
       - keyword.other.config-keyword.switchport-mode.trunk
 
+## [0.5.1] - 2023-02-06
 
-## 0.5.1 (2023-02-06)
 ### Added
+
 - Add syntax highlighting pattern.
   - Add secret pattern
 
-## 0.5.0 (2022-06-21)
+## [0.5.0] - 2022-06-21
+
 ### Added
+
 - Add syntax highlighting patterns.
   - Add Management interface pattern
   - Add TwentyFiveGigabitEthernet interface pattern
@@ -207,24 +237,30 @@
   - Add HundredGigabitEthernet interface pattern
   - Add TwoHundredGigabitEthernet interface pattern
   - Add comment line pattern (beginning with #)
+
 ### Changed
+
 - Update implementation of symbol display in the outline panel, which is currently an experimental feature.
 
+## [0.4.1] - 2022-06-10
 
-## 0.4.1 (2022-06-10)
 ### Added
+
 - Add syntax highlighting patterns.
   - Add pool name pattern
   - Add crypto map name pattern
   - Add transform-set name pattern
 
+## [0.4.0] - 2022-06-04
 
-## 0.4.0 (2022-06-04)
 ### Added
+
 - Added notification of incompatible changes.
 - Add syntax highlighting pattern.
   - Add remark keyword
+
 ### Changed
+
 - Change Token Name Issue#2
   - Note: If you have customized the token color in Settings.json, the corresponding Token must be renamed to the new name.
   - Changed the category name of tokens whose category name was QoS to Group.
@@ -242,103 +278,158 @@
   entity.name.tag.acl.object-group.name.cisco --> entity.name.tag.group.object-group.name.cisco
   ```
 
+## [0.3.5] - 2021-12-12
 
-## 0.3.5 (2021-12-12)
 ### Added
+
 - Add syntax highlighting pattern.
   - Add shutdown keyword
+
 ### Changed
+
 - Update syntax highlighting patterns.
   - Changed the beginning-of-line match pattern of some patterns from `\s` to `(^|\\s)`.
   - Updated regular expression in hostname to exclude irrelevant matches.
 
+## [0.3.4] - 2021-12-10
 
-## 0.3.4 (2021-12-10)
 ### Added
+
 - Add Command symbol to outline panel.
+
 ### Changed
+
 - Update syntax highlighting patterns.
   - Update route-map, prefix-list patterns.
 - Symbol info object moved to symbolsInfo.ts file.
 
+## [0.3.3] - 2021-11-07
 
-## 0.3.3 (2021-11-07)
 ### Changed
+
 - Update outline symbol pattern.
   - Exclude vrf forwarding from ip vrf outline symbol.
 
+## [0.3.2] - 2021-11-07
 
-## 0.3.2 (2021-11-07)
-### Changed
+### Added
+
 - Update outline symbol.
   - Add vrf symbol.
 
+## [0.3.1] - 2021-10-11
 
-## 0.3.1 (2021-10-11)
 ### Changed
+
 - Update syntax highlighting patterns.
   - Add logging system message pattern.
   - Add interface patterns. (BRI, BVI)
   - Update status pattern. (add first character uppercase.)
 
+## [0.3.0] - 2021-09-14
 
-## 0.3.0 (2021-09-14)
 ### Added
+
 - Add a list to the config to toggle which symbols to enable.
+
 ### Changed
+
 - Changed to use TypeScript.
 
+## [0.2.0] - 2021-07-12
 
-## 0.2.0 (2021-07-12)
-### Changed
+### Added
+
 - Add the feature to show symbols in the outline panel.
 - Add `showSymbolsInOutlinePanel` to configuration.
 
+## [0.1.5] - 2021-05-27
 
-## 0.1.5 (2021-05-27)
 ### Changed
+
 - Update syntax highlighting patterns.
   - Add interface async patterns
   - Add string patterns
   - Update patterns
+
 ### Removed
+
 - remove comment patterns from `language-configuration.json`.
 
+## [0.1.4] - 2021-05-25
 
-## 0.1.4 (2021-05-25)
 ### Changed
+
 - Update syntax highlighting patterns.
   - Add interface dialer patterns
   - Change key names
   - Update patterns
 
+## [0.1.3] - 2021-05-23
 
-## 0.1.3 (2021-05-23)
 ### Changed
+
 - Update syntax highlighting patterns.
   - Add bgp pattern
   - Add acl pattern
   - Add string pattern
   - Update patterns
 
+## [0.1.2] - 2021-05-22
 
-## 0.1.2 (2021-05-22)
 ### Changed
+
 - Update syntax highlighting patterns.
   - Add patterns
   - Change key names
   - Update patterns
 
-## 0.1.1 (2021-05-22)
+## [0.1.1] - 2021-05-22
+
 ### Changed
+
 - Update syntax highlighting patterns.
   - Add patterns
   - Change key names
   - Update patterns
 
-## 0.1.0 (2021-05-21)
+## [0.1.0] - 2021-05-21
+
 ### Added
+
 - Add syntax highlighting patterns.
 
-## 0.0.1 (2021-03-29)
-- Initial release
+## [0.0.1] - 2021-03-29
+
+### Added
+
+- Initial release.
+
+[0.9.2]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.9.1...v0.9.2
+[0.9.1]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.9.0...v0.9.1
+[0.9.0]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.8.2...v0.9.0
+[0.8.2]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.7.1...v0.8.0
+[0.7.1]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.6.1...v0.7.0
+[0.6.1]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/Y-Ysss/vscode-cisco-config-highlight/releases/tag/v0.5.0
+[0.4.1]: #041---2022-06-10
+[0.4.0]: #040---2022-06-04
+[0.3.5]: #035---2021-12-12
+[0.3.4]: #034---2021-12-10
+[0.3.3]: #033---2021-11-07
+[0.3.2]: #032---2021-11-07
+[0.3.1]: #031---2021-10-11
+[0.3.0]: #030---2021-09-14
+[0.2.0]: #020---2021-07-12
+[0.1.5]: #015---2021-05-27
+[0.1.4]: #014---2021-05-25
+[0.1.3]: #013---2021-05-23
+[0.1.2]: #012---2021-05-22
+[0.1.1]: #011---2021-05-22
+[0.1.0]: #010---2021-05-21
+[0.0.1]: #001---2021-03-29
